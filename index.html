@@ -1,0 +1,2146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>프로의 일지</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --card: #1a2332;
+      --border: #2d3a4f;
+      --text: #e8edf4;
+      --muted: #8b9cb3;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --admin: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    .app-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+    .sidebar {
+      width: 200px;
+      flex-shrink: 0;
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      padding: 20px 14px;
+      position: sticky;
+      top: 0;
+      align-self: flex-start;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-date-picker {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .sidebar-date-picker label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .sidebar-date-picker select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.88rem;
+      margin-bottom: 0;
+    }
+    .sidebar-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+    .sidebar-date {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .sidebar-list { list-style: none; }
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 4px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+    }
+    .sidebar-item.active {
+      background: rgba(59, 130, 246, 0.15);
+    }
+    .sidebar-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--muted);
+      pointer-events: none;
+      flex-shrink: 0;
+    }
+    .sidebar-item.has-checked input[type="checkbox"] {
+      accent-color: var(--success);
+      box-shadow: none;
+    }
+    .sidebar-item.has-items-only input[type="checkbox"] {
+      accent-color: var(--muted);
+      box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.65);
+      border-radius: 3px;
+    }
+    .sidebar-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 14px 0;
+    }
+    .sidebar-legend {
+      font-size: 0.65rem;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-top: 12px;
+    }
+    .sidebar-legend span { display: block; }
+    .sidebar-item .name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .sidebar-item .name-link {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text);
+      font: inherit;
+      text-align: left;
+      padding: 0;
+    }
+    .sidebar-item .name-link:hover {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+    .sidebar-item.active .name-link {
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .sidebar-empty {
+      font-size: 0.8rem;
+      color: var(--muted);
+      padding: 8px 4px;
+    }
+    .sidebar-item-status {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .sidebar-load-spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    .sidebar-item.is-loading .name-link {
+      color: var(--muted);
+    }
+    .main-area {
+      flex: 1;
+      padding: 24px 16px 48px;
+      min-width: 0;
+    }
+    .container { max-width: 560px; margin: 0 auto; }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 8px;
+      cursor: default;
+      user-select: none;
+    }
+    h1.admin-hint { color: var(--admin); }
+    .subtitle {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 28px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    input[type="text"],
+    input[type="password"],
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 1rem;
+      margin-bottom: 12px;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .task-input-wrap { margin-top: 8px; }
+    .task-input-wrap input { margin-bottom: 0; }
+    .hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .task-list { list-style: none; margin-top: 16px; }
+    .task-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .task-item.is-pending { opacity: 0.92; }
+    .task-item.is-new {
+      animation: taskSlideIn 0.28s ease;
+    }
+    @keyframes taskSlideIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .task-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px 8px;
+      min-width: 0;
+    }
+    .task-item:last-child { border-bottom: none; }
+    .task-state-btn {
+      width: 22px;
+      height: 22px;
+      margin-top: 1px;
+      flex-shrink: 0;
+      border: 2px solid var(--border);
+      border-radius: 5px;
+      background: var(--bg);
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .task-state-btn.state-checked {
+      background: var(--success);
+      border-color: var(--success);
+      color: #fff;
+    }
+    .task-state-btn.state-checked .task-state-icon {
+      font-size: 0.8rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .task-state-btn.state-triangle {
+      border-color: #f59e0b;
+      background: rgba(245, 158, 11, 0.18);
+      color: #fbbf24;
+    }
+    .task-state-btn.state-triangle .task-state-icon {
+      font-size: 0.95rem;
+      line-height: 1;
+      font-weight: 700;
+    }
+    .task-item.is-modifying .task-state-btn,
+    .task-item.is-deleting .task-state-btn { pointer-events: none; opacity: 0.7; }
+    .task-item.is-modifying .task-delete { display: none; }
+    .task-saving.task-modifying { color: var(--accent); }
+    .task-saving.task-modifying .save-spinner { border-top-color: var(--accent); }
+    .task-item label.task-text {
+      flex: 1;
+      cursor: pointer;
+      font-size: 0.95rem;
+      margin: 0;
+      color: var(--text);
+      min-width: 0;
+      word-break: break-word;
+    }
+    .task-delete {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      margin-left: auto;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 1.15rem;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .task-delete:hover {
+      color: var(--danger);
+      background: rgba(239, 68, 68, 0.15);
+    }
+    .task-item.is-pending .task-delete,
+    .task-item.is-deleting .task-delete { display: none; }
+    .task-item.is-deleting { opacity: 0.88; }
+    .task-saving.task-deleting { color: #f87171; }
+    .task-saving.task-deleting .save-spinner {
+      border-top-color: #f87171;
+    }
+    .task-item.done label.task-text {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+    .task-saving {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+    .save-spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+    .task-saving.done-save {
+      color: var(--success);
+      animation: saveFadeOut 0.5s ease forwards;
+    }
+    .task-saving.done-save .save-spinner {
+      border: none;
+      width: auto;
+      height: auto;
+      animation: none;
+    }
+    .task-saving.done-save .save-spinner::before {
+      content: '✓';
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+    @keyframes saveFadeOut {
+      0% { opacity: 1; }
+      70% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 24px 0;
+      font-size: 0.9rem;
+    }
+    .date-badge {
+      display: inline-block;
+      background: var(--border);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      margin-bottom: 12px;
+    }
+    .chart-wrap {
+      position: relative;
+      height: 220px;
+      margin-top: 8px;
+    }
+    .chart-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      border-radius: 8px;
+      background: rgba(15, 20, 25, 0.55);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .chart-overlay.visible {
+      display: flex;
+    }
+    .chart-overlay.initial {
+      background: rgba(26, 35, 50, 0.92);
+    }
+    .chart-overlay-text {
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+    .chart-overlay .chart-overlay-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+    .chart-error-msg {
+      display: none;
+      text-align: center;
+      color: #fca5a5;
+      font-size: 0.85rem;
+      padding: 12px 0 0;
+    }
+    .chart-error-msg.show { display: block; }
+    .task-loading {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      padding: 20px 0;
+    }
+    .task-loading { padding: 12px 0; }
+    .skeleton-line {
+      height: 14px;
+      border-radius: 6px;
+      background: linear-gradient(90deg, var(--border) 25%, #3d4d66 50%, var(--border) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      margin: 10px 0;
+    }
+    .skeleton-line.short { width: 55%; }
+    .skeleton-line.mid { width: 78%; }
+    @keyframes shimmer {
+      0% { background-position: 100% 0; }
+      100% { background-position: -100% 0; }
+    }
+    .section-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--muted);
+    }
+    .summary {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .summary-box {
+      flex: 1;
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+    .summary-box .num { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+    .summary-box .lbl { font-size: 0.7rem; color: var(--muted); }
+    .btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+    .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+    .admin-panel { display: none; border-color: var(--admin); }
+    .admin-panel.show { display: block; }
+    .admin-panel h2 { font-size: 1rem; color: var(--admin); margin-bottom: 16px; }
+    .user-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg);
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+    }
+    .chip button {
+      background: none;
+      border: none;
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      padding: 0 2px;
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+    }
+    .error {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .error.show { display: block; }
+    .name-locked .name-edit { display: none; }
+    .name-locked .name-display {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .name-display { display: none; }
+    .name-display strong { font-size: 1.1rem; }
+    .link-btn {
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-size: 0.8rem;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    body.is-busy { overflow: hidden; }
+    body.is-busy .app-layout { pointer-events: none; }
+    @media (max-width: 720px) {
+      .app-layout { flex-direction: column; }
+      .sidebar {
+        width: 100%;
+        min-height: auto;
+        position: static;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .sidebar-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 12px;
+      }
+      .sidebar-item { padding: 4px 0; }
+    }
+    .busy-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(15, 20, 25, 0.72);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .busy-overlay.visible {
+      display: flex;
+      pointer-events: all;
+    }
+    .busy-spinner {
+      width: 44px;
+      height: 44px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .busy-message {
+      color: var(--text);
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+    .busy-sub {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <p class="sidebar-title">오늘 일지</p>
+      <p class="sidebar-date" id="sidebarTodayDate"></p>
+      <ul class="sidebar-list" id="diaryTodayList"></ul>
+      <p class="sidebar-legend">
+        <span>☐ 미작성</span>
+        <span>☐ 초록 테두리 · 항목만 추가</span>
+        <span>☑ 초록 · 1개 이상 체크</span>
+      </p>
+      <div class="sidebar-divider"></div>
+      <p class="sidebar-title">어제 일지</p>
+      <p class="sidebar-date" id="sidebarYesterdayDate"></p>
+      <ul class="sidebar-list" id="diaryYesterdayList"></ul>
+      <p class="sidebar-legend">
+        <span>☐ 미작성</span>
+        <span>☐ 초록 테두리 · 항목만 추가</span>
+        <span>☑ 초록 · 1개 이상 체크</span>
+      </p>
+      <div class="sidebar-date-picker">
+        <label for="viewDateSelect">일지 날짜</label>
+        <select id="viewDateSelect" aria-label="일지 날짜 선택"></select>
+      </div>
+    </aside>
+    <div class="main-area">
+  <div class="container">
+    <h1 id="pageTitle">프로의 일지</h1>
+    <p class="subtitle" id="todayLabel"></p>
+
+    <div id="errorBox" class="error"></div>
+
+    <div id="mainView">
+      <div class="card" id="nameCard">
+        <label for="userName">이름</label>
+        <div class="name-edit">
+          <select id="userSelect" style="display:none;">
+            <option value="">이름 선택</option>
+          </select>
+          <input type="text" id="userName" placeholder="이름을 입력하세요" autocomplete="name">
+        </div>
+        <div class="name-display">
+          <strong id="displayName"></strong>
+          <button type="button" class="link-btn" id="changeNameBtn">이름 변경</button>
+        </div>
+        <p class="hint" id="nameHint">이름을 선택하면 이 컴퓨터·브라우저에 저장되어, 다음 접속 시 마지막으로 선택한 이름이 자동으로 선택됩니다.</p>
+      </div>
+
+      <div class="card" id="taskCard" style="display:none;">
+        <span class="date-badge" id="dateBadge"></span>
+        <div class="summary">
+          <div class="summary-box">
+            <div class="num" id="todayPercent">0%</div>
+            <div class="lbl">오늘 완료율</div>
+          </div>
+          <div class="summary-box">
+            <div class="num" id="todayCount">0/0</div>
+            <div class="lbl">완료 / 전체</div>
+          </div>
+        </div>
+        <label for="taskInput">오늘 할 일</label>
+        <div class="task-input-wrap">
+          <input type="text" id="taskInput" placeholder="할 일 입력 후 Enter">
+        </div>
+        <p class="hint">Enter 키를 누르면 바로 항목이 추가됩니다.</p>
+        <p class="task-loading" id="taskLoading" style="display:none;">할 일 불러오는 중...</p>
+        <ul class="task-list" id="taskList"></ul>
+        <p class="empty" id="emptyTasks" style="display:none;">아직 할 일이 없습니다. 위에 입력 후 Enter를 눌러주세요.</p>
+      </div>
+
+      <div class="card" id="chartCard" style="display:none;">
+        <p class="section-title">일별 작업 완료율 (%)</p>
+        <div class="chart-wrap" id="chartWrap">
+          <canvas id="progressChart"></canvas>
+          <div class="chart-overlay initial" id="chartOverlay">
+            <div class="chart-overlay-spinner"></div>
+            <span class="chart-overlay-text" id="chartOverlayText">그래프 불러오는 중...</span>
+          </div>
+        </div>
+        <p class="chart-error-msg" id="chartErrorMsg"></p>
+      </div>
+    </div>
+
+    <div class="card admin-panel" id="adminPanel">
+      <h2>관리자 모드</h2>
+      <label for="newUserName">새 사용자 추가</label>
+      <input type="text" id="newUserName" placeholder="추가할 이름">
+      <button type="button" class="btn btn-primary" id="addUserBtn">사용자 추가</button>
+      <p class="section-title" style="margin-top:20px;">등록된 사용자</p>
+      <div class="user-chips" id="userChips"></div>
+      <p style="margin-top:16px;">
+        <button type="button" class="link-btn" id="closeAdminBtn">관리자 모드 닫기</button>
+      </p>
+    </div>
+
+  </div>
+    </div>
+  </div>
+
+  <div id="busyOverlay" class="busy-overlay" aria-live="polite" aria-busy="true">
+    <div class="busy-spinner"></div>
+    <p class="busy-message" id="busyMessage">진행 중...</p>
+    <p class="busy-sub">잠시만 기다려 주세요</p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    (function () {
+      var STORAGE_KEY = 'proDiary_userName';
+      var STORAGE_VIEW_DATE = 'proDiary_viewDate';
+      var VIEW_DATE_DAYS = 90;
+      var CACHE_USERS = 'proDiary_users';
+      var CACHE_SIDEBAR = 'proDiary_sidebar_';
+      var CACHE_TASKS = 'proDiary_tasks_';
+      var CACHE_CHART = 'proDiary_chart_';
+      var CHART_DAYS = 14;
+      var titleClickCount = 0;
+      var titleClickTimer = null;
+      var chart = null;
+      var chartJsPromise = null;
+      var currentUser = '';
+      var viewDate = '';
+      var users = [];
+      var busyCount = 0;
+      var busyHideTimer = null;
+      var chartLoadToken = 0;
+      var pendingIdCounter = 0;
+
+      var el = {
+        title: document.getElementById('pageTitle'),
+        todayLabel: document.getElementById('todayLabel'),
+        errorBox: document.getElementById('errorBox'),
+        mainView: document.getElementById('mainView'),
+        nameCard: document.getElementById('nameCard'),
+        userSelect: document.getElementById('userSelect'),
+        userName: document.getElementById('userName'),
+        displayName: document.getElementById('displayName'),
+        changeNameBtn: document.getElementById('changeNameBtn'),
+        nameHint: document.getElementById('nameHint'),
+        taskCard: document.getElementById('taskCard'),
+        dateBadge: document.getElementById('dateBadge'),
+        taskInput: document.getElementById('taskInput'),
+        taskList: document.getElementById('taskList'),
+        emptyTasks: document.getElementById('emptyTasks'),
+        todayPercent: document.getElementById('todayPercent'),
+        todayCount: document.getElementById('todayCount'),
+        chartCard: document.getElementById('chartCard'),
+        chartWrap: document.getElementById('chartWrap'),
+        chartOverlay: document.getElementById('chartOverlay'),
+        chartOverlayText: document.getElementById('chartOverlayText'),
+        chartErrorMsg: document.getElementById('chartErrorMsg'),
+        taskLoading: document.getElementById('taskLoading'),
+        adminPanel: document.getElementById('adminPanel'),
+        newUserName: document.getElementById('newUserName'),
+        addUserBtn: document.getElementById('addUserBtn'),
+        userChips: document.getElementById('userChips'),
+        closeAdminBtn: document.getElementById('closeAdminBtn'),
+        busyOverlay: document.getElementById('busyOverlay'),
+        busyMessage: document.getElementById('busyMessage'),
+        sidebar: document.getElementById('sidebar'),
+        viewDateSelect: document.getElementById('viewDateSelect'),
+        sidebarTodayDate: document.getElementById('sidebarTodayDate'),
+        sidebarYesterdayDate: document.getElementById('sidebarYesterdayDate'),
+        diaryTodayList: document.getElementById('diaryTodayList'),
+        diaryYesterdayList: document.getElementById('diaryYesterdayList')
+      };
+
+      function setBusy(active, message) {
+        if (active) {
+          clearTimeout(busyHideTimer);
+          busyHideTimer = null;
+          busyCount++;
+          if (message) el.busyMessage.textContent = message;
+          el.busyOverlay.classList.add('visible');
+          el.busyOverlay.setAttribute('aria-busy', 'true');
+          document.body.classList.add('is-busy');
+        } else {
+          busyCount = Math.max(0, busyCount - 1);
+          if (busyCount === 0) {
+            busyHideTimer = setTimeout(function () {
+              el.busyOverlay.classList.remove('visible');
+              el.busyOverlay.setAttribute('aria-busy', 'false');
+              document.body.classList.remove('is-busy');
+              el.busyMessage.textContent = '진행 중...';
+            }, 120);
+          }
+        }
+      }
+
+      function showError(msg) {
+        el.errorBox.textContent = msg;
+        el.errorBox.classList.add('show');
+        setTimeout(function () { el.errorBox.classList.remove('show'); }, 5000);
+      }
+
+      function todayStr() {
+        var d = new Date();
+        return d.getFullYear() + '-' +
+          String(d.getMonth() + 1).padStart(2, '0') + '-' +
+          String(d.getDate()).padStart(2, '0');
+      }
+
+      function yesterdayStr() {
+        var d = new Date();
+        d.setDate(d.getDate() - 1);
+        return d.getFullYear() + '-' +
+          String(d.getMonth() + 1).padStart(2, '0') + '-' +
+          String(d.getDate()).padStart(2, '0');
+      }
+
+      function dateFromOffset(daysAgo) {
+        var d = new Date();
+        d.setDate(d.getDate() - daysAgo);
+        return d.getFullYear() + '-' +
+          String(d.getMonth() + 1).padStart(2, '0') + '-' +
+          String(d.getDate()).padStart(2, '0');
+      }
+
+      function loadViewDate() {
+        try {
+          var saved = localStorage.getItem(STORAGE_VIEW_DATE);
+          if (saved) return saved;
+        } catch (e) { /* ignore */ }
+        return todayStr();
+      }
+
+      function saveViewDate(dateStr) {
+        viewDate = dateStr;
+        try {
+          localStorage.setItem(STORAGE_VIEW_DATE, dateStr);
+        } catch (e) { /* ignore */ }
+      }
+
+      function formatDateOptionLabel(dateStr) {
+        var today = todayStr();
+        var yest = yesterdayStr();
+        if (dateStr === today) return '오늘 (' + dateStr + ')';
+        if (dateStr === yest) return '어제 (' + dateStr + ')';
+        var p = dateStr.split('-');
+        return p[0] + '년 ' + parseInt(p[1], 10) + '월 ' + parseInt(p[2], 10) + '일';
+      }
+
+      function populateViewDateSelect() {
+        el.viewDateSelect.innerHTML = '';
+        for (var d = 0; d < VIEW_DATE_DAYS; d++) {
+          var key = dateFromOffset(d);
+          var opt = document.createElement('option');
+          opt.value = key;
+          opt.textContent = formatDateOptionLabel(key);
+          el.viewDateSelect.appendChild(opt);
+        }
+        if (viewDate && el.viewDateSelect.querySelector('option[value="' + viewDate + '"]')) {
+          el.viewDateSelect.value = viewDate;
+        } else {
+          el.viewDateSelect.value = todayStr();
+          viewDate = todayStr();
+        }
+      }
+
+      function updateDateBadge() {
+        if (!el.dateBadge) return;
+        if (viewDate === todayStr()) {
+          el.dateBadge.textContent = '오늘 · ' + viewDate;
+        } else {
+          el.dateBadge.textContent = formatDateOptionLabel(viewDate);
+        }
+      }
+
+      function loadViewDateTasks() {
+        if (!currentUser) return Promise.resolve();
+        var cached = loadTasksCache();
+        if (cached) {
+          renderTasks(cached);
+        } else {
+          showTaskSkeleton();
+        }
+        return runSilent('getTasks', [currentUser, viewDate])
+          .then(function (tasks) {
+            renderTasks(tasks);
+            saveTasksCache(tasks);
+            if (viewDate === todayStr()) {
+              patchTodaySidebarFromTasks(tasks);
+            }
+          })
+          .catch(function (e) {
+            el.taskLoading.style.display = 'none';
+            if (!loadTasksCache()) showError(e.message || String(e));
+          });
+      }
+
+      function onViewDateChange() {
+        var next = el.viewDateSelect.value;
+        if (!next || next === viewDate) return;
+        saveViewDate(next);
+        updateDateBadge();
+        if (!currentUser || el.taskCard.style.display === 'none') return;
+        loadViewDateTasks();
+        scheduleChartLoad();
+      }
+
+      function namesMatch(a, b) {
+        return String(a || '').trim() === String(b || '').trim();
+      }
+
+      function normalizeDiaryItem(item) {
+        item = item || {};
+        var hasItems = !!(item.hasItems || item.hasDiary);
+        var hasChecked = item.hasChecked === true ||
+          item.hasChecked === 'true' || item.hasChecked === 'TRUE';
+        return {
+          name: String(item.name || '').trim(),
+          hasItems: hasItems,
+          hasChecked: hasChecked
+        };
+      }
+
+      function normalizeSidebarData(data) {
+        if (!data) return null;
+        if (data.today && data.yesterday) {
+          return {
+            todayDate: data.todayDate || todayStr(),
+            yesterdayDate: data.yesterdayDate || yesterdayStr(),
+            today: (data.today || []).map(normalizeDiaryItem),
+            yesterday: (data.yesterday || []).map(normalizeDiaryItem)
+          };
+        }
+        if (Array.isArray(data)) {
+          return {
+            todayDate: todayStr(),
+            yesterdayDate: yesterdayStr(),
+            today: data.map(normalizeDiaryItem),
+            yesterday: []
+          };
+        }
+        return null;
+      }
+
+      function getTaskState(t) {
+        if (t.state === 'checked' || t.state === 'triangle' || t.state === 'none') {
+          return t.state;
+        }
+        if (t.completed) return 'checked';
+        return 'none';
+      }
+
+      function nextStateClient(state) {
+        if (state === 'none') return 'checked';
+        if (state === 'checked') return 'triangle';
+        return 'none';
+      }
+
+      function isTaskCompleted(t) {
+        if (!t) return false;
+        if (t.state) return t.state === 'checked';
+        var c = t.completed;
+        return c === true || c === 'TRUE' || c === 'true' || c === 1 || c === '1';
+      }
+
+      function applyTaskRowState(li, state) {
+        li.dataset.state = state;
+        li.classList.remove('done', 'state-triangle');
+        var btn = li.querySelector('.task-state-btn');
+        if (!btn) return;
+        var icon = btn.querySelector('.task-state-icon');
+        btn.className = 'task-state-btn state-' + state;
+        if (state === 'checked') {
+          li.classList.add('done');
+          if (icon) icon.textContent = '✓';
+        } else if (state === 'triangle') {
+          li.classList.add('state-triangle');
+          if (icon) icon.textContent = '△';
+        } else {
+          if (icon) icon.textContent = '';
+        }
+      }
+
+      function getTodayTasksFromDOM() {
+        var tasks = [];
+        el.taskList.querySelectorAll('.task-item:not(.is-pending)').forEach(function (li) {
+          var lbl = li.querySelector('.task-text');
+          var state = li.dataset.state || 'none';
+          if (lbl) {
+            tasks.push({
+              text: lbl.textContent,
+              state: state,
+              completed: state === 'checked'
+            });
+          }
+        });
+        return tasks;
+      }
+
+      function showTaskModifying(li) {
+        li.classList.add('is-modifying');
+        var stateBtn = li.querySelector('.task-state-btn');
+        if (stateBtn) stateBtn.disabled = true;
+        var delBtn = li.querySelector('.task-delete');
+        if (delBtn) delBtn.style.display = 'none';
+
+        var content = li.querySelector('.task-content');
+        var existing = content.querySelector('.task-modifying');
+        if (existing) return existing;
+
+        var modifying = document.createElement('span');
+        modifying.className = 'task-saving task-modifying';
+        modifying.innerHTML = '<span class="save-spinner"></span>수정 중';
+        content.appendChild(modifying);
+        return modifying;
+      }
+
+      function clearTaskModifying(li, modifyingEl) {
+        li.classList.remove('is-modifying');
+        var stateBtn = li.querySelector('.task-state-btn');
+        if (stateBtn) stateBtn.disabled = false;
+        var delBtn = li.querySelector('.task-delete');
+        if (delBtn) delBtn.style.display = '';
+        if (modifyingEl && modifyingEl.parentNode) {
+          modifyingEl.parentNode.removeChild(modifyingEl);
+        }
+      }
+
+      function diaryStatusFromTasks(tasks) {
+        var list = tasks || [];
+        var hasItems = list.length > 0;
+        var hasChecked = list.some(function (t) { return isTaskCompleted(t); });
+        return { hasItems: hasItems, hasChecked: hasChecked };
+      }
+
+      /** 오늘·현재 보고 있는 사용자는 화면 할 일 목록 기준으로 상태 확정 */
+      function resolveSidebarItemStatus(item, label) {
+        item = normalizeDiaryItem(item);
+        if (label !== '오늘' || !namesMatch(item.name, currentUser) || viewDate !== todayStr()) {
+          return item;
+        }
+        if (el.taskCard.style.display === 'none') {
+          return item;
+        }
+        var tasks = getTodayTasksFromDOM();
+        if (!tasks.length) {
+          tasks = loadTasksCache() || [];
+        }
+        if (tasks.length) {
+          return {
+            name: item.name,
+            hasItems: true,
+            hasChecked: tasks.some(isTaskCompleted)
+          };
+        }
+        return item;
+      }
+
+      function patchTodaySidebarFromTasks(tasks) {
+        if (!currentUser || viewDate !== todayStr()) return;
+        var status = diaryStatusFromTasks(tasks || []);
+        var todayItem = {
+          name: currentUser,
+          hasItems: status.hasItems,
+          hasChecked: status.hasChecked
+        };
+        applySidebarRow(findSidebarRow(currentUser, 'today'), todayItem, '오늘');
+        var cache = loadSidebarUsersCache() || {
+          todayDate: todayStr(),
+          yesterdayDate: yesterdayStr(),
+          users: {}
+        };
+        if (!cache.users) cache.users = {};
+        var prev = cache.users[currentUser] || {};
+        cache.users[currentUser] = {
+          today: todayItem,
+          yesterday: prev.yesterday || normalizeDiaryItem({ name: currentUser })
+        };
+        saveSidebarCache(cache);
+      }
+
+      function formatTodayKorean() {
+        var d = new Date();
+        var days = ['일', '월', '화', '수', '목', '금', '토'];
+        return d.getFullYear() + '년 ' + (d.getMonth() + 1) + '월 ' + d.getDate() + '일 (' + days[d.getDay()] + ')';
+      }
+
+      function run(fn, args, message) {
+        setBusy(true, message || '진행 중...');
+        return runSilent(fn, args).finally(function () {
+          setBusy(false);
+        });
+      }
+
+      function runSilent(fn, args) {
+        return new Promise(function (resolve, reject) {
+          if (!window.ProDiaryApi || !window.ProDiaryApi.isReady()) {
+            reject(new Error('config.js에 Supabase URL과 anon key를 설정해주세요.'));
+            return;
+          }
+          if (typeof window.ProDiaryApi[fn] !== 'function') {
+            reject(new Error('API 함수를 찾을 수 없습니다: ' + fn));
+            return;
+          }
+          Promise.resolve(window.ProDiaryApi[fn].apply(null, args || []))
+            .then(resolve)
+            .catch(function (e) {
+              reject(new Error(e && e.message ? e.message : String(e)));
+            });
+        });
+      }
+
+      function setNameLocked(locked) {
+        if (locked) {
+          el.nameCard.classList.add('name-locked');
+          el.displayName.textContent = currentUser;
+        } else {
+          el.nameCard.classList.remove('name-locked');
+        }
+      }
+
+      function saveUserName(name) {
+        name = String(name || '').trim();
+        if (!name) return;
+        try {
+          localStorage.setItem(STORAGE_KEY, name);
+        } catch (e) { /* private mode 등 */ }
+        currentUser = name;
+      }
+
+      function loadUserName() {
+        try {
+          return localStorage.getItem(STORAGE_KEY) || '';
+        } catch (e) {
+          return '';
+        }
+      }
+
+      function saveUsersCache(list) {
+        try {
+          localStorage.setItem(CACHE_USERS, JSON.stringify(list || []));
+        } catch (e) { /* ignore */ }
+      }
+
+      function loadUsersCache() {
+        try {
+          var raw = localStorage.getItem(CACHE_USERS);
+          return raw ? JSON.parse(raw) : null;
+        } catch (e) { return null; }
+      }
+
+      function saveTasksCache(tasks) {
+        if (!currentUser || !viewDate) return;
+        try {
+          localStorage.setItem(
+            CACHE_TASKS + currentUser + '_' + viewDate,
+            JSON.stringify(tasks || [])
+          );
+        } catch (e) { /* ignore */ }
+      }
+
+      function loadTasksCache() {
+        if (!currentUser || !viewDate) return null;
+        try {
+          var raw = localStorage.getItem(CACHE_TASKS + currentUser + '_' + viewDate);
+          return raw ? JSON.parse(raw) : null;
+        } catch (e) { return null; }
+      }
+
+      function saveSidebarCache(status) {
+        try {
+          localStorage.setItem(CACHE_SIDEBAR + todayStr(), JSON.stringify(status || {}));
+        } catch (e) { /* ignore */ }
+      }
+
+      function loadSidebarCache() {
+        try {
+          var raw = localStorage.getItem(CACHE_SIDEBAR + todayStr());
+          return raw ? JSON.parse(raw) : null;
+        } catch (e) { return null; }
+      }
+
+      function loadSidebarUsersCache() {
+        var raw = loadSidebarCache();
+        if (!raw) return null;
+        if (raw.users) return raw;
+        var norm = normalizeSidebarData(raw);
+        if (!norm) return null;
+        var usersMap = {};
+        (norm.today || []).forEach(function (item, i) {
+          var yItem = (norm.yesterday || [])[i] ||
+            normalizeDiaryItem({ name: item.name });
+          usersMap[item.name] = { today: item, yesterday: yItem };
+        });
+        return {
+          todayDate: norm.todayDate,
+          yesterdayDate: norm.yesterdayDate,
+          users: usersMap
+        };
+      }
+
+      function saveUserSidebarCache(userName, data) {
+        var cache = loadSidebarUsersCache() || {
+          todayDate: todayStr(),
+          yesterdayDate: yesterdayStr(),
+          users: {}
+        };
+        if (!cache.users) cache.users = {};
+        cache.users[userName] = {
+          today: normalizeDiaryItem(data.today || { name: userName }),
+          yesterday: normalizeDiaryItem(data.yesterday || { name: userName })
+        };
+        saveSidebarCache(cache);
+      }
+
+      function showTaskSkeleton() {
+        el.taskLoading.style.display = 'none';
+        el.taskList.innerHTML =
+          '<li class="skeleton-line mid"></li>' +
+          '<li class="skeleton-line short"></li>';
+        el.emptyTasks.style.display = 'none';
+      }
+
+      function applyCachedBootData() {
+        var cachedUsers = loadUsersCache();
+        if (cachedUsers && cachedUsers.length) {
+          users = cachedUsers;
+          populateUserSelect();
+          el.mainView.style.display = 'block';
+        }
+        if (!currentUser) return;
+        var cachedTasks = loadTasksCache();
+        if (cachedTasks) {
+          el.taskLoading.style.display = 'none';
+          renderTasks(cachedTasks);
+        } else {
+          showTaskSkeleton();
+        }
+      }
+
+      function bootstrapFromServer(userName) {
+        return runSilent('getBootstrapData', [userName || '', viewDate || todayStr()])
+          .then(function (data) {
+            data = data || {};
+            users = data.users || [];
+            saveUsersCache(users);
+            populateUserSelect();
+            el.mainView.style.display = 'block';
+
+            if (userName) {
+              if (users.length > 0 && users.indexOf(userName) === -1) {
+                el.taskCard.style.display = 'none';
+                el.chartCard.style.display = 'none';
+                setNameLocked(false);
+                el.userName.value = userName;
+                return;
+              }
+              currentUser = userName;
+              applySavedNameToSelect();
+              renderTasks(data.tasks || []);
+              saveTasksCache(data.tasks);
+            }
+
+            if (users.length) {
+              loadSidebarPerUser();
+            } else {
+              el.sidebar.style.display = 'none';
+            }
+          });
+      }
+
+      /** 오늘 포함 최근 14일. 같은 날에는 캐시에 고정해 축 일자가 안 바뀌게 함 */
+      function computeChartDateRange() {
+        var dates = [];
+        for (var d = CHART_DAYS - 1; d >= 0; d--) {
+          var dt = new Date();
+          dt.setDate(dt.getDate() - d);
+          dates.push(
+            dt.getFullYear() + '-' +
+            String(dt.getMonth() + 1).padStart(2, '0') + '-' +
+            String(dt.getDate()).padStart(2, '0')
+          );
+        }
+        return dates;
+      }
+
+      function getChartDateRange() {
+        var today = todayStr();
+        var cache = loadChartCache();
+        if (
+          cache.rangeAnchor === today &&
+          cache.rangeDates &&
+          cache.rangeDates.length === CHART_DAYS
+        ) {
+          return cache.rangeDates.slice();
+        }
+        var dates = computeChartDateRange();
+        cache.rangeAnchor = today;
+        cache.rangeDates = dates;
+        saveChartCache(cache);
+        return dates;
+      }
+
+      function loadChartCache() {
+        if (!currentUser) return { days: {} };
+        try {
+          var raw = localStorage.getItem(CACHE_CHART + currentUser);
+          return raw ? JSON.parse(raw) : { days: {} };
+        } catch (e) {
+          return { days: {} };
+        }
+      }
+
+      function saveChartCache(cache) {
+        if (!currentUser) return;
+        try {
+          localStorage.setItem(CACHE_CHART + currentUser, JSON.stringify(cache || { days: {} }));
+        } catch (e) { /* ignore */ }
+      }
+
+      function statFromCacheEntry(date, entry) {
+        return {
+          date: date,
+          total: entry.total || 0,
+          completed: entry.completed || 0,
+          percent: entry.percent || 0
+        };
+      }
+
+      function buildChartStats(cache, dates, todayOverride) {
+        var today = todayStr();
+        return dates.map(function (d) {
+          if (todayOverride && d === today) return todayOverride;
+          if (cache.days[d]) return statFromCacheEntry(d, cache.days[d]);
+          return { date: d, total: 0, completed: 0, percent: 0 };
+        });
+      }
+
+      function cacheDayStat(cache, stat) {
+        if (!stat || !stat.date) return;
+        cache.days[stat.date] = {
+          total: stat.total,
+          completed: stat.completed,
+          percent: stat.percent
+        };
+      }
+
+      function updateTodayChartFromTasks(tasks) {
+        var done = 0;
+        (tasks || []).forEach(function (t) { if (t.completed) done++; });
+        var total = (tasks || []).length;
+        var stat = {
+          date: todayStr(),
+          total: total,
+          completed: done,
+          percent: total > 0 ? Math.round((done / total) * 100) : 0
+        };
+        var cache = loadChartCache();
+        cacheDayStat(cache, stat);
+        saveChartCache(cache);
+        return stat;
+      }
+
+      function renderChartFromStats(stats, token) {
+        if (!stats) return;
+        if (token !== undefined && token !== chartLoadToken) return;
+        var labels = stats.map(function (s) {
+          var p = s.date.split('-');
+          return parseInt(p[1], 10) + '/' + parseInt(p[2], 10);
+        });
+        var data = stats.map(function (s) { return s.percent; });
+
+        if (chart) chart.destroy();
+        var ctx = document.getElementById('progressChart').getContext('2d');
+        chart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: '완료율 (%)',
+              data: data,
+              backgroundColor: 'rgba(59, 130, 246, 0.7)',
+              borderColor: 'rgba(59, 130, 246, 1)',
+              borderWidth: 1,
+              borderRadius: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 100,
+                ticks: { callback: function (v) { return v + '%'; } }
+              }
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  afterLabel: function (ctx) {
+                    var s = stats[ctx.dataIndex];
+                    return '완료 ' + s.completed + ' / 전체 ' + s.total;
+                  }
+                }
+              }
+            }
+          }
+        });
+        hideChartOverlay();
+        el.chartErrorMsg.classList.remove('show');
+      }
+
+      function showChartOverlay(message, isInitial) {
+        el.chartCard.style.display = 'block';
+        el.chartWrap.style.display = 'block';
+        el.chartOverlayText.textContent = message || '갱신 중...';
+        if (isInitial) {
+          el.chartOverlay.classList.add('initial');
+        } else {
+          el.chartOverlay.classList.remove('initial');
+        }
+        el.chartOverlay.classList.add('visible');
+        el.chartErrorMsg.classList.remove('show');
+      }
+
+      function hideChartOverlay() {
+        el.chartOverlay.classList.remove('visible');
+        el.chartWrap.style.display = 'block';
+      }
+
+      function showChartFromCacheIfAny(token) {
+        if (!currentUser) return false;
+        var cache = loadChartCache();
+        var dates = getChartDateRange();
+        var hasCached = dates.some(function (d) { return !!cache.days[d]; });
+        if (!hasCached) return false;
+
+        el.chartCard.style.display = 'block';
+        el.chartWrap.style.display = 'block';
+        ensureChartJs().then(function () {
+          if (token !== undefined && token !== chartLoadToken) return;
+          renderChartFromStats(buildChartStats(cache, dates), token);
+        });
+        return true;
+      }
+
+      function scheduleChartLoad() {
+        setTimeout(function () { loadChartAsync(); }, 200);
+      }
+
+      function prefetchChartJs() {
+        setTimeout(function () {
+          ensureChartJs().catch(function () { /* ignore */ });
+        }, 800);
+      }
+
+      function applySavedNameToSelect() {
+        var saved = loadUserName();
+        if (!saved) return;
+        if (users.length > 0) {
+          if (users.indexOf(saved) !== -1) {
+            el.userSelect.value = saved;
+          }
+        } else {
+          el.userName.value = saved;
+        }
+      }
+
+      function populateUserSelect() {
+        el.userSelect.innerHTML = '<option value="">이름 선택</option>';
+        users.forEach(function (u) {
+          var opt = document.createElement('option');
+          opt.value = u;
+          opt.textContent = u;
+          el.userSelect.appendChild(opt);
+        });
+        if (users.length > 0) {
+          el.userSelect.style.display = 'block';
+          el.userName.style.display = 'none';
+        } else {
+          el.userSelect.style.display = 'none';
+          el.userName.style.display = 'block';
+        }
+        applySavedNameToSelect();
+      }
+
+      function diaryItemTitle(item, label) {
+        if (!item.hasItems) return label + ' · 미작성';
+        if (item.hasChecked) return label + ' · 항목 추가 · 1개 이상 체크함';
+        return label + ' · 항목 추가함 (미체크)';
+      }
+
+      function findSidebarRow(userName, section) {
+        var list = section === 'yesterday' ? el.diaryYesterdayList : el.diaryTodayList;
+        var rows = list.querySelectorAll('.sidebar-item[data-sidebar-user]');
+        for (var i = 0; i < rows.length; i++) {
+          if (rows[i].getAttribute('data-sidebar-user') === userName) {
+            return rows[i];
+          }
+        }
+        return null;
+      }
+
+      function createSidebarRowShell(userName, section, showLoader) {
+        var label = section === 'yesterday' ? '어제' : '오늘';
+        var li = document.createElement('li');
+        var classes = ['sidebar-item'];
+        if (showLoader) classes.push('is-loading');
+        if (namesMatch(userName, currentUser)) classes.push('active');
+        li.className = classes.join(' ');
+        li.setAttribute('data-sidebar-user', userName);
+        li.setAttribute('data-sidebar-section', section);
+
+        var cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = false;
+        cb.disabled = true;
+
+        var nameBtn = document.createElement('button');
+        nameBtn.type = 'button';
+        nameBtn.className = 'name name-link';
+        nameBtn.textContent = userName;
+        nameBtn.title = userName + ' 일지 보기';
+        nameBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          switchToUser(userName);
+        });
+
+        li.appendChild(cb);
+        li.appendChild(nameBtn);
+
+        if (showLoader) {
+          var statusSlot = document.createElement('span');
+          statusSlot.className = 'sidebar-item-status';
+          statusSlot.setAttribute('aria-label', '불러오는 중');
+          statusSlot.innerHTML = '<span class="sidebar-load-spinner" aria-hidden="true"></span>';
+          li.appendChild(statusSlot);
+        }
+
+        return li;
+      }
+
+      function applySidebarRow(li, item, label) {
+        if (!li) return;
+        item = resolveSidebarItemStatus(item, label);
+        li.classList.remove('is-loading', 'has-checked', 'has-items-only', 'active');
+        if (namesMatch(item.name, currentUser)) li.classList.add('active');
+        if (item.hasChecked) li.classList.add('has-checked');
+        else if (item.hasItems) li.classList.add('has-items-only');
+
+        var cb = li.querySelector('input[type="checkbox"]');
+        if (cb) {
+          cb.checked = item.hasChecked === true;
+          cb.disabled = true;
+          cb.title = diaryItemTitle(item, label);
+        }
+
+        var statusSlot = li.querySelector('.sidebar-item-status');
+        if (statusSlot) statusSlot.remove();
+      }
+
+      function applySidebarUserStatus(userName, todayItem, yesterdayItem) {
+        if (todayItem) {
+          applySidebarRow(findSidebarRow(userName, 'today'), todayItem, '오늘');
+        }
+        if (yesterdayItem) {
+          applySidebarRow(findSidebarRow(userName, 'yesterday'), yesterdayItem, '어제');
+        }
+      }
+
+      function renderSidebarShell(userList, cached) {
+        el.sidebarTodayDate.textContent = todayStr();
+        el.sidebarYesterdayDate.textContent = yesterdayStr();
+        el.diaryTodayList.innerHTML = '';
+        el.diaryYesterdayList.innerHTML = '';
+
+        if (!userList || !userList.length) {
+          el.sidebar.style.display = 'none';
+          return;
+        }
+
+        el.sidebar.style.display = '';
+        userList.forEach(function (name) {
+          var hasCache = cached && cached.users && cached.users[name];
+          el.diaryTodayList.appendChild(createSidebarRowShell(name, 'today', !hasCache));
+          el.diaryYesterdayList.appendChild(createSidebarRowShell(name, 'yesterday', !hasCache));
+          if (hasCache) {
+            applySidebarUserStatus(
+              name,
+              cached.users[name].today,
+              cached.users[name].yesterday
+            );
+          }
+        });
+        updateSidebarActiveState();
+      }
+
+      function loadSidebarPerUser() {
+        if (!users.length) {
+          el.sidebar.style.display = 'none';
+          return;
+        }
+
+        var cached = loadSidebarUsersCache();
+        renderSidebarShell(users, cached);
+
+        users.forEach(function (name) {
+          runSilent('getUserDiaryStatus', [name, todayStr()])
+            .then(function (data) {
+              applySidebarUserStatus(name, data.today, data.yesterday);
+              saveUserSidebarCache(name, data);
+              updateSidebarActiveState();
+            })
+            .catch(function () {
+              var emptyItem = normalizeDiaryItem({ name: name });
+              applySidebarUserStatus(name, emptyItem, emptyItem);
+            });
+        });
+      }
+
+      function updateSidebarActiveState() {
+        document.querySelectorAll('.sidebar-item[data-sidebar-user]').forEach(function (li) {
+          if (namesMatch(li.getAttribute('data-sidebar-user'), currentUser)) {
+            li.classList.add('active');
+          } else {
+            li.classList.remove('active');
+          }
+        });
+      }
+
+      function switchToUser(name) {
+        name = String(name || '').trim();
+        if (!name) return;
+        if (users.length > 0 && users.indexOf(name) === -1) {
+          showError('등록되지 않은 사용자입니다.');
+          return;
+        }
+        if (name === currentUser) {
+          el.taskInput.focus();
+          return;
+        }
+        saveUserName(name);
+        currentUser = name;
+        showTaskUI();
+        updateSidebarActiveState();
+      }
+
+      function refreshDiarySidebar() {
+        loadSidebarPerUser();
+        return Promise.resolve();
+      }
+
+      function updateTaskSummary(done, total) {
+        if (typeof done !== 'number' || typeof total !== 'number') {
+          done = 0;
+          total = 0;
+          el.taskList.querySelectorAll('.task-item').forEach(function (li) {
+            total++;
+            if (li.dataset.state === 'checked') done++;
+          });
+        }
+        var pct = total > 0 ? Math.round((done / total) * 100) : 0;
+        el.todayPercent.textContent = pct + '%';
+        el.todayCount.textContent = done + '/' + total;
+        el.emptyTasks.style.display = total === 0 ? 'block' : 'none';
+      }
+
+      function buildTaskItem(t) {
+        var state = getTaskState(t);
+        var li = document.createElement('li');
+        var classes = ['task-item'];
+        if (state === 'checked') classes.push('done');
+        if (state === 'triangle') classes.push('state-triangle');
+        if (t.pending) classes.push('is-pending');
+        if (t.isNew) classes.push('is-new');
+        li.className = classes.join(' ');
+        li.dataset.state = state;
+        if (t.id) li.dataset.taskId = t.id;
+        if (t.tempId) li.dataset.tempId = t.tempId;
+
+        var stateBtn = document.createElement('button');
+        stateBtn.type = 'button';
+        stateBtn.className = 'task-state-btn state-' + state;
+        stateBtn.setAttribute('aria-label', '상태 변경: 체크 → 세모 → 해제');
+        var icon = document.createElement('span');
+        icon.className = 'task-state-icon';
+        if (state === 'checked') icon.textContent = '✓';
+        else if (state === 'triangle') icon.textContent = '△';
+        stateBtn.appendChild(icon);
+
+        var content = document.createElement('div');
+        content.className = 'task-content';
+
+        var lbl = document.createElement('span');
+        lbl.className = 'task-text';
+        lbl.textContent = t.text;
+
+        content.appendChild(lbl);
+
+        if (t.pending) {
+          stateBtn.disabled = true;
+          var saving = document.createElement('span');
+          saving.className = 'task-saving';
+          saving.innerHTML = '<span class="save-spinner"></span>저장 중';
+          content.appendChild(saving);
+        }
+
+        if (!t.pending && t.id) {
+          stateBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            onCycleTask(t.id);
+          });
+
+          var delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'task-delete';
+          delBtn.title = '삭제';
+          delBtn.setAttribute('aria-label', '할 일 삭제');
+          delBtn.textContent = '×';
+          delBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            onDeleteTask(t.id);
+          });
+          content.appendChild(delBtn);
+        }
+
+        li.appendChild(stateBtn);
+        li.appendChild(content);
+        return li;
+      }
+
+      function onCycleTask(taskId) {
+        var li = el.taskList.querySelector('[data-task-id="' + taskId + '"]');
+        if (!li || li.classList.contains('is-modifying') || li.classList.contains('is-pending')) {
+          return;
+        }
+        var prevState = li.dataset.state || 'none';
+        var next = nextStateClient(prevState);
+        applyTaskRowState(li, next);
+        updateTaskSummary();
+
+        var modEl = showTaskModifying(li);
+        runSilent('cycleTaskState', [currentUser, taskId])
+          .then(function (tasks) {
+            clearTaskModifying(li, modEl);
+            renderTasks(tasks);
+            refreshChartLocal(tasks);
+          })
+          .catch(function (e) {
+            applyTaskRowState(li, prevState);
+            updateTaskSummary();
+            clearTaskModifying(li, modEl);
+            showError(e.message || String(e));
+          });
+      }
+
+      function showTaskDeleting(li) {
+        li.classList.add('is-deleting');
+        var stateBtn = li.querySelector('.task-state-btn');
+        if (stateBtn) stateBtn.disabled = true;
+        var delBtn = li.querySelector('.task-delete');
+        if (delBtn) delBtn.style.display = 'none';
+
+        var content = li.querySelector('.task-content');
+        var existing = content.querySelector('.task-deleting');
+        if (existing) return existing;
+
+        var deleting = document.createElement('span');
+        deleting.className = 'task-saving task-deleting';
+        deleting.innerHTML = '<span class="save-spinner"></span>삭제 중';
+        content.appendChild(deleting);
+        return deleting;
+      }
+
+      function onDeleteTask(taskId) {
+        if (!confirm('이 할 일을 삭제할까요?')) return;
+        var li = el.taskList.querySelector('[data-task-id="' + taskId + '"]');
+        if (!li) return;
+
+        var deletingEl = showTaskDeleting(li);
+
+        runSilent('deleteTask', [currentUser, taskId])
+          .then(function (tasks) {
+            li.style.transition = 'opacity 0.22s ease';
+            li.style.opacity = '0';
+            setTimeout(function () {
+              renderTasks(tasks);
+              refreshChartLocal(tasks);
+            }, 220);
+          })
+          .catch(function (e) {
+            li.classList.remove('is-deleting');
+            li.style.opacity = '1';
+            var stateBtn = li.querySelector('.task-state-btn');
+            if (stateBtn) stateBtn.disabled = false;
+            var delBtn = li.querySelector('.task-delete');
+            if (delBtn) delBtn.style.display = '';
+            if (deletingEl && deletingEl.parentNode) deletingEl.parentNode.removeChild(deletingEl);
+            showError(e.message || String(e));
+          });
+      }
+
+      function renderTasks(tasks) {
+        el.taskList.innerHTML = '';
+        el.taskLoading.style.display = 'none';
+        var done = 0;
+        tasks.forEach(function (t) {
+          if (isTaskCompleted(t)) done++;
+          el.taskList.appendChild(buildTaskItem(t));
+        });
+        updateTaskSummary(done, tasks.length);
+        saveTasksCache(tasks);
+        if (currentUser) {
+          patchTodaySidebarFromTasks(tasks);
+        }
+      }
+
+      function addPendingTask(text) {
+        var tempId = 'p' + (++pendingIdCounter) + '-' + Date.now();
+        var item = buildTaskItem({
+          text: text,
+          completed: false,
+          pending: true,
+          tempId: tempId,
+          isNew: true
+        });
+        el.emptyTasks.style.display = 'none';
+        el.taskList.appendChild(item);
+        updateTaskSummary();
+        if (currentUser) {
+          patchTodaySidebarFromTasks(getTodayTasksFromDOM());
+        }
+        return tempId;
+      }
+
+      function findTaskInList(tasks, text) {
+        for (var i = tasks.length - 1; i >= 0; i--) {
+          if (tasks[i].text === text) return tasks[i];
+        }
+        return tasks.length ? tasks[tasks.length - 1] : null;
+      }
+
+      function finalizePendingTask(tempId, tasks) {
+        var pendingLi = el.taskList.querySelector('[data-temp-id="' + tempId + '"]');
+        if (!pendingLi) {
+          renderTasks(tasks);
+          return;
+        }
+        var text = pendingLi.querySelector('.task-text').textContent;
+        var serverTask = findTaskInList(tasks, text);
+        var savingEl = pendingLi.querySelector('.task-saving');
+
+        if (savingEl) {
+          savingEl.classList.add('done-save');
+          savingEl.innerHTML = '<span class="save-spinner"></span>저장됨';
+        }
+
+        setTimeout(function () {
+          if (!serverTask) {
+            pendingLi.remove();
+            updateTaskSummary();
+            return;
+          }
+          var newLi = buildTaskItem(serverTask);
+          pendingLi.replaceWith(newLi);
+          var done = 0;
+          tasks.forEach(function (t) { if (isTaskCompleted(t)) done++; });
+          updateTaskSummary(done, tasks.length);
+          saveTasksCache(tasks);
+          patchTodaySidebarFromTasks(tasks);
+        }, savingEl ? 480 : 0);
+      }
+
+      function ensureChartJs() {
+        if (window.Chart) return Promise.resolve();
+        if (chartJsPromise) return chartJsPromise;
+        chartJsPromise = new Promise(function (resolve, reject) {
+          var s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';
+          s.onload = resolve;
+          s.onerror = function () { reject(new Error('그래프 라이브러리 로드 실패')); };
+          document.head.appendChild(s);
+        });
+        return chartJsPromise;
+      }
+
+      function showChartError(msg) {
+        hideChartOverlay();
+        el.chartCard.style.display = 'block';
+        el.chartErrorMsg.textContent = msg || '그래프를 불러올 수 없습니다';
+        el.chartErrorMsg.classList.add('show');
+      }
+
+      function loadTasksSilent() {
+        return loadViewDateTasks();
+      }
+
+      function loadChartAsync() {
+        if (!currentUser) return Promise.resolve();
+        var token = ++chartLoadToken;
+        var today = todayStr();
+        var dates = getChartDateRange();
+        var cache = loadChartCache();
+
+        el.chartCard.style.display = 'block';
+        var hasCachedDays = dates.some(function (d) { return !!cache.days[d]; });
+
+        if (hasCachedDays) {
+          showChartFromCacheIfAny(token);
+          showChartOverlay('갱신 중...', false);
+        } else {
+          showChartOverlay('그래프 불러오는 중...', true);
+        }
+
+        var missingPast = dates.filter(function (d) {
+          return d !== today && !cache.days[d];
+        });
+
+        var seedPastPromise = missingPast.length > 0
+          ? runSilent('getDailyProgress', [currentUser, CHART_DAYS]).then(function (all) {
+              (all || []).forEach(function (s) {
+                if (s.date !== today) cacheDayStat(cache, s);
+              });
+              saveChartCache(cache);
+            })
+          : Promise.resolve();
+
+        return ensureChartJs()
+          .then(function () {
+            if (token !== chartLoadToken) return;
+            return seedPastPromise;
+          })
+          .then(function () {
+            if (token !== chartLoadToken) return;
+            return runSilent('getDayProgress', [currentUser, today]);
+          })
+          .then(function (todayStat) {
+            if (token !== chartLoadToken) return;
+            cache = loadChartCache();
+            cacheDayStat(cache, todayStat);
+            saveChartCache(cache);
+            renderChartFromStats(buildChartStats(cache, dates), token);
+          })
+          .catch(function () {
+            if (token !== chartLoadToken) return;
+            if (hasCachedDays) {
+              hideChartOverlay();
+              return;
+            }
+            showChartError('그래프를 불러올 수 없습니다');
+          });
+      }
+
+      function refreshChartLocal(tasks) {
+        if (!currentUser) return;
+        var token = ++chartLoadToken;
+        var dates = getChartDateRange();
+        var cache = loadChartCache();
+        var todayStat = updateTodayChartFromTasks(tasks);
+        ensureChartJs().then(function () {
+          renderChartFromStats(buildChartStats(cache, dates, todayStat), token);
+        });
+      }
+
+      function showTaskUIShell() {
+        el.mainView.style.display = 'block';
+        el.taskCard.style.display = 'block';
+        updateDateBadge();
+        setNameLocked(true);
+        el.displayName.textContent = currentUser;
+        el.nameHint.textContent = '할 일을 입력하고 Enter를 누르세요.';
+        el.chartCard.style.display = 'block';
+        if (showChartFromCacheIfAny()) {
+          showChartOverlay('갱신 중...', false);
+        } else {
+          showChartOverlay('그래프 불러오는 중...', true);
+        }
+        el.todayPercent.textContent = '0%';
+        el.todayCount.textContent = '0/0';
+      }
+
+      function showTaskUI() {
+        showTaskUIShell();
+        if (users.length > 0) el.userSelect.value = currentUser;
+        applyCachedBootData();
+        bootstrapFromServer(currentUser).then(scheduleChartLoad);
+        el.taskInput.focus();
+      }
+
+      function confirmUser() {
+        var name = (users.length > 0 && el.userSelect.value)
+          ? el.userSelect.value.trim()
+          : el.userName.value.trim();
+        if (!name) {
+          showError('이름을 입력하거나 선택해주세요.');
+          return;
+        }
+        saveUserName(name);
+        showTaskUI();
+      }
+
+      function addTask() {
+        var text = el.taskInput.value.trim();
+        if (!text) return;
+        el.taskInput.value = '';
+        el.taskInput.focus();
+        var tempId = addPendingTask(text);
+
+        runSilent('addTask', [currentUser, text, viewDate])
+          .then(function (tasks) {
+            finalizePendingTask(tempId, tasks);
+            saveTasksCache(tasks);
+            refreshChartLocal(tasks);
+            runSilent('getDayProgress', [currentUser, todayStr()])
+              .then(function (s) {
+                var cache = loadChartCache();
+                cacheDayStat(cache, s);
+                saveChartCache(cache);
+              })
+              .catch(function () { });
+          })
+          .catch(function (e) {
+            var pendingLi = el.taskList.querySelector('[data-temp-id="' + tempId + '"]');
+            if (pendingLi) pendingLi.remove();
+            updateTaskSummary();
+            showError(e.message || String(e));
+          });
+      }
+
+      function renderAdminUsers() {
+        el.userChips.innerHTML = '';
+        users.forEach(function (u) {
+          var chip = document.createElement('span');
+          chip.className = 'chip';
+          chip.textContent = u;
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.title = '삭제';
+          btn.textContent = '×';
+          btn.addEventListener('click', function () {
+            if (!confirm('"' + u + '" 사용자를 삭제할까요?')) return;
+            run('removeUser', [u], '사용자 삭제 중...')
+              .then(function (list) {
+                users = list;
+                renderAdminUsers();
+                populateUserSelect();
+                refreshDiarySidebar();
+              })
+              .catch(function (e) { showError(e.message || String(e)); });
+          });
+          chip.appendChild(btn);
+          el.userChips.appendChild(chip);
+        });
+      }
+
+      function openAdmin() {
+        el.adminPanel.classList.add('show');
+        el.mainView.style.opacity = '0.5';
+        el.title.classList.add('admin-hint');
+        renderAdminUsers();
+      }
+
+      function closeAdmin() {
+        el.adminPanel.classList.remove('show');
+        el.mainView.style.opacity = '1';
+        el.title.classList.remove('admin-hint');
+      }
+
+      el.title.addEventListener('click', function () {
+        titleClickCount++;
+        clearTimeout(titleClickTimer);
+        titleClickTimer = setTimeout(function () { titleClickCount = 0; }, 800);
+        if (titleClickCount >= 3) {
+          titleClickCount = 0;
+          openAdmin();
+        }
+      });
+
+      el.userName.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); confirmUser(); }
+      });
+      el.userSelect.addEventListener('change', function () {
+        if (el.userSelect.value) {
+          saveUserName(el.userSelect.value);
+          confirmUser();
+        }
+      });
+      el.changeNameBtn.addEventListener('click', function () {
+        setNameLocked(false);
+        applySavedNameToSelect();
+        if (users.length === 0) el.userName.value = currentUser;
+        el.taskCard.style.display = 'none';
+        el.chartCard.style.display = 'none';
+        el.nameHint.textContent = '이름을 선택하면 이 기기에 저장되어 다음 접속 시 자동으로 선택됩니다.';
+      });
+
+      el.taskInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addTask();
+        }
+      });
+
+      el.addUserBtn.addEventListener('click', function () {
+        var name = el.newUserName.value.trim();
+        if (!name) { showError('추가할 이름을 입력하세요.'); return; }
+        run('addUser', [name], '사용자 추가 중...')
+          .then(function (list) {
+            users = list;
+            el.newUserName.value = '';
+            renderAdminUsers();
+            populateUserSelect();
+            refreshDiarySidebar();
+            showError('사용자가 추가되었습니다.'); // 재사용 as toast
+            el.errorBox.style.background = 'rgba(34, 197, 94, 0.15)';
+            el.errorBox.style.color = '#86efac';
+          })
+          .catch(function (e) { showError(e.message || String(e)); });
+      });
+
+      el.closeAdminBtn.addEventListener('click', closeAdmin);
+
+      el.todayLabel.textContent = formatTodayKorean();
+      viewDate = loadViewDate();
+      populateViewDateSelect();
+      el.viewDateSelect.addEventListener('change', onViewDateChange);
+
+      el.sidebarTodayDate.textContent = todayStr();
+      el.sidebarYesterdayDate.textContent = yesterdayStr();
+
+      var savedOnBoot = loadUserName();
+      if (savedOnBoot) {
+        currentUser = savedOnBoot;
+        showTaskUIShell();
+        applyCachedBootData();
+        el.taskInput.focus();
+        scheduleChartLoad();
+      } else {
+        var cachedUsersOnly = loadUsersCache();
+        if (cachedUsersOnly && cachedUsersOnly.length) {
+          users = cachedUsersOnly;
+          populateUserSelect();
+          el.mainView.style.display = 'block';
+          loadSidebarPerUser();
+        } else {
+          el.mainView.style.display = 'none';
+        }
+      }
+
+      bootstrapFromServer(savedOnBoot || '')
+        .then(function () {
+          if (!savedOnBoot) prefetchChartJs();
+        })
+        .catch(function (e) {
+          el.mainView.style.display = 'block';
+          if (!savedOnBoot && !loadUsersCache()) {
+            showError('초기화 실패: ' + (e.message || String(e)));
+          }
+        });
+
+      if (savedOnBoot) prefetchChartJs();
+    })();
+  </script>
+</body>
+</html>
