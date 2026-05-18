@@ -896,12 +896,13 @@
     return res.data || [];
   }
 
-  function scanUserStats(data, dayCount) {
+  function scanUserStats(data, dayCount, endDateStr) {
     var stats = {};
-    var today = new Date();
+    dayCount = dayCount || 14;
+    var end = endDateStr ? new Date(endDateStr + 'T12:00:00') : new Date();
     for (var d = 0; d < dayCount; d++) {
-      var dt = new Date(today);
-      dt.setDate(today.getDate() - (dayCount - 1 - d));
+      var dt = new Date(end);
+      dt.setDate(end.getDate() - (dayCount - 1 - d));
       var key = formatDate(dt);
       stats[key] = { date: key, total: 0, completed: 0, percent: 0 };
     }
@@ -914,11 +915,12 @@
     return stats;
   }
 
-  async function getDailyProgress(userName, dayCount) {
+  async function getDailyProgress(userName, dayCount, endDateStr) {
     userName = String(userName || '').trim();
     dayCount = dayCount || 14;
+    endDateStr = endDateStr || formatDate(new Date());
     var data = await readUserTasks(userName);
-    var stats = scanUserStats(data, dayCount);
+    var stats = scanUserStats(data, dayCount, endDateStr);
     return Object.keys(stats).sort().map(function (k) {
       var s = stats[k];
       s.percent = s.total > 0 ? Math.round((s.completed / s.total) * 100) : 0;
@@ -1551,12 +1553,14 @@
           });
       }
 
-      /** 오늘 포함 최근 14일. 같은 날에는 캐시에 고정해 축 일자가 안 바뀌게 함 */
-      function computeChartDateRange() {
+      /** 선택일(viewDate)이 맨 오른쪽, 과거 14일(2주) */
+      function computeChartDateRange(endDateStr) {
+        endDateStr = endDateStr || viewDate || todayStr();
+        var end = new Date(endDateStr + 'T12:00:00');
         var dates = [];
         for (var d = CHART_DAYS - 1; d >= 0; d--) {
-          var dt = new Date();
-          dt.setDate(dt.getDate() - d);
+          var dt = new Date(end);
+          dt.setDate(end.getDate() - d);
           dates.push(
             dt.getFullYear() + '-' +
             String(dt.getMonth() + 1).padStart(2, '0') + '-' +
@@ -1567,17 +1571,17 @@
       }
 
       function getChartDateRange() {
-        var today = todayStr();
+        var anchor = viewDate || todayStr();
         var cache = loadChartCache();
         if (
-          cache.rangeAnchor === today &&
+          cache.rangeAnchor === anchor &&
           cache.rangeDates &&
           cache.rangeDates.length === CHART_DAYS
         ) {
           return cache.rangeDates.slice();
         }
-        var dates = computeChartDateRange();
-        cache.rangeAnchor = today;
+        var dates = computeChartDateRange(anchor);
+        cache.rangeAnchor = anchor;
         cache.rangeDates = dates;
         saveChartCache(cache);
         return dates;
@@ -1609,10 +1613,10 @@
         };
       }
 
-      function buildChartStats(cache, dates, todayOverride) {
-        var today = todayStr();
+      function buildChartStats(cache, dates, selectedOverride) {
+        var anchor = viewDate || todayStr();
         return dates.map(function (d) {
-          if (todayOverride && d === today) return todayOverride;
+          if (selectedOverride && d === anchor) return selectedOverride;
           if (cache.days[d]) return statFromCacheEntry(d, cache.days[d]);
           return { date: d, total: 0, completed: 0, percent: 0 };
         });
@@ -1627,12 +1631,13 @@
         };
       }
 
-      function updateTodayChartFromTasks(tasks) {
+      function updateViewDateChartFromTasks(tasks) {
         var done = 0;
-        (tasks || []).forEach(function (t) { if (t.completed) done++; });
+        (tasks || []).forEach(function (t) { if (isTaskCompleted(t)) done++; });
         var total = (tasks || []).length;
+        var anchor = viewDate || todayStr();
         var stat = {
-          date: todayStr(),
+          date: anchor,
           total: total,
           completed: done,
           percent: total > 0 ? Math.round((done / total) * 100) : 0
@@ -2183,9 +2188,11 @@
       function loadChartAsync() {
         if (!currentUser) return Promise.resolve();
         var token = ++chartLoadToken;
-        var today = todayStr();
+        var endDate = viewDate || todayStr();
         var dates = getChartDateRange();
         var cache = loadChartCache();
+        var dateSet = {};
+        dates.forEach(function (d) { dateSet[d] = true; });
 
         el.chartCard.style.display = 'block';
         var hasCachedDays = dates.some(function (d) { return !!cache.days[d]; });
@@ -2198,13 +2205,13 @@
         }
 
         var missingPast = dates.filter(function (d) {
-          return d !== today && !cache.days[d];
+          return d !== endDate && !cache.days[d];
         });
 
         var seedPastPromise = missingPast.length > 0
-          ? runSilent('getDailyProgress', [currentUser, CHART_DAYS]).then(function (all) {
+          ? runSilent('getDailyProgress', [currentUser, CHART_DAYS, endDate]).then(function (all) {
               (all || []).forEach(function (s) {
-                if (s.date !== today) cacheDayStat(cache, s);
+                if (dateSet[s.date] && s.date !== endDate) cacheDayStat(cache, s);
               });
               saveChartCache(cache);
             })
@@ -2217,12 +2224,12 @@
           })
           .then(function () {
             if (token !== chartLoadToken) return;
-            return runSilent('getDayProgress', [currentUser, today]);
+            return runSilent('getDayProgress', [currentUser, endDate]);
           })
-          .then(function (todayStat) {
+          .then(function (endStat) {
             if (token !== chartLoadToken) return;
             cache = loadChartCache();
-            cacheDayStat(cache, todayStat);
+            cacheDayStat(cache, endStat);
             saveChartCache(cache);
             renderChartFromStats(buildChartStats(cache, dates), token);
           })
@@ -2241,9 +2248,9 @@
         var token = ++chartLoadToken;
         var dates = getChartDateRange();
         var cache = loadChartCache();
-        var todayStat = updateTodayChartFromTasks(tasks);
+        var selectedStat = updateViewDateChartFromTasks(tasks);
         ensureChartJs().then(function () {
-          renderChartFromStats(buildChartStats(cache, dates, todayStat), token);
+          renderChartFromStats(buildChartStats(cache, dates, selectedStat), token);
         });
       }
 
@@ -2296,7 +2303,7 @@
             finalizePendingTask(tempId, tasks);
             saveTasksCache(tasks);
             refreshChartLocal(tasks);
-            runSilent('getDayProgress', [currentUser, todayStr()])
+            runSilent('getDayProgress', [currentUser, viewDate || todayStr()])
               .then(function (s) {
                 var cache = loadChartCache();
                 cacheDayStat(cache, s);
