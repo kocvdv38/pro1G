@@ -687,8 +687,298 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
-  <script src="js/api.js"></script>
+  <script>
+    /* GitHub에 올리기 전에 아래 두 줄만 수정하세요 */
+    window.SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
+    window.SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+  </script>
+  <script>
+/**
+ * 프로의 일지 — Supabase API (GitHub Pages 정적 호스팅용)
+ */
+(function (global) {
+  'use strict';
+
+  var client = null;
+
+  function requireConfig() {
+    if (!global.SUPABASE_URL || !global.SUPABASE_ANON_KEY ||
+        global.SUPABASE_URL.includes('YOUR_PROJECT') ||
+        global.SUPABASE_ANON_KEY.includes('YOUR_SUPABASE')) {
+      throw new Error('index.html 상단에 Supabase URL과 anon key를 설정해주세요.');
+    }
+    if (!global.supabase) {
+      throw new Error('Supabase 라이브러리를 불러오지 못했습니다.');
+    }
+    if (!client) {
+      client = global.supabase.createClient(global.SUPABASE_URL, global.SUPABASE_ANON_KEY);
+    }
+    return client;
+  }
+
+  function formatDate(d) {
+    var dt = d instanceof Date ? d : new Date(d);
+    return dt.getFullYear() + '-' +
+      String(dt.getMonth() + 1).padStart(2, '0') + '-' +
+      String(dt.getDate()).padStart(2, '0');
+  }
+
+  function isCompleted(val) {
+    if (val === true) return true;
+    if (val === false || val === '' || val === null) return false;
+    var s = String(val).trim().toUpperCase();
+    return s === 'TRUE' || s === '1' || s === 'YES' || s === '완료' || s === 'O' || s === 'CHECKED';
+  }
+
+  function parseTaskState(val) {
+    if (val === true || val === 'checked') return 'checked';
+    if (val === false || val === '' || val === null || val === 'none') return 'none';
+    var s = String(val).trim();
+    if (!s) return 'none';
+    if (isCompleted(val)) return 'checked';
+    if (s === '△' || s === '▲' || s === '▽' || s === '세모' ||
+        s.toUpperCase() === 'TRIANGLE' || s.toUpperCase() === 'PARTIAL') {
+      return 'triangle';
+    }
+    return 'none';
+  }
+
+  function nextTaskState(state) {
+    if (state === 'none') return 'checked';
+    if (state === 'checked') return 'triangle';
+    return 'none';
+  }
+
+  function mapTaskRow(row) {
+    var state = parseTaskState(row.state);
+    return {
+      id: row.id,
+      text: String(row.text || ''),
+      state: state,
+      completed: state === 'checked'
+    };
+  }
+
+  function yesterdayStr(dateStr) {
+    var base = dateStr ? new Date(dateStr + 'T12:00:00') : new Date();
+    base.setDate(base.getDate() - 1);
+    return formatDate(base);
+  }
+
+  async function getUserByName(name) {
+    var db = requireConfig();
+    name = String(name || '').trim();
+    var res = await db.from('users').select('id, name, created_at').eq('name', name).maybeSingle();
+    if (res.error) throw new Error(res.error.message);
+    return res.data;
+  }
+
+  async function getUsers() {
+    var db = requireConfig();
+    var res = await db.from('users').select('name').order('created_at', { ascending: true });
+    if (res.error) throw new Error(res.error.message);
+    return (res.data || []).map(function (r) { return String(r.name).trim(); }).filter(Boolean);
+  }
+
+  async function addUser(name) {
+    name = String(name || '').trim();
+    if (!name) throw new Error('이름을 입력해주세요.');
+    var users = await getUsers();
+    if (users.indexOf(name) !== -1) throw new Error('이미 등록된 사용자입니다.');
+    var db = requireConfig();
+    var res = await db.from('users').insert({ name: name }).select('name').single();
+    if (res.error) throw new Error(res.error.message);
+    return getUsers();
+  }
+
+  async function removeUser(name) {
+    name = String(name || '').trim();
+    var db = requireConfig();
+    var res = await db.from('users').delete().eq('name', name).select('id');
+    if (res.error) throw new Error(res.error.message);
+    if (!res.data || !res.data.length) throw new Error('사용자를 찾을 수 없습니다.');
+    return getUsers();
+  }
+
+  async function getTasks(userName, dateStr) {
+    userName = String(userName || '').trim();
+    dateStr = dateStr || formatDate(new Date());
+    var user = await getUserByName(userName);
+    if (!user) return [];
+
+    var db = requireConfig();
+    var res = await db.from('tasks')
+      .select('id, text, state, task_date, created_at')
+      .eq('user_id', user.id)
+      .eq('task_date', dateStr)
+      .order('created_at', { ascending: true });
+    if (res.error) throw new Error(res.error.message);
+    return (res.data || []).map(mapTaskRow);
+  }
+
+  async function addTask(userName, text, dateStr) {
+    userName = String(userName || '').trim();
+    text = String(text || '').trim();
+    dateStr = dateStr || formatDate(new Date());
+    if (!userName) throw new Error('이름을 선택하거나 입력해주세요.');
+    if (!text) throw new Error('할 일 내용을 입력해주세요.');
+
+    var users = await getUsers();
+    if (users.length > 0 && users.indexOf(userName) === -1) {
+      throw new Error('등록되지 않은 사용자입니다. 관리자에게 등록을 요청하세요.');
+    }
+
+    var user = await getUserByName(userName);
+    if (!user) {
+      await addUser(userName);
+      user = await getUserByName(userName);
+    }
+
+    var db = requireConfig();
+    var res = await db.from('tasks').insert({
+      user_id: user.id,
+      task_date: dateStr,
+      text: text,
+      state: 'none'
+    }).select('id');
+    if (res.error) throw new Error(res.error.message);
+    return getTasks(userName, dateStr);
+  }
+
+  async function cycleTaskState(userName, taskId) {
+    userName = String(userName || '').trim();
+    var db = requireConfig();
+    var found = await db.from('tasks').select('id, state, task_date').eq('id', taskId).maybeSingle();
+    if (found.error) throw new Error(found.error.message);
+    if (!found.data) throw new Error('할 일을 찾을 수 없습니다.');
+
+    var next = nextTaskState(parseTaskState(found.data.state));
+    var upd = await db.from('tasks').update({ state: next }).eq('id', taskId);
+    if (upd.error) throw new Error(upd.error.message);
+    return getTasks(userName, found.data.task_date);
+  }
+
+  async function deleteTask(userName, taskId) {
+    userName = String(userName || '').trim();
+    var db = requireConfig();
+    var found = await db.from('tasks').select('task_date').eq('id', taskId).maybeSingle();
+    if (found.error) throw new Error(found.error.message);
+    if (!found.data) throw new Error('할 일을 찾을 수 없습니다.');
+
+    var del = await db.from('tasks').delete().eq('id', taskId);
+    if (del.error) throw new Error(del.error.message);
+    return getTasks(userName, found.data.task_date);
+  }
+
+  async function readUserTasks(userName) {
+    var user = await getUserByName(userName);
+    if (!user) return [];
+    var db = requireConfig();
+    var res = await db.from('tasks')
+      .select('task_date, text, state')
+      .eq('user_id', user.id)
+      .order('task_date', { ascending: true });
+    if (res.error) throw new Error(res.error.message);
+    return res.data || [];
+  }
+
+  function scanUserStats(data, dayCount) {
+    var stats = {};
+    var today = new Date();
+    for (var d = 0; d < dayCount; d++) {
+      var dt = new Date(today);
+      dt.setDate(today.getDate() - (dayCount - 1 - d));
+      var key = formatDate(dt);
+      stats[key] = { date: key, total: 0, completed: 0, percent: 0 };
+    }
+    data.forEach(function (row) {
+      var rowDate = String(row.task_date).substring(0, 10);
+      if (!stats[rowDate]) return;
+      stats[rowDate].total++;
+      if (isCompleted(row.state)) stats[rowDate].completed++;
+    });
+    return stats;
+  }
+
+  async function getDailyProgress(userName, dayCount) {
+    userName = String(userName || '').trim();
+    dayCount = dayCount || 14;
+    var data = await readUserTasks(userName);
+    var stats = scanUserStats(data, dayCount);
+    return Object.keys(stats).sort().map(function (k) {
+      var s = stats[k];
+      s.percent = s.total > 0 ? Math.round((s.completed / s.total) * 100) : 0;
+      return s;
+    });
+  }
+
+  async function getDayProgress(userName, dateStr) {
+    userName = String(userName || '').trim();
+    dateStr = dateStr || formatDate(new Date());
+    var stat = { date: dateStr, total: 0, completed: 0, percent: 0 };
+    var data = await readUserTasks(userName);
+    data.forEach(function (row) {
+      var rowDate = String(row.task_date).substring(0, 10);
+      if (rowDate !== dateStr) return;
+      stat.total++;
+      if (isCompleted(row.state)) stat.completed++;
+    });
+    stat.percent = stat.total > 0 ? Math.round((stat.completed / stat.total) * 100) : 0;
+    return stat;
+  }
+
+  async function getUserDiaryStatus(userName, todayStr) {
+    userName = String(userName || '').trim();
+    todayStr = todayStr || formatDate(new Date());
+    var yStr = yesterdayStr(todayStr);
+    var data = await readUserTasks(userName);
+
+    var today = { hasItems: false, hasChecked: false };
+    var yesterday = { hasItems: false, hasChecked: false };
+    data.forEach(function (row) {
+      var rowDate = String(row.task_date).substring(0, 10);
+      if (rowDate !== todayStr && rowDate !== yStr) return;
+      var done = isCompleted(row.state);
+      var target = rowDate === todayStr ? today : yesterday;
+      target.hasItems = true;
+      if (done) target.hasChecked = true;
+    });
+
+    return {
+      userName: userName,
+      today: { name: userName, hasItems: today.hasItems, hasChecked: today.hasChecked },
+      yesterday: { name: userName, hasItems: yesterday.hasItems, hasChecked: yesterday.hasChecked }
+    };
+  }
+
+  async function getBootstrapData(userName, viewDateStr) {
+    viewDateStr = viewDateStr || formatDate(new Date());
+    userName = String(userName || '').trim();
+    var users = await getUsers();
+    var tasks = userName ? await getTasks(userName, viewDateStr) : [];
+    return { users: users, tasks: tasks };
+  }
+
+  global.ProDiaryApi = {
+    isReady: function () {
+      return Boolean(global.SUPABASE_URL && global.SUPABASE_ANON_KEY &&
+        !String(global.SUPABASE_URL).includes('YOUR_PROJECT'));
+    },
+    getUsers: getUsers,
+    addUser: addUser,
+    removeUser: removeUser,
+    getTasks: getTasks,
+    addTask: addTask,
+    cycleTaskState: cycleTaskState,
+    deleteTask: deleteTask,
+    getUserDiaryStatus: getUserDiaryStatus,
+    getDailyProgress: getDailyProgress,
+    getDayProgress: getDayProgress,
+    getBootstrapData: getBootstrapData
+  };
+})(window);
+
+  </script>
   <script>
     (function () {
       var STORAGE_KEY = 'proDiary_userName';
@@ -1073,7 +1363,7 @@
       function runSilent(fn, args) {
         return new Promise(function (resolve, reject) {
           if (!window.ProDiaryApi || !window.ProDiaryApi.isReady()) {
-            reject(new Error('config.js에 Supabase URL과 anon key를 설정해주세요.'));
+            reject(new Error('index.html 상단에 Supabase URL과 anon key를 설정해주세요.'));
             return;
           }
           if (typeof window.ProDiaryApi[fn] !== 'function') {
