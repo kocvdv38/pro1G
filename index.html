@@ -87,21 +87,35 @@
     .sidebar-item.active {
       background: rgba(59, 130, 246, 0.15);
     }
-    .sidebar-item input[type="checkbox"] {
+    .sidebar-check {
       width: 18px;
       height: 18px;
-      accent-color: var(--muted);
-      pointer-events: none;
       flex-shrink: 0;
+      border: 2px solid var(--muted);
+      border-radius: 4px;
+      background: transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1;
+      color: transparent;
+      pointer-events: none;
+      user-select: none;
     }
-    .sidebar-item.has-checked input[type="checkbox"] {
-      accent-color: var(--success);
-      box-shadow: none;
+    /* 오늘 할 일 1개 이상 작성 → 초록 테두리 */
+    .sidebar-item.has-items-only .sidebar-check {
+      border-color: var(--success);
     }
-    .sidebar-item.has-items-only input[type="checkbox"] {
-      accent-color: var(--muted);
-      box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.65);
-      border-radius: 3px;
+    /* 1개 이상 체크(완료) → 초록 테두리 + 초록 체크 */
+    .sidebar-item.has-checked .sidebar-check {
+      border-color: var(--success);
+      background: var(--success);
+      color: #0f1419;
+    }
+    .sidebar-item.has-checked .sidebar-check::before {
+      content: '✓';
     }
     .sidebar-divider {
       height: 1px;
@@ -689,8 +703,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     /* GitHub에 올리기 전에 아래 두 줄만 수정하세요 */
-    window.SUPABASE_URL = 'https://nnbfwgswqenjahmsiebx.supabase.co';
-    window.SUPABASE_ANON_KEY = 'sb_publishable_WF-1hKniZKgX3QUGmzs1_g_IyI_rcAP';
+    window.SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
+    window.SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
   </script>
   <script>
 /**
@@ -1251,7 +1265,7 @@
 
       function getTodayTasksFromDOM() {
         var tasks = [];
-        el.taskList.querySelectorAll('.task-item:not(.is-pending)').forEach(function (li) {
+        el.taskList.querySelectorAll('.task-item').forEach(function (li) {
           var lbl = li.querySelector('.task-text');
           var state = li.dataset.state || 'none';
           if (lbl) {
@@ -1781,10 +1795,10 @@
         li.setAttribute('data-sidebar-user', userName);
         li.setAttribute('data-sidebar-section', section);
 
-        var cb = document.createElement('input');
-        cb.type = 'checkbox';
-        cb.checked = false;
-        cb.disabled = true;
+        var cb = document.createElement('span');
+        cb.className = 'sidebar-check';
+        cb.setAttribute('role', 'checkbox');
+        cb.setAttribute('aria-checked', 'false');
 
         var nameBtn = document.createElement('button');
         nameBtn.type = 'button';
@@ -1818,10 +1832,9 @@
         if (item.hasChecked) li.classList.add('has-checked');
         else if (item.hasItems) li.classList.add('has-items-only');
 
-        var cb = li.querySelector('input[type="checkbox"]');
+        var cb = li.querySelector('.sidebar-check');
         if (cb) {
-          cb.checked = item.hasChecked === true;
-          cb.disabled = true;
+          cb.setAttribute('aria-checked', item.hasChecked ? 'true' : 'false');
           cb.title = diaryItemTitle(item, label);
         }
 
@@ -2009,6 +2022,7 @@
         var next = nextStateClient(prevState);
         applyTaskRowState(li, next);
         updateTaskSummary();
+        patchTodaySidebarFromTasks(getTodayTasksFromDOM());
 
         var modEl = showTaskModifying(li);
         runSilent('cycleTaskState', [currentUser, taskId])
