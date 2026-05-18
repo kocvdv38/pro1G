@@ -743,8 +743,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     /* GitHub에 올리기 전에 아래 두 줄만 수정하세요 */
-    window.SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
-    window.SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    window.SUPABASE_URL = 'https://nnbfwgswqenjahmsiebx.supabase.co';
+    window.SUPABASE_ANON_KEY = 'sb_publishable_WF-1hKniZKgX3QUGmzs1_g_IyI_rcAP';
   </script>
   <script>
 /**
@@ -801,6 +801,18 @@
     if (state === 'none') return 'checked';
     if (state === 'checked') return 'triangle';
     return 'none';
+  }
+
+  /** 그래프·완료율: 체크 100%, 세모 50% */
+  function progressWeight(val) {
+    var state = parseTaskState(val);
+    if (state === 'checked') return 1;
+    if (state === 'triangle') return 0.5;
+    return 0;
+  }
+
+  function calcProgressPercent(total, score) {
+    return total > 0 ? Math.round((score / total) * 100) : 0;
   }
 
   function mapTaskRow(row) {
@@ -944,13 +956,13 @@
       var dt = new Date(end);
       dt.setDate(end.getDate() - (dayCount - 1 - d));
       var key = formatDate(dt);
-      stats[key] = { date: key, total: 0, completed: 0, percent: 0 };
+      stats[key] = { date: key, total: 0, score: 0, percent: 0 };
     }
     data.forEach(function (row) {
       var rowDate = String(row.task_date).substring(0, 10);
       if (!stats[rowDate]) return;
       stats[rowDate].total++;
-      if (isCompleted(row.state)) stats[rowDate].completed++;
+      stats[rowDate].score += progressWeight(row.state);
     });
     return stats;
   }
@@ -963,7 +975,7 @@
     var stats = scanUserStats(data, dayCount, endDateStr);
     return Object.keys(stats).sort().map(function (k) {
       var s = stats[k];
-      s.percent = s.total > 0 ? Math.round((s.completed / s.total) * 100) : 0;
+      s.percent = calcProgressPercent(s.total, s.score);
       return s;
     });
   }
@@ -971,15 +983,15 @@
   async function getDayProgress(userName, dateStr) {
     userName = String(userName || '').trim();
     dateStr = dateStr || formatDate(new Date());
-    var stat = { date: dateStr, total: 0, completed: 0, percent: 0 };
+    var stat = { date: dateStr, total: 0, score: 0, percent: 0 };
     var data = await readUserTasks(userName);
     data.forEach(function (row) {
       var rowDate = String(row.task_date).substring(0, 10);
       if (rowDate !== dateStr) return;
       stat.total++;
-      if (isCompleted(row.state)) stat.completed++;
+      stat.score += progressWeight(row.state);
     });
-    stat.percent = stat.total > 0 ? Math.round((stat.completed / stat.total) * 100) : 0;
+    stat.percent = calcProgressPercent(stat.total, stat.score);
     return stat;
   }
 
@@ -1058,6 +1070,7 @@
       var pendingIdCounter = 0;
       var encourageToastTimer = null;
       var encourageFadeTimer = null;
+      var activeSidebarSection = 'today';
 
       var el = {
         title: document.getElementById('pageTitle'),
@@ -1227,9 +1240,25 @@
         if (!next || next === viewDate) return;
         saveViewDate(next);
         updateDateBadge();
+        syncSidebarSectionFromViewDate();
+        updateSidebarActiveState();
         if (!currentUser || el.taskCard.style.display === 'none') return;
         loadViewDateTasks();
         scheduleChartLoad();
+      }
+
+      function syncSidebarSectionFromViewDate() {
+        if (viewDate === todayStr()) activeSidebarSection = 'today';
+        else if (viewDate === yesterdayStr()) activeSidebarSection = 'yesterday';
+      }
+
+      function viewDateForSidebarSection(section) {
+        return section === 'yesterday' ? yesterdayStr() : todayStr();
+      }
+
+      function isSidebarRowActive(li) {
+        return namesMatch(li.getAttribute('data-sidebar-user'), currentUser) &&
+          li.getAttribute('data-sidebar-section') === activeSidebarSection;
       }
 
       function namesMatch(a, b) {
@@ -1288,6 +1317,16 @@
         if (t.state) return t.state === 'checked';
         var c = t.completed;
         return c === true || c === 'TRUE' || c === 'true' || c === 1 || c === '1';
+      }
+
+      function progressWeightForState(state) {
+        if (state === 'checked') return 1;
+        if (state === 'triangle') return 0.5;
+        return 0;
+      }
+
+      function calcProgressPercent(total, score) {
+        return total > 0 ? Math.round((score / total) * 100) : 0;
       }
 
       function applyTaskRowState(li, state) {
@@ -1648,11 +1687,13 @@
       }
 
       function statFromCacheEntry(date, entry) {
+        var total = entry.total || 0;
+        var score = entry.score != null ? entry.score : (entry.completed || 0);
         return {
           date: date,
-          total: entry.total || 0,
-          completed: entry.completed || 0,
-          percent: entry.percent || 0
+          total: total,
+          score: score,
+          percent: entry.percent != null ? entry.percent : calcProgressPercent(total, score)
         };
       }
 
@@ -1661,29 +1702,32 @@
         return dates.map(function (d) {
           if (selectedOverride && d === anchor) return selectedOverride;
           if (cache.days[d]) return statFromCacheEntry(d, cache.days[d]);
-          return { date: d, total: 0, completed: 0, percent: 0 };
+          return { date: d, total: 0, score: 0, percent: 0 };
         });
       }
 
       function cacheDayStat(cache, stat) {
         if (!stat || !stat.date) return;
+        var score = stat.score != null ? stat.score : (stat.completed || 0);
         cache.days[stat.date] = {
           total: stat.total,
-          completed: stat.completed,
-          percent: stat.percent
+          score: score,
+          percent: stat.percent != null ? stat.percent : calcProgressPercent(stat.total, score)
         };
       }
 
       function updateViewDateChartFromTasks(tasks) {
-        var done = 0;
-        (tasks || []).forEach(function (t) { if (isTaskCompleted(t)) done++; });
         var total = (tasks || []).length;
+        var score = 0;
+        (tasks || []).forEach(function (t) {
+          score += progressWeightForState(getTaskState(t));
+        });
         var anchor = viewDate || todayStr();
         var stat = {
           date: anchor,
           total: total,
-          completed: done,
-          percent: total > 0 ? Math.round((done / total) * 100) : 0
+          score: score,
+          percent: calcProgressPercent(total, score)
         };
         var cache = loadChartCache();
         cacheDayStat(cache, stat);
@@ -1731,7 +1775,8 @@
                 callbacks: {
                   afterLabel: function (ctx) {
                     var s = stats[ctx.dataIndex];
-                    return '완료 ' + s.completed + ' / 전체 ' + s.total;
+                    var scoreLabel = (s.score % 1) ? s.score.toFixed(1) : String(s.score);
+                    return '반영 ' + scoreLabel + ' / 전체 ' + s.total + ' (세모 50%)';
                   }
                 }
               }
@@ -1838,7 +1883,6 @@
         var li = document.createElement('li');
         var classes = ['sidebar-item'];
         if (showLoader) classes.push('is-loading');
-        if (namesMatch(userName, currentUser)) classes.push('active');
         li.className = classes.join(' ');
         li.setAttribute('data-sidebar-user', userName);
         li.setAttribute('data-sidebar-section', section);
@@ -1855,7 +1899,7 @@
         nameBtn.title = userName + ' 일지 보기';
         nameBtn.addEventListener('click', function (e) {
           e.preventDefault();
-          switchToUser(userName);
+          switchToDiary(userName, section);
         });
 
         li.appendChild(cb);
@@ -1876,7 +1920,6 @@
         if (!li) return;
         item = resolveSidebarItemStatus(item, label);
         li.classList.remove('is-loading', 'has-checked', 'has-items-only', 'active');
-        if (namesMatch(item.name, currentUser)) li.classList.add('active');
         if (item.hasChecked) li.classList.add('has-checked');
         else if (item.hasItems) li.classList.add('has-items-only');
 
@@ -1951,29 +1994,44 @@
 
       function updateSidebarActiveState() {
         document.querySelectorAll('.sidebar-item[data-sidebar-user]').forEach(function (li) {
-          if (namesMatch(li.getAttribute('data-sidebar-user'), currentUser)) {
-            li.classList.add('active');
-          } else {
-            li.classList.remove('active');
-          }
+          if (isSidebarRowActive(li)) li.classList.add('active');
+          else li.classList.remove('active');
         });
       }
 
-      function switchToUser(name) {
+      function switchToDiary(name, section) {
         name = String(name || '').trim();
+        section = section === 'yesterday' ? 'yesterday' : 'today';
         if (!name) return;
         if (users.length > 0 && users.indexOf(name) === -1) {
           showError('등록되지 않은 사용자입니다.');
           return;
         }
-        if (name === currentUser) {
-          el.taskInput.focus();
-          return;
-        }
+
+        var targetDate = viewDateForSidebarSection(section);
+        activeSidebarSection = section;
+        var sameUser = namesMatch(name, currentUser);
+
         saveUserName(name);
         currentUser = name;
-        showTaskUI();
+        saveViewDate(targetDate);
+        if (el.viewDateSelect.querySelector('option[value="' + targetDate + '"]')) {
+          el.viewDateSelect.value = targetDate;
+        }
+        updateDateBadge();
+
+        if (!sameUser || el.taskCard.style.display === 'none') {
+          showTaskUI();
+        } else {
+          loadViewDateTasks();
+          scheduleChartLoad();
+        }
         updateSidebarActiveState();
+        el.taskInput.focus();
+      }
+
+      function switchToUser(name) {
+        switchToDiary(name, activeSidebarSection);
       }
 
       function refreshDiarySidebar() {
@@ -2073,15 +2131,21 @@
       }
 
       function updateTaskSummary(done, total) {
+        var score = 0;
         if (typeof done !== 'number' || typeof total !== 'number') {
           done = 0;
           total = 0;
           el.taskList.querySelectorAll('.task-item').forEach(function (li) {
             total++;
             if (li.dataset.state === 'checked') done++;
+            score += progressWeightForState(li.dataset.state || 'none');
+          });
+        } else {
+          el.taskList.querySelectorAll('.task-item').forEach(function (li) {
+            score += progressWeightForState(li.dataset.state || 'none');
           });
         }
-        var pct = total > 0 ? Math.round((done / total) * 100) : 0;
+        var pct = calcProgressPercent(total, score);
         el.todayPercent.textContent = pct + '%';
         el.todayCount.textContent = done + '/' + total;
         el.emptyTasks.style.display = total === 0 ? 'block' : 'none';
@@ -2164,6 +2228,7 @@
         applyTaskRowState(li, next);
         updateTaskSummary();
         patchTodaySidebarFromTasks(getTodayTasksFromDOM());
+        refreshChartLocal(getTodayTasksFromDOM());
         if (becameChecked) maybeToastForCheck(progressBefore);
 
         var modEl = showTaskModifying(li);
@@ -2554,6 +2619,7 @@
       el.todayLabel.textContent = formatTodayKorean();
       viewDate = loadViewDate();
       populateViewDateSelect();
+      syncSidebarSectionFromViewDate();
       el.viewDateSelect.addEventListener('change', onViewDateChange);
 
       el.sidebarTodayDate.textContent = todayStr();
