@@ -4,47 +4,224 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>프로의 일지</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
   <style>
     :root {
-      --bg: #0f1419;
-      --card: #1a2332;
-      --border: #2d3a4f;
-      --text: #e8edf4;
-      --muted: #8b9cb3;
-      --accent: #3b82f6;
-      --accent-hover: #2563eb;
-      --success: #22c55e;
+      --radius-sm: 10px;
+      --radius: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 26px;
+      --ease: cubic-bezier(0.34, 1.2, 0.64, 1);
+    }
+    /* 선셋 — 따뜻한 밝은 오렌지 */
+    html[data-theme="sunrise"] {
+      --bg: #fff9f5;
+      --bg-elevated: #ffffff;
+      --card: rgba(255, 255, 255, 0.92);
+      --card-solid: #ffffff;
+      --input-bg: #fff3eb;
+      --border: rgba(255, 87, 34, 0.18);
+      --border-strong: rgba(255, 87, 34, 0.32);
+      --text: #2a221c;
+      --muted: #7a6f65;
+      --accent: #ff5722;
+      --accent-2: #ffb300;
+      --accent-soft: rgba(255, 87, 34, 0.14);
+      --accent-hover: #ff7043;
+      --electric: #1e88e5;
+      --electric-soft: rgba(30, 136, 229, 0.12);
+      --success: #00c853;
+      --success-soft: rgba(0, 200, 83, 0.14);
+      --danger: #e53935;
+      --admin: #f9a825;
+      --pct-low: #ff8f00;
+      --pct-mid: #00c853;
+      --pct-high: #1e88e5;
+      --on-accent: #ffffff;
+      --on-success: #ffffff;
+      --shadow: 0 10px 32px rgba(255, 87, 34, 0.12);
+      --shadow-sm: 0 2px 12px rgba(42, 34, 28, 0.08);
+      --body-bg: var(--bg);
+    }
+    /* 전기 — 시원한 밝은 블루 */
+    html[data-theme="electric"] {
+      --bg: #f4f8ff;
+      --bg-elevated: #ffffff;
+      --card: rgba(255, 255, 255, 0.95);
+      --card-solid: #ffffff;
+      --input-bg: #eef4ff;
+      --border: rgba(41, 98, 255, 0.16);
+      --border-strong: rgba(41, 98, 255, 0.28);
+      --text: #152238;
+      --muted: #5c6b82;
+      --accent: #2962ff;
+      --accent-2: #ff3d00;
+      --accent-soft: rgba(41, 98, 255, 0.12);
+      --accent-hover: #448aff;
+      --electric: #2962ff;
+      --electric-soft: rgba(41, 98, 255, 0.1);
+      --success: #00e676;
+      --success-soft: rgba(0, 230, 118, 0.12);
+      --danger: #ff1744;
+      --admin: #ffc400;
+      --pct-low: #ff9100;
+      --pct-mid: #00e676;
+      --pct-high: #2962ff;
+      --on-accent: #ffffff;
+      --on-success: #0a1f12;
+      --shadow: 0 10px 32px rgba(41, 98, 255, 0.14);
+      --shadow-sm: 0 2px 12px rgba(21, 34, 56, 0.08);
+      --body-bg: var(--bg);
+    }
+    /* 라임 — 밝은 라임·핑크 */
+    html[data-theme="lime"] {
+      --bg: #f8fdf2;
+      --bg-elevated: #ffffff;
+      --card: rgba(255, 255, 255, 0.94);
+      --card-solid: #ffffff;
+      --input-bg: #f0fce4;
+      --border: rgba(124, 179, 66, 0.22);
+      --border-strong: rgba(124, 179, 66, 0.36);
+      --text: #1f2e14;
+      --muted: #5f6f52;
+      --accent: #e91e8c;
+      --accent-2: #9ccc20;
+      --accent-soft: rgba(233, 30, 140, 0.1);
+      --accent-hover: #f06292;
+      --electric: #7cb342;
+      --electric-soft: rgba(124, 179, 66, 0.12);
+      --success: #43a047;
+      --success-soft: rgba(67, 160, 71, 0.14);
+      --danger: #d81b60;
+      --admin: #cddc39;
+      --pct-low: #fbc02d;
+      --pct-mid: #43a047;
+      --pct-high: #7cb342;
+      --on-accent: #ffffff;
+      --on-success: #ffffff;
+      --shadow: 0 10px 32px rgba(124, 179, 66, 0.14);
+      --shadow-sm: 0 2px 12px rgba(31, 46, 20, 0.08);
+      --body-bg: var(--bg);
+    }
+    /* 스카이 — 맑은 하늘 */
+    html[data-theme="sky"] {
+      --bg: #f0f9ff;
+      --bg-elevated: #ffffff;
+      --card: rgba(255, 255, 255, 0.96);
+      --card-solid: #ffffff;
+      --input-bg: #e8f6fc;
+      --border: rgba(2, 132, 199, 0.18);
+      --border-strong: rgba(2, 132, 199, 0.32);
+      --text: #0c2d48;
+      --muted: #5a7a94;
+      --accent: #0284c7;
+      --accent-2: #f59e0b;
+      --accent-soft: rgba(2, 132, 199, 0.12);
+      --accent-hover: #0ea5e9;
+      --electric: #0284c7;
+      --electric-soft: rgba(2, 132, 199, 0.1);
+      --success: #10b981;
+      --success-soft: rgba(16, 185, 129, 0.12);
       --danger: #ef4444;
       --admin: #f59e0b;
+      --pct-low: #f59e0b;
+      --pct-mid: #10b981;
+      --pct-high: #0284c7;
+      --on-accent: #ffffff;
+      --on-success: #ffffff;
+      --shadow: 0 10px 32px rgba(2, 132, 199, 0.12);
+      --shadow-sm: 0 2px 12px rgba(12, 45, 72, 0.08);
+      --body-bg: var(--bg);
+    }
+    /* 파워 — 다크 오렌지 (기본) */
+    html:not([data-theme]),
+    html[data-theme="ember"] {
+      --bg: #0e1118;
+      --bg-elevated: #151a24;
+      --card: rgba(255, 255, 255, 0.04);
+      --card-solid: #181e2a;
+      --input-bg: rgba(0, 0, 0, 0.35);
+      --border: rgba(255, 140, 70, 0.14);
+      --border-strong: rgba(255, 140, 70, 0.22);
+      --text: #f4f2ef;
+      --muted: #a8aebe;
+      --accent: #ff6b2c;
+      --accent-2: #ffc53d;
+      --accent-soft: rgba(255, 107, 44, 0.16);
+      --accent-hover: #ff9555;
+      --electric: #4d9fff;
+      --electric-soft: rgba(77, 159, 255, 0.14);
+      --success: #34d97b;
+      --success-soft: rgba(52, 217, 123, 0.16);
+      --danger: #ff5c7a;
+      --admin: #ffc53d;
+      --pct-low: #ffb020;
+      --pct-mid: #34d97b;
+      --pct-high: #4d9fff;
+      --on-accent: #ffffff;
+      --on-success: #0e1118;
+      --shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+      --shadow-sm: 0 4px 18px rgba(255, 80, 30, 0.12);
+      --body-bg:
+        radial-gradient(ellipse 85% 55% at 0% -8%, rgba(255, 107, 44, 0.18), transparent 52%),
+        radial-gradient(ellipse 65% 45% at 100% 0%, rgba(77, 159, 255, 0.12), transparent 48%),
+        var(--bg);
+      --title-gradient: linear-gradient(115deg, #fff8f2 0%, #ff8f4a 42%, #ffc53d 100%);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
-      background: var(--bg);
+      font-family: 'Pretendard', -apple-system, 'Malgun Gothic', sans-serif;
+      background: var(--body-bg, var(--bg));
+      background-attachment: fixed;
       color: var(--text);
       min-height: 100vh;
-      line-height: 1.5;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
     }
     .app-layout {
       display: flex;
       min-height: 100vh;
     }
     .sidebar {
-      width: 200px;
+      width: 216px;
       flex-shrink: 0;
-      background: var(--card);
+      background: var(--bg);
       border-right: 1px solid var(--border);
-      padding: 20px 14px;
+      padding: 22px 16px;
       position: sticky;
       top: 0;
       align-self: flex-start;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      backdrop-filter: blur(16px);
+    }
+    .theme-picker {
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+    .theme-picker label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .theme-picker select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 0.88rem;
+      font-family: inherit;
+      margin-bottom: 0;
     }
     .sidebar-date-picker {
-      margin-top: auto;
-      padding-top: 16px;
+      padding-top: 14px;
+      margin-top: 0;
       border-top: 1px solid var(--border);
     }
     .sidebar-date-picker label {
@@ -63,36 +240,41 @@
       margin-bottom: 0;
     }
     .sidebar-title {
-      font-size: 0.75rem;
+      font-size: 0.82rem;
       font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
+      color: var(--accent-hover);
+      letter-spacing: -0.02em;
       margin-bottom: 4px;
     }
     .sidebar-date {
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       color: var(--muted);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
+      padding-left: 2px;
     }
     .sidebar-list { list-style: none; }
     .sidebar-item {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 8px 4px;
-      border-radius: 6px;
+      padding: 9px 10px;
+      border-radius: var(--radius);
       font-size: 0.88rem;
+      transition: background 0.2s var(--ease), transform 0.15s var(--ease);
+    }
+    .sidebar-item:hover {
+      background: rgba(255, 255, 255, 0.04);
     }
     .sidebar-item.active {
-      background: rgba(59, 130, 246, 0.15);
+      background: var(--accent-soft);
+      box-shadow: inset 0 0 0 1px rgba(255, 107, 44, 0.35);
     }
     .sidebar-check {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       flex-shrink: 0;
-      border: 2px solid var(--muted);
-      border-radius: 4px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 7px;
       background: transparent;
       display: inline-flex;
       align-items: center;
@@ -112,7 +294,7 @@
     .sidebar-item.has-checked .sidebar-check {
       border-color: var(--success);
       background: var(--success);
-      color: #0f1419;
+      color: #0e1118;
     }
     .sidebar-item.has-checked .sidebar-check::before {
       content: '✓';
@@ -135,8 +317,85 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .sidebar-item .name-link {
+    .sidebar-name-row {
       flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .sidebar-name-row .name-link {
+      flex: 0 1 auto;
+      max-width: 100%;
+    }
+    .pro-badge-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      flex-shrink: 0;
+    }
+    .user-pro-badge-wrap {
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    .sidebar-pro-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 0.58rem;
+      font-weight: 800;
+      line-height: 1.15;
+      color: #ffe8d4;
+      background: rgba(255, 107, 44, 0.35);
+      border: 1px solid rgba(255, 140, 70, 0.55);
+      cursor: default;
+    }
+    .sidebar-pro-badge .pro-badge-mult {
+      font-size: 0.52rem;
+      font-weight: 800;
+      opacity: 0.95;
+      margin-left: 1px;
+    }
+    .name-display-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+    .pro-badge {
+      display: inline-block;
+      font-size: 0.58rem;
+      font-weight: 800;
+      line-height: 1.15;
+      padding: 2px 5px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+      cursor: default;
+    }
+    .pro-badge--y-write {
+      color: #ffe8d4;
+      background: rgba(255, 107, 44, 0.35);
+      border: 1px solid rgba(255, 140, 70, 0.55);
+    }
+    .pro-badge--y-rate {
+      color: #d4ffe8;
+      background: rgba(52, 217, 123, 0.3);
+      border: 1px solid rgba(52, 217, 123, 0.5);
+    }
+    .pro-badge--w-write {
+      color: #fff3d6;
+      background: rgba(255, 197, 61, 0.28);
+      border: 1px solid rgba(255, 197, 61, 0.5);
+    }
+    .pro-badge--w-rate {
+      color: #dcecff;
+      background: rgba(77, 159, 255, 0.3);
+      border: 1px solid rgba(77, 159, 255, 0.5);
+    }
+    .sidebar-item .name-link {
       min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -150,12 +409,12 @@
       padding: 0;
     }
     .sidebar-item .name-link:hover {
-      color: var(--accent);
+      color: var(--text);
       text-decoration: underline;
     }
     .sidebar-item.active .name-link {
       font-weight: 700;
-      color: var(--accent);
+      color: var(--text);
     }
     .sidebar-empty {
       font-size: 0.8rem;
@@ -183,7 +442,7 @@
     }
     .main-area {
       flex: 1;
-      padding: 24px 16px 48px;
+      padding: 28px 20px 56px;
       min-width: 0;
     }
     .container { max-width: 960px; margin: 0 auto; }
@@ -214,7 +473,9 @@
     .task-diary-col.tomorrow-col {
       flex: 0 0 44%;
       max-width: 400px;
-      border-color: rgba(59, 130, 246, 0.35);
+      background: var(--card);
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-sm);
     }
     #tomorrowTaskCard {
       display: none;
@@ -224,8 +485,9 @@
       flex-direction: column;
     }
     .tomorrow-badge {
-      background: rgba(59, 130, 246, 0.2);
-      color: #93c5fd;
+      background: var(--electric-soft);
+      color: #b8d4ff;
+      border: 1px solid rgba(77, 159, 255, 0.35);
     }
     .tomorrow-hint {
       font-size: 0.75rem;
@@ -235,22 +497,38 @@
     }
     .title-block {
       position: relative;
-      margin-bottom: 28px;
+      margin-bottom: 32px;
+      text-align: center;
     }
     h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
+      font-size: 1.85rem;
+      font-weight: 800;
       text-align: center;
       margin-bottom: 8px;
       cursor: default;
       user-select: none;
+      letter-spacing: -0.03em;
+      color: var(--accent);
     }
-    h1.admin-hint { color: var(--admin); }
+    html:not([data-theme]) h1:not(.admin-hint),
+    html[data-theme="ember"] h1:not(.admin-hint) {
+      color: transparent;
+      background: linear-gradient(115deg, #fff8f2 0%, #ff8f4a 42%, #ffc53d 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    h1.admin-hint {
+      color: var(--admin);
+      background: none;
+      -webkit-text-fill-color: var(--admin);
+    }
     .subtitle {
       text-align: center;
       color: var(--muted);
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       margin-bottom: 0;
+      font-weight: 500;
     }
     .encourage-overlay {
       position: fixed;
@@ -280,16 +558,16 @@
       max-width: 380px;
       width: 100%;
       margin: 0;
-      padding: 22px 26px;
-      border-radius: 14px;
-      background: var(--card);
-      border: 1px solid rgba(34, 197, 94, 0.65);
-      box-shadow: 0 24px 56px rgba(0, 0, 0, 0.55);
-      color: #bbf7d0;
-      font-size: 1.05rem;
+      padding: 24px 28px;
+      border-radius: var(--radius-xl);
+      background: var(--bg-elevated);
+      border: 1px solid rgba(52, 217, 123, 0.45);
+      box-shadow: var(--shadow), 0 0 32px rgba(52, 217, 123, 0.15);
+      color: var(--success);
+      font-size: 1.08rem;
       font-weight: 600;
       text-align: center;
-      line-height: 1.55;
+      line-height: 1.6;
       transform: scale(0.9) translateY(12px);
       opacity: 0;
       transition: transform 0.4s ease, opacity 0.4s ease;
@@ -305,46 +583,77 @@
     .card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 16px;
+      border-radius: var(--radius-lg);
+      padding: 22px 24px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .card:hover {
+      border-color: var(--border-strong);
+    }
+    #taskCard {
+      box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 140, 70, 0.08);
     }
     label {
       display: block;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
+      font-weight: 600;
       color: var(--muted);
-      margin-bottom: 6px;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
     }
     input[type="text"],
     input[type="password"],
     select {
       width: 100%;
-      padding: 12px 14px;
+      padding: 14px 16px;
       border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--bg);
+      border-radius: var(--radius);
+      background: var(--input-bg);
       color: var(--text);
       font-size: 1rem;
       margin-bottom: 12px;
+      font-family: inherit;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+    input::placeholder {
+      color: rgba(169, 158, 184, 0.65);
     }
     input:focus, select:focus {
       outline: none;
-      border-color: var(--accent);
+      border-color: var(--border-strong);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+      background: var(--input-bg);
     }
     .task-input-wrap { margin-top: 8px; }
     .task-input-wrap input { margin-bottom: 0; }
     .hint {
-      font-size: 0.75rem;
+      font-size: 0.78rem;
       color: var(--muted);
-      margin-top: 6px;
+      margin-top: 8px;
+      line-height: 1.5;
     }
-    .task-list { list-style: none; margin-top: 16px; }
+    .task-list {
+      list-style: none;
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
     .task-item {
       display: flex;
       align-items: flex-start;
       gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
+      padding: 13px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--input-bg);
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s var(--ease);
+    }
+    .task-item:hover {
+      background: var(--accent-soft);
+      border-color: var(--border-strong);
     }
     .task-item.is-pending { opacity: 0.92; }
     .task-item.is-new {
@@ -362,25 +671,30 @@
       gap: 6px 8px;
       min-width: 0;
     }
-    .task-item:last-child { border-bottom: none; }
+    .task-item:last-child { border-bottom: 1px solid var(--border); }
     .task-state-btn {
-      width: 22px;
-      height: 22px;
+      width: 24px;
+      height: 24px;
       margin-top: 1px;
       flex-shrink: 0;
-      border: 2px solid var(--border);
-      border-radius: 5px;
-      background: var(--bg);
+      border: 2px solid rgba(255, 255, 255, 0.18);
+      border-radius: 8px;
+      background: var(--input-bg);
+      transition: transform 0.15s var(--ease), background 0.15s ease, border-color 0.15s ease;
       cursor: pointer;
       padding: 0;
       display: flex;
       align-items: center;
       justify-content: center;
     }
+    .task-state-btn:hover:not(:disabled) {
+      transform: scale(1.06);
+    }
     .task-state-btn.state-checked {
       background: var(--success);
       border-color: var(--success);
-      color: #fff;
+      color: var(--on-success);
+      box-shadow: 0 0 10px rgba(52, 217, 123, 0.35);
     }
     .task-state-btn.state-checked .task-state-icon {
       font-size: 0.8rem;
@@ -388,9 +702,9 @@
       line-height: 1;
     }
     .task-state-btn.state-triangle {
-      border-color: #f59e0b;
-      background: rgba(245, 158, 11, 0.18);
-      color: #fbbf24;
+      border-color: var(--pct-low);
+      background: rgba(184, 160, 120, 0.15);
+      color: var(--pct-low);
     }
     .task-state-btn.state-triangle .task-state-icon {
       font-size: 0.95rem;
@@ -413,11 +727,11 @@
     }
     .task-delete {
       flex-shrink: 0;
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       margin-left: auto;
       border: none;
-      border-radius: 6px;
+      border-radius: var(--radius-sm);
       background: transparent;
       color: var(--muted);
       font-size: 1.15rem;
@@ -482,16 +796,23 @@
     .empty {
       text-align: center;
       color: var(--muted);
-      padding: 24px 0;
-      font-size: 0.9rem;
+      padding: 28px 16px;
+      font-size: 0.92rem;
+      line-height: 1.65;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px dashed rgba(255, 255, 255, 0.1);
     }
     .date-badge {
       display: inline-block;
-      background: var(--border);
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      margin-bottom: 12px;
+      background: var(--accent-soft);
+      color: #ffd4bc;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin-bottom: 14px;
+      border: 1px solid rgba(255, 107, 44, 0.35);
     }
     .chart-wrap {
       position: relative;
@@ -509,7 +830,7 @@
       inset: 0;
       z-index: 2;
       border-radius: 8px;
-      background: rgba(15, 20, 25, 0.55);
+      background: color-mix(in srgb, var(--bg) 55%, transparent);
       align-items: center;
       justify-content: center;
       flex-direction: column;
@@ -519,7 +840,8 @@
       display: flex;
     }
     .chart-overlay.initial {
-      background: rgba(26, 35, 50, 0.92);
+      background: color-mix(in srgb, var(--bg) 90%, transparent);
+      backdrop-filter: blur(6px);
     }
     .chart-overlay-text {
       color: var(--muted);
@@ -536,7 +858,7 @@
     .chart-error-msg {
       display: none;
       text-align: center;
-      color: #fca5a5;
+      color: #ff9aaa;
       font-size: 0.85rem;
       padding: 12px 0 0;
     }
@@ -550,8 +872,8 @@
     .task-loading { padding: 12px 0; }
     .skeleton-line {
       height: 14px;
-      border-radius: 6px;
-      background: linear-gradient(90deg, var(--border) 25%, #3d4d66 50%, var(--border) 75%);
+      border-radius: 8px;
+      background: linear-gradient(90deg, var(--accent-soft) 25%, var(--border) 50%, var(--accent-soft) 75%);
       background-size: 200% 100%;
       animation: shimmer 1.2s infinite;
       margin: 10px 0;
@@ -563,38 +885,60 @@
       100% { background-position: -100% 0; }
     }
     .section-title {
-      font-size: 0.9rem;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: var(--text);
+      letter-spacing: -0.02em;
     }
     .summary {
       display: flex;
       gap: 12px;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
     .summary-box {
       flex: 1;
-      background: var(--bg);
-      border-radius: 8px;
-      padding: 12px;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 12px;
       text-align: center;
+      transition: transform 0.2s var(--ease);
     }
-    .summary-box .num { font-size: 1.4rem; font-weight: 700; color: var(--accent); transition: color 0.35s ease; }
-    .summary-box .num.pct-low { color: #f59e0b; }
-    .summary-box .num.pct-mid { color: #22c55e; }
-    .summary-box .num.pct-high { color: #3b82f6; }
-    .summary-box .lbl { font-size: 0.7rem; color: var(--muted); }
+    .summary-box:hover {
+      transform: translateY(-2px);
+    }
+    .summary-box .num {
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: var(--accent-hover);
+      transition: color 0.35s ease;
+      letter-spacing: -0.03em;
+    }
+    .summary-box .num.pct-low { color: var(--pct-low); }
+    .summary-box .num.pct-mid { color: var(--pct-mid); }
+    .summary-box .num.pct-high { color: var(--pct-high); }
+    .summary-box .lbl { font-size: 0.72rem; color: var(--muted); font-weight: 500; margin-top: 2px; }
     .btn {
-      padding: 10px 16px;
+      padding: 11px 18px;
       border: none;
-      border-radius: 8px;
+      border-radius: var(--radius);
       font-size: 0.9rem;
       cursor: pointer;
       font-weight: 600;
+      font-family: inherit;
+      transition: transform 0.15s var(--ease), box-shadow 0.15s ease, background 0.15s ease;
     }
-    .btn-primary { background: var(--accent); color: #fff; }
-    .btn-primary:hover { background: var(--accent-hover); }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--on-accent);
+      box-shadow: 0 4px 14px var(--accent-soft);
+    }
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 6px 20px var(--accent-soft);
+    }
     .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
     .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
     .admin-panel { display: none; border-color: var(--admin); }
@@ -605,10 +949,11 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: var(--bg);
-      padding: 6px 10px;
-      border-radius: 20px;
+      background: var(--input-bg);
+      padding: 7px 12px;
+      border-radius: 999px;
       font-size: 0.85rem;
+      border: 1px solid var(--border);
     }
     .chip button {
       background: none;
@@ -625,13 +970,14 @@
       color: var(--muted);
     }
     .error {
-      background: rgba(239, 68, 68, 0.15);
-      color: #fca5a5;
-      padding: 10px 12px;
-      border-radius: 8px;
+      background: rgba(251, 113, 133, 0.12);
+      color: #fda4af;
+      padding: 12px 16px;
+      border-radius: var(--radius);
       font-size: 0.85rem;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       display: none;
+      border: 1px solid rgba(251, 113, 133, 0.25);
     }
     .error.show { display: block; }
     .name-locked .name-edit { display: none; }
@@ -641,14 +987,26 @@
       justify-content: space-between;
     }
     .name-display { display: none; }
-    .name-display strong { font-size: 1.1rem; }
     .link-btn {
       background: none;
       border: none;
       color: var(--accent);
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       cursor: pointer;
-      text-decoration: underline;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .link-btn:hover {
+      background: var(--accent-soft);
+      text-decoration: none;
+    }
+    .name-display strong {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
     }
     body.is-busy { overflow: hidden; }
     body.is-busy .app-layout { pointer-events: none; }
@@ -660,6 +1018,7 @@
         position: static;
         border-right: none;
         border-bottom: 1px solid var(--border);
+        border-radius: 0 0 var(--radius-lg) var(--radius-lg);
       }
       .sidebar-list {
         display: flex;
@@ -712,6 +1071,17 @@
       font-size: 0.8rem;
     }
   </style>
+  <script>
+    (function () {
+      var THEMES = ['sunrise', 'electric', 'lime', 'sky', 'ember'];
+      try {
+        var t = localStorage.getItem('proDiary_theme');
+        if (t && THEMES.indexOf(t) !== -1 && t !== 'ember') {
+          document.documentElement.setAttribute('data-theme', t);
+        }
+      } catch (e) { /* ignore */ }
+    })();
+  </script>
 </head>
 <body>
   <div class="app-layout">
@@ -734,6 +1104,16 @@
           <span>☐ 초록 테두리 · 항목만 추가</span>
           <span>☑ 초록 · 1개 이상 체크</span>
         </p>
+      </div>
+      <div class="theme-picker">
+        <label for="themeSelect">색 테마</label>
+        <select id="themeSelect" aria-label="색 테마 선택">
+          <option value="ember">파워</option>
+          <option value="sunrise">선셋</option>
+          <option value="electric">전기</option>
+          <option value="lime">라임</option>
+          <option value="sky">스카이</option>
+        </select>
       </div>
       <div class="sidebar-date-picker">
         <label for="viewDateSelect">일지 날짜</label>
@@ -759,7 +1139,10 @@
           <input type="text" id="userName" placeholder="이름을 입력하세요" autocomplete="name">
         </div>
         <div class="name-display">
-          <strong id="displayName"></strong>
+          <div class="name-display-row">
+            <strong id="displayName"></strong>
+            <span id="userProBadgeWrap" class="pro-badge-wrap user-pro-badge-wrap" aria-label="프로 뱃지"></span>
+          </div>
           <button type="button" class="link-btn" id="changeNameBtn">이름 변경</button>
         </div>
         <p class="hint" id="nameHint">이름을 선택하면 이 컴퓨터·브라우저에 저장되어, 다음 접속 시 마지막으로 선택한 이름이 자동으로 선택됩니다.</p>
@@ -785,7 +1168,7 @@
           <p class="hint">1시간 단위 혹은 부품별로 할 일을 작성해보세요.</p>
           <p class="task-loading" id="taskLoading" style="display:none;">할 일 불러오는 중...</p>
           <ul class="task-list" id="taskList"></ul>
-          <p class="empty" id="emptyTasks" style="display:none;">아직 할 일이 없습니다. 위에 입력 후 Enter를 눌러주세요.</p>
+          <p class="empty" id="emptyTasks" style="display:none;">아직 할 일이 없어요<br>위에 적고 Enter 눌러보세요 ✨</p>
         </div>
 
         <div class="card task-diary-col tomorrow-col" id="tomorrowTaskCard">
@@ -798,12 +1181,12 @@
           <p class="hint">내일 일지는 매일 비워지고, 적어 둔 항목만 오늘로 이어집니다.</p>
           <p class="task-loading" id="tomorrowTaskLoading" style="display:none;">불러오는 중...</p>
           <ul class="task-list" id="tomorrowTaskList"></ul>
-          <p class="empty" id="tomorrowEmptyTasks" style="display:none;">내일 할 일을 미리 적어 보세요.</p>
+          <p class="empty" id="tomorrowEmptyTasks" style="display:none;">내일 할 일을 미리 적어두면<br>더 여유롭게 시작할 수 있어요 🌙</p>
         </div>
       </div>
 
       <div class="card" id="chartCard" style="display:none;">
-        <p class="section-title">일별 작업 완료율 (%)</p>
+        <p class="section-title">📈 나의 성장 그래프</p>
         <div class="chart-wrap" id="chartWrap">
           <canvas id="progressChart"></canvas>
           <div class="chart-overlay initial" id="chartOverlay">
@@ -1148,6 +1531,96 @@
     return Object.keys(set).sort(function (a, b) { return b.localeCompare(a); });
   }
 
+  function shiftDateStr(dateStr, dayDelta) {
+    var d = new Date(dateStr + 'T12:00:00');
+    d.setDate(d.getDate() + dayDelta);
+    return formatDate(d);
+  }
+
+  async function getAllTasksInRange(startStr, endStr) {
+    var db = requireConfig();
+    var res = await db.from('tasks')
+      .select('task_date, state, user_id, users(name)')
+      .gte('task_date', startStr)
+      .lte('task_date', endStr);
+    if (res.error) throw new Error(res.error.message);
+    return res.data || [];
+  }
+
+  function aggregateTasksByUser(rows, dateFilter) {
+    var map = {};
+    (rows || []).forEach(function (row) {
+      var d = String(row.task_date).substring(0, 10);
+      if (dateFilter && !dateFilter(d)) return;
+      var name = row.users && row.users.name ? String(row.users.name).trim() : '';
+      if (!name) return;
+      if (!map[name]) map[name] = { count: 0, score: 0 };
+      map[name].count++;
+      map[name].score += progressWeight(row.state);
+    });
+    return map;
+  }
+
+  function winnersByTaskCount(agg, userNames) {
+    var max = 0;
+    var hasAny = false;
+    userNames.forEach(function (name) {
+      var c = (agg[name] && agg[name].count) || 0;
+      if (c > 0) hasAny = true;
+      if (c > max) max = c;
+    });
+    if (!hasAny || max <= 0) return [];
+    return userNames.filter(function (name) {
+      return ((agg[name] && agg[name].count) || 0) === max;
+    });
+  }
+
+  function winnersByCompletionRate(agg, userNames) {
+    var maxPct = -1;
+    userNames.forEach(function (name) {
+      var a = agg[name];
+      if (!a || a.count <= 0) return;
+      var pct = calcProgressPercent(a.count, a.score);
+      if (pct > maxPct) maxPct = pct;
+    });
+    if (maxPct < 0) return [];
+    return userNames.filter(function (name) {
+      var a = agg[name];
+      if (!a || a.count <= 0) return false;
+      return calcProgressPercent(a.count, a.score) === maxPct;
+    });
+  }
+
+  async function getProBadges(todayStr) {
+    todayStr = todayStr || formatDate(new Date());
+    var yStr = yesterdayStr(todayStr);
+    var weekStart = shiftDateStr(todayStr, -6);
+    var userNames = await getUsers();
+    var badges = {};
+    userNames.forEach(function (name) { badges[name] = []; });
+    if (!userNames.length) return { badges: badges };
+
+    var rows = await getAllTasksInRange(weekStart, todayStr);
+    var yesterdayAgg = aggregateTasksByUser(rows, function (d) { return d === yStr; });
+    var weekAgg = aggregateTasksByUser(rows, function (d) {
+      return d >= weekStart && d <= todayStr;
+    });
+
+    function grant(list, key) {
+      (list || []).forEach(function (name) {
+        if (!badges[name]) badges[name] = [];
+        if (badges[name].indexOf(key) === -1) badges[name].push(key);
+      });
+    }
+
+    grant(winnersByTaskCount(yesterdayAgg, userNames), 'y-write');
+    grant(winnersByCompletionRate(yesterdayAgg, userNames), 'y-rate');
+    grant(winnersByTaskCount(weekAgg, userNames), 'w-write');
+    grant(winnersByCompletionRate(weekAgg, userNames), 'w-rate');
+
+    return { badges: badges };
+  }
+
   global.ProDiaryApi = {
     isReady: function () {
       return Boolean(global.SUPABASE_URL && global.SUPABASE_ANON_KEY &&
@@ -1164,7 +1637,8 @@
     getDailyProgress: getDailyProgress,
     getDayProgress: getDayProgress,
     getBootstrapData: getBootstrapData,
-    getTaskDates: getTaskDates
+    getTaskDates: getTaskDates,
+    getProBadges: getProBadges
   };
 })(window);
 
@@ -1173,6 +1647,40 @@
     (function () {
       var STORAGE_KEY = 'proDiary_userName';
       var STORAGE_VIEW_DATE = 'proDiary_viewDate';
+      var STORAGE_THEME = 'proDiary_theme';
+      var THEME_IDS = ['sunrise', 'electric', 'lime', 'sky', 'ember'];
+      var DEFAULT_THEME = 'ember';
+
+      function getSavedTheme() {
+        try {
+          var t = localStorage.getItem(STORAGE_THEME);
+          if (t && THEME_IDS.indexOf(t) !== -1) return t;
+        } catch (e) { /* ignore */ }
+        return DEFAULT_THEME;
+      }
+
+      function applyTheme(themeId) {
+        var id = THEME_IDS.indexOf(themeId) !== -1 ? themeId : DEFAULT_THEME;
+        if (id === DEFAULT_THEME) {
+          document.documentElement.removeAttribute('data-theme');
+        } else {
+          document.documentElement.setAttribute('data-theme', id);
+        }
+        try {
+          localStorage.setItem(STORAGE_THEME, id);
+        } catch (e) { /* ignore */ }
+        var sel = document.getElementById('themeSelect');
+        if (sel && sel.value !== id) sel.value = id;
+      }
+
+      function initThemePicker() {
+        applyTheme(getSavedTheme());
+        var sel = document.getElementById('themeSelect');
+        if (!sel) return;
+        sel.addEventListener('change', function () {
+          applyTheme(sel.value);
+        });
+      }
       var CACHE_USERS = 'proDiary_users';
       var CACHE_SIDEBAR = 'proDiary_sidebar_';
       var CACHE_TASKS = 'proDiary_tasks_';
@@ -1192,6 +1700,14 @@
       var encourageToastTimer = null;
       var encourageFadeTimer = null;
       var activeSidebarSection = 'today';
+      var proBadgesByUser = {};
+      var PRO_BADGE_ORDER = ['y-write', 'y-rate', 'w-write', 'w-rate'];
+      var PRO_BADGE_META = {
+        'y-write': { label: 'PRO', title: '어제 할 일을 가장 많이 작성', className: 'pro-badge--y-write' },
+        'y-rate': { label: 'PRO', title: '어제 완료율이 가장 높음', className: 'pro-badge--y-rate' },
+        'w-write': { label: 'PRO', title: '최근 7일 할 일을 가장 많이 작성', className: 'pro-badge--w-write' },
+        'w-rate': { label: 'PRO', title: '최근 7일 완료율이 가장 높음', className: 'pro-badge--w-rate' }
+      };
 
       var el = {
         title: document.getElementById('pageTitle'),
@@ -1204,6 +1720,7 @@
         userSelect: document.getElementById('userSelect'),
         userName: document.getElementById('userName'),
         displayName: document.getElementById('displayName'),
+        userProBadgeWrap: document.getElementById('userProBadgeWrap'),
         changeNameBtn: document.getElementById('changeNameBtn'),
         nameHint: document.getElementById('nameHint'),
         taskDiaryRow: document.getElementById('taskDiaryRow'),
@@ -1697,8 +2214,10 @@
         if (locked) {
           el.nameCard.classList.add('name-locked');
           el.displayName.textContent = currentUser;
+          renderUserProBadges();
         } else {
           el.nameCard.classList.remove('name-locked');
+          if (el.userProBadgeWrap) el.userProBadgeWrap.innerHTML = '';
         }
       }
 
@@ -1989,7 +2508,7 @@
               if (typeof bar.x !== 'number' || typeof bar.y !== 'number') return;
               ctx.save();
               ctx.font = '600 11px "Segoe UI", "Malgun Gothic", sans-serif';
-              ctx.fillStyle = '#e8edf4';
+              ctx.fillStyle = '#c8cdd8';
               ctx.textAlign = 'center';
               ctx.textBaseline = 'bottom';
               ctx.fillText(label, bar.x, bar.y - 5);
@@ -2035,19 +2554,19 @@
         var p = Number(percent) || 0;
         if (p <= 30) {
           return {
-            bg: 'rgba(245, 158, 11, 0.85)',
-            border: 'rgba(245, 158, 11, 1)'
+            bg: 'rgba(255, 176, 32, 0.88)',
+            border: 'rgba(255, 176, 32, 1)'
           };
         }
         if (p <= 75) {
           return {
-            bg: 'rgba(34, 197, 94, 0.85)',
-            border: 'rgba(34, 197, 94, 1)'
+            bg: 'rgba(52, 217, 123, 0.88)',
+            border: 'rgba(52, 217, 123, 1)'
           };
         }
         return {
-          bg: 'rgba(59, 130, 246, 0.85)',
-          border: 'rgba(59, 130, 246, 1)'
+          bg: 'rgba(77, 159, 255, 0.88)',
+          border: 'rgba(77, 159, 255, 1)'
         };
       }
 
@@ -2223,6 +2742,89 @@
         return label + ' · 항목 추가함 (미체크)';
       }
 
+      function createProBadgeEl(key) {
+        var meta = PRO_BADGE_META[key];
+        if (!meta) return null;
+        var span = document.createElement('span');
+        span.className = 'pro-badge ' + meta.className;
+        span.textContent = meta.label;
+        span.title = meta.title;
+        return span;
+      }
+
+      function getOrderedBadgeKeys(userName) {
+        var keys = proBadgesByUser[userName] || [];
+        return PRO_BADGE_ORDER.filter(function (key) {
+          return keys.indexOf(key) >= 0;
+        });
+      }
+
+      function renderSidebarProIndicator(wrap, userName) {
+        if (!wrap) return;
+        wrap.innerHTML = '';
+        var keys = getOrderedBadgeKeys(userName);
+        if (!keys.length) return;
+        if (keys.length === 1) {
+          var single = createProBadgeEl(keys[0]);
+          if (single) wrap.appendChild(single);
+          return;
+        }
+        var multi = document.createElement('span');
+        multi.className = 'sidebar-pro-badge';
+        multi.title = keys.map(function (key) {
+          return PRO_BADGE_META[key] ? PRO_BADGE_META[key].title : key;
+        }).join('\n');
+        var label = document.createElement('span');
+        label.className = 'pro-badge-label';
+        label.textContent = 'PRO';
+        var mult = document.createElement('span');
+        mult.className = 'pro-badge-mult';
+        mult.textContent = '×' + keys.length;
+        multi.appendChild(label);
+        multi.appendChild(mult);
+        wrap.appendChild(multi);
+      }
+
+      function renderUserProBadges() {
+        if (!el.userProBadgeWrap) return;
+        el.userProBadgeWrap.innerHTML = '';
+        if (!currentUser) return;
+        getOrderedBadgeKeys(currentUser).forEach(function (key) {
+          var badge = createProBadgeEl(key);
+          if (badge) el.userProBadgeWrap.appendChild(badge);
+        });
+      }
+
+      function applyProBadgesToSidebar() {
+        document.querySelectorAll('.sidebar-item[data-sidebar-user]').forEach(function (li) {
+          var name = li.getAttribute('data-sidebar-user');
+          var wrap = li.querySelector('.pro-badge-wrap');
+          renderSidebarProIndicator(wrap, name);
+        });
+        renderUserProBadges();
+      }
+
+      function loadProBadges() {
+        if (!users.length) {
+          proBadgesByUser = {};
+          applyProBadgesToSidebar();
+          return Promise.resolve();
+        }
+        return runSilent('getProBadges', [todayStr()])
+          .then(function (data) {
+            proBadgesByUser = (data && data.badges) ? data.badges : {};
+            applyProBadgesToSidebar();
+          })
+          .catch(function () {
+            proBadgesByUser = {};
+            applyProBadgesToSidebar();
+          });
+      }
+
+      function maybeRefreshProBadges() {
+        if (users.length) loadProBadges();
+      }
+
       function findSidebarRow(userName, section) {
         var list = section === 'yesterday' ? el.diaryYesterdayList : el.diaryTodayList;
         var rows = list.querySelectorAll('.sidebar-item[data-sidebar-user]');
@@ -2248,6 +2850,8 @@
         cb.setAttribute('role', 'checkbox');
         cb.setAttribute('aria-checked', 'false');
 
+        var nameRow = document.createElement('div');
+        nameRow.className = 'sidebar-name-row';
         var nameBtn = document.createElement('button');
         nameBtn.type = 'button';
         nameBtn.className = 'name name-link';
@@ -2257,9 +2861,15 @@
           e.preventDefault();
           switchToDiary(userName, section);
         });
+        var badgeWrap = document.createElement('span');
+        badgeWrap.className = 'pro-badge-wrap';
+        badgeWrap.setAttribute('aria-label', '프로 뱃지');
+        nameRow.appendChild(nameBtn);
+        nameRow.appendChild(badgeWrap);
+        renderSidebarProIndicator(badgeWrap, userName);
 
         li.appendChild(cb);
-        li.appendChild(nameBtn);
+        li.appendChild(nameRow);
 
         if (showLoader) {
           var statusSlot = document.createElement('span');
@@ -2379,7 +2989,7 @@
               applySidebarUserStatus(name, emptyItem, emptyItem);
             });
         });
-        Promise.all(loads).then(function () {
+        Promise.all([Promise.all(loads), loadProBadges()]).then(function () {
           updateYesterdaySectionVisibility();
         });
       }
@@ -2428,7 +3038,7 @@
 
       function refreshDiarySidebar() {
         loadSidebarPerUser();
-        return Promise.resolve();
+        return loadProBadges();
       }
 
       function isViewingToday() {
@@ -2636,6 +3246,7 @@
             clearTaskModifying(li, modEl);
             renderTasks(tasks);
             refreshChartLocal(tasks);
+            maybeRefreshProBadges();
           })
           .catch(function (e) {
             applyTaskRowState(li, prevState);
@@ -2696,9 +3307,10 @@
             li.style.transition = 'opacity 0.22s ease';
             li.style.opacity = '0';
             setTimeout(function () {
-              renderTasks(tasks);
-              refreshChartLocal(tasks);
+            renderTasks(tasks);
+            refreshChartLocal(tasks);
               refreshDiaryDates();
+              maybeRefreshProBadges();
             }, 220);
           })
           .catch(function (e) {
@@ -2725,6 +3337,7 @@
             li.style.opacity = '0';
             setTimeout(function () {
               renderTomorrowTasks(tasks);
+              maybeRefreshProBadges();
             }, 220);
           })
           .catch(function (e) {
@@ -2979,6 +3592,7 @@
           .then(function (tasks) {
             finalizePendingTask(tempId, tasks, 'tomorrow');
             saveTomorrowTasksCache(tasks);
+            maybeRefreshProBadges();
           })
           .catch(function (e) {
             var pendingLi = el.tomorrowTaskList.querySelector('[data-temp-id="' + tempId + '"]');
@@ -3001,6 +3615,7 @@
             saveTasksCache(tasks);
             refreshChartLocal(tasks);
             refreshDiaryDates();
+            maybeRefreshProBadges();
             runSilent('getDayProgress', [currentUser, viewDate || todayStr()])
               .then(function (s) {
                 var cache = loadChartCache();
@@ -3121,6 +3736,7 @@
       el.closeAdminBtn.addEventListener('click', closeAdmin);
 
       el.todayLabel.textContent = formatTodayKorean();
+      initThemePicker();
       viewDate = loadViewDate();
       populateViewDateSelect([]);
       syncSidebarSectionFromViewDate();
