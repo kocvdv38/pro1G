@@ -186,7 +186,53 @@
       padding: 24px 16px 48px;
       min-width: 0;
     }
-    .container { max-width: 560px; margin: 0 auto; }
+    .container { max-width: 960px; margin: 0 auto; }
+    .task-diary-row {
+      display: flex;
+      gap: 16px;
+      align-items: stretch;
+      margin-bottom: 16px;
+    }
+    .task-diary-col {
+      flex: 1;
+      min-width: 0;
+      margin-bottom: 0 !important;
+      display: flex;
+      flex-direction: column;
+      align-self: stretch;
+    }
+    .task-diary-col .task-list {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+    .task-diary-col .empty {
+      flex: 1 1 auto;
+      display: flex;
+      align-items: flex-start;
+      margin-top: 16px;
+    }
+    .task-diary-col.tomorrow-col {
+      flex: 0 0 44%;
+      max-width: 400px;
+      border-color: rgba(59, 130, 246, 0.35);
+    }
+    #tomorrowTaskCard {
+      display: none;
+    }
+    #tomorrowTaskCard.visible {
+      display: flex;
+      flex-direction: column;
+    }
+    .tomorrow-badge {
+      background: rgba(59, 130, 246, 0.2);
+      color: #93c5fd;
+    }
+    .tomorrow-hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+      line-height: 1.45;
+    }
     .title-block {
       position: relative;
       margin-bottom: 28px;
@@ -206,38 +252,55 @@
       font-size: 0.85rem;
       margin-bottom: 0;
     }
-    .encourage-toast {
-      position: absolute;
-      left: 50%;
-      bottom: calc(100% + 8px);
-      transform: translateX(-50%) translateY(8px);
-      z-index: 20;
-      max-width: min(100%, 420px);
-      width: max-content;
-      padding: 10px 16px;
-      border-radius: 10px;
-      background: rgba(26, 35, 50, 0.96);
-      border: 1px solid rgba(34, 197, 94, 0.55);
-      color: #bbf7d0;
-      font-size: 0.88rem;
-      font-weight: 600;
-      text-align: center;
-      line-height: 1.45;
-      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
-      opacity: 0;
+    .encourage-overlay {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 200px;
+      z-index: 9500;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: max(56px, 11vh) 20px 20px;
+      background: transparent;
       visibility: hidden;
       pointer-events: none;
-      transition: opacity 0.45s ease, transform 0.45s ease, visibility 0.45s ease;
+      transition: visibility 0.4s ease;
     }
-    .encourage-toast.show {
-      opacity: 1;
+    .encourage-overlay.show {
       visibility: visible;
-      transform: translateX(-50%) translateY(0);
+      pointer-events: none;
     }
-    .encourage-toast.fade-out {
-      opacity: 0;
+    .encourage-overlay.fade-out {
       visibility: hidden;
-      transform: translateX(-50%) translateY(-6px);
+      pointer-events: none;
+    }
+    .encourage-popup {
+      max-width: 380px;
+      width: 100%;
+      margin: 0;
+      padding: 22px 26px;
+      border-radius: 14px;
+      background: var(--card);
+      border: 1px solid rgba(34, 197, 94, 0.65);
+      box-shadow: 0 24px 56px rgba(0, 0, 0, 0.55);
+      color: #bbf7d0;
+      font-size: 1.05rem;
+      font-weight: 600;
+      text-align: center;
+      line-height: 1.55;
+      transform: scale(0.9) translateY(12px);
+      opacity: 0;
+      transition: transform 0.4s ease, opacity 0.4s ease;
+    }
+    .encourage-overlay.show .encourage-popup {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+    .encourage-overlay.fade-out .encourage-popup {
+      transform: scale(0.95) translateY(-8px);
+      opacity: 0;
     }
     .card {
       background: var(--card);
@@ -435,6 +498,11 @@
       height: 220px;
       margin-top: 8px;
     }
+    .chart-wrap canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
     .chart-overlay {
       display: none;
       position: absolute;
@@ -512,7 +580,10 @@
       padding: 12px;
       text-align: center;
     }
-    .summary-box .num { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+    .summary-box .num { font-size: 1.4rem; font-weight: 700; color: var(--accent); transition: color 0.35s ease; }
+    .summary-box .num.pct-low { color: #f59e0b; }
+    .summary-box .num.pct-mid { color: #22c55e; }
+    .summary-box .num.pct-high { color: #3b82f6; }
     .summary-box .lbl { font-size: 0.7rem; color: var(--muted); }
     .btn {
       padding: 10px 16px;
@@ -596,6 +667,16 @@
         gap: 4px 12px;
       }
       .sidebar-item { padding: 4px 0; }
+      .encourage-overlay {
+        left: 0;
+      }
+      .task-diary-row {
+        flex-direction: column;
+      }
+      .task-diary-col.tomorrow-col {
+        flex: 1;
+        max-width: none;
+      }
     }
     .busy-overlay {
       display: none;
@@ -643,15 +724,17 @@
         <span>☐ 초록 테두리 · 항목만 추가</span>
         <span>☑ 초록 · 1개 이상 체크</span>
       </p>
-      <div class="sidebar-divider"></div>
-      <p class="sidebar-title">어제 일지</p>
-      <p class="sidebar-date" id="sidebarYesterdayDate"></p>
-      <ul class="sidebar-list" id="diaryYesterdayList"></ul>
-      <p class="sidebar-legend">
-        <span>☐ 미작성</span>
-        <span>☐ 초록 테두리 · 항목만 추가</span>
-        <span>☑ 초록 · 1개 이상 체크</span>
-      </p>
+      <div class="sidebar-divider" id="sidebarYesterdayDivider" style="display:none;"></div>
+      <div id="sidebarYesterdayBlock" style="display:none;">
+        <p class="sidebar-title">어제 일지</p>
+        <p class="sidebar-date" id="sidebarYesterdayDate"></p>
+        <ul class="sidebar-list" id="diaryYesterdayList"></ul>
+        <p class="sidebar-legend">
+          <span>☐ 미작성</span>
+          <span>☐ 초록 테두리 · 항목만 추가</span>
+          <span>☑ 초록 · 1개 이상 체크</span>
+        </p>
+      </div>
       <div class="sidebar-date-picker">
         <label for="viewDateSelect">일지 날짜</label>
         <select id="viewDateSelect" aria-label="일지 날짜 선택"></select>
@@ -660,7 +743,6 @@
     <div class="main-area">
   <div class="container">
     <div class="title-block">
-      <p id="encourageToast" class="encourage-toast" role="status" aria-live="polite"></p>
       <h1 id="pageTitle">프로의 일지</h1>
       <p class="subtitle" id="todayLabel"></p>
     </div>
@@ -683,26 +765,41 @@
         <p class="hint" id="nameHint">이름을 선택하면 이 컴퓨터·브라우저에 저장되어, 다음 접속 시 마지막으로 선택한 이름이 자동으로 선택됩니다.</p>
       </div>
 
-      <div class="card" id="taskCard" style="display:none;">
-        <span class="date-badge" id="dateBadge"></span>
-        <div class="summary">
-          <div class="summary-box">
-            <div class="num" id="todayPercent">0%</div>
-            <div class="lbl">오늘 완료율</div>
+      <div class="task-diary-row" id="taskDiaryRow" style="display:none;">
+        <div class="card task-diary-col" id="taskCard" style="display:none;">
+          <span class="date-badge" id="dateBadge"></span>
+          <div class="summary">
+            <div class="summary-box">
+              <div class="num" id="todayPercent">0%</div>
+              <div class="lbl">오늘 완료율</div>
+            </div>
+            <div class="summary-box">
+              <div class="num" id="todayCount">0/0</div>
+              <div class="lbl">완료 / 전체</div>
+            </div>
           </div>
-          <div class="summary-box">
-            <div class="num" id="todayCount">0/0</div>
-            <div class="lbl">완료 / 전체</div>
+          <label for="taskInput">오늘 할 일</label>
+          <div class="task-input-wrap">
+            <input type="text" id="taskInput" placeholder="할 일 입력 후 Enter">
           </div>
+          <p class="hint">1시간 단위 혹은 부품별로 할 일을 작성해보세요.</p>
+          <p class="task-loading" id="taskLoading" style="display:none;">할 일 불러오는 중...</p>
+          <ul class="task-list" id="taskList"></ul>
+          <p class="empty" id="emptyTasks" style="display:none;">아직 할 일이 없습니다. 위에 입력 후 Enter를 눌러주세요.</p>
         </div>
-        <label for="taskInput">오늘 할 일</label>
-        <div class="task-input-wrap">
-          <input type="text" id="taskInput" placeholder="할 일 입력 후 Enter">
+
+        <div class="card task-diary-col tomorrow-col" id="tomorrowTaskCard">
+          <span class="date-badge tomorrow-badge" id="tomorrowDateBadge">내일</span>
+          <p class="tomorrow-hint">미리 적어 두면, 내일이 되었을 때 <strong>오늘 할 일</strong> 목록으로 옮겨집니다.</p>
+          <label for="tomorrowTaskInput">내일 할 일</label>
+          <div class="task-input-wrap">
+            <input type="text" id="tomorrowTaskInput" placeholder="내일 할 일 입력 후 Enter">
+          </div>
+          <p class="hint">내일 일지는 매일 비워지고, 적어 둔 항목만 오늘로 이어집니다.</p>
+          <p class="task-loading" id="tomorrowTaskLoading" style="display:none;">불러오는 중...</p>
+          <ul class="task-list" id="tomorrowTaskList"></ul>
+          <p class="empty" id="tomorrowEmptyTasks" style="display:none;">내일 할 일을 미리 적어 보세요.</p>
         </div>
-        <p class="hint">Enter 키를 누르면 바로 항목이 추가됩니다.</p>
-        <p class="task-loading" id="taskLoading" style="display:none;">할 일 불러오는 중...</p>
-        <ul class="task-list" id="taskList"></ul>
-        <p class="empty" id="emptyTasks" style="display:none;">아직 할 일이 없습니다. 위에 입력 후 Enter를 눌러주세요.</p>
       </div>
 
       <div class="card" id="chartCard" style="display:none;">
@@ -734,6 +831,11 @@
     </div>
   </div>
 
+
+  <div id="encourageOverlay" class="encourage-overlay" aria-hidden="true">
+    <p id="encourageToast" class="encourage-popup" role="status" aria-live="polite"></p>
+  </div>
+
   <div id="busyOverlay" class="busy-overlay" aria-live="polite" aria-busy="true">
     <div class="busy-spinner"></div>
     <p class="busy-message" id="busyMessage">진행 중...</p>
@@ -742,7 +844,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    /* GitHub에 올리기 전에 아래 두 줄만 수정하세요 */
+    /* Supabase 연결 — 코드 수정 시 아래 값 유지 */
     window.SUPABASE_URL = 'https://nnbfwgswqenjahmsiebx.supabase.co';
     window.SUPABASE_ANON_KEY = 'sb_publishable_WF-1hKniZKgX3QUGmzs1_g_IyI_rcAP';
   </script>
@@ -809,6 +911,10 @@
     if (state === 'checked') return 1;
     if (state === 'triangle') return 0.5;
     return 0;
+  }
+
+  function countCompletedState(val) {
+    return parseTaskState(val) === 'checked' ? 1 : 0;
   }
 
   function calcProgressPercent(total, score) {
@@ -956,12 +1062,13 @@
       var dt = new Date(end);
       dt.setDate(end.getDate() - (dayCount - 1 - d));
       var key = formatDate(dt);
-      stats[key] = { date: key, total: 0, score: 0, percent: 0 };
+      stats[key] = { date: key, total: 0, completed: 0, score: 0, percent: 0 };
     }
     data.forEach(function (row) {
       var rowDate = String(row.task_date).substring(0, 10);
       if (!stats[rowDate]) return;
       stats[rowDate].total++;
+      stats[rowDate].completed += countCompletedState(row.state);
       stats[rowDate].score += progressWeight(row.state);
     });
     return stats;
@@ -983,12 +1090,13 @@
   async function getDayProgress(userName, dateStr) {
     userName = String(userName || '').trim();
     dateStr = dateStr || formatDate(new Date());
-    var stat = { date: dateStr, total: 0, score: 0, percent: 0 };
+    var stat = { date: dateStr, total: 0, completed: 0, score: 0, percent: 0 };
     var data = await readUserTasks(userName);
     data.forEach(function (row) {
       var rowDate = String(row.task_date).substring(0, 10);
       if (rowDate !== dateStr) return;
       stat.total++;
+      stat.completed += countCompletedState(row.state);
       stat.score += progressWeight(row.state);
     });
     stat.percent = calcProgressPercent(stat.total, stat.score);
@@ -1027,6 +1135,19 @@
     return { users: users, tasks: tasks };
   }
 
+  async function getTaskDates(userName) {
+    userName = String(userName || '').trim();
+    if (!userName) return [];
+    var today = formatDate(new Date());
+    var data = await readUserTasks(userName);
+    var set = {};
+    (data || []).forEach(function (row) {
+      var d = String(row.task_date).substring(0, 10);
+      if (d <= today) set[d] = true;
+    });
+    return Object.keys(set).sort(function (a, b) { return b.localeCompare(a); });
+  }
+
   global.ProDiaryApi = {
     isReady: function () {
       return Boolean(global.SUPABASE_URL && global.SUPABASE_ANON_KEY &&
@@ -1042,7 +1163,8 @@
     getUserDiaryStatus: getUserDiaryStatus,
     getDailyProgress: getDailyProgress,
     getDayProgress: getDayProgress,
-    getBootstrapData: getBootstrapData
+    getBootstrapData: getBootstrapData,
+    getTaskDates: getTaskDates
   };
 })(window);
 
@@ -1051,7 +1173,6 @@
     (function () {
       var STORAGE_KEY = 'proDiary_userName';
       var STORAGE_VIEW_DATE = 'proDiary_viewDate';
-      var VIEW_DATE_DAYS = 90;
       var CACHE_USERS = 'proDiary_users';
       var CACHE_SIDEBAR = 'proDiary_sidebar_';
       var CACHE_TASKS = 'proDiary_tasks_';
@@ -1074,6 +1195,7 @@
 
       var el = {
         title: document.getElementById('pageTitle'),
+        encourageOverlay: document.getElementById('encourageOverlay'),
         encourageToast: document.getElementById('encourageToast'),
         todayLabel: document.getElementById('todayLabel'),
         errorBox: document.getElementById('errorBox'),
@@ -1084,8 +1206,15 @@
         displayName: document.getElementById('displayName'),
         changeNameBtn: document.getElementById('changeNameBtn'),
         nameHint: document.getElementById('nameHint'),
+        taskDiaryRow: document.getElementById('taskDiaryRow'),
         taskCard: document.getElementById('taskCard'),
         dateBadge: document.getElementById('dateBadge'),
+        tomorrowTaskCard: document.getElementById('tomorrowTaskCard'),
+        tomorrowDateBadge: document.getElementById('tomorrowDateBadge'),
+        tomorrowTaskInput: document.getElementById('tomorrowTaskInput'),
+        tomorrowTaskList: document.getElementById('tomorrowTaskList'),
+        tomorrowEmptyTasks: document.getElementById('tomorrowEmptyTasks'),
+        tomorrowTaskLoading: document.getElementById('tomorrowTaskLoading'),
         taskInput: document.getElementById('taskInput'),
         taskList: document.getElementById('taskList'),
         emptyTasks: document.getElementById('emptyTasks'),
@@ -1109,7 +1238,9 @@
         sidebarTodayDate: document.getElementById('sidebarTodayDate'),
         sidebarYesterdayDate: document.getElementById('sidebarYesterdayDate'),
         diaryTodayList: document.getElementById('diaryTodayList'),
-        diaryYesterdayList: document.getElementById('diaryYesterdayList')
+        diaryYesterdayList: document.getElementById('diaryYesterdayList'),
+        sidebarYesterdayBlock: document.getElementById('sidebarYesterdayBlock'),
+        sidebarYesterdayDivider: document.getElementById('sidebarYesterdayDivider')
       };
 
       function setBusy(active, message) {
@@ -1155,6 +1286,14 @@
           String(d.getDate()).padStart(2, '0');
       }
 
+      function tomorrowStr() {
+        var d = new Date();
+        d.setDate(d.getDate() + 1);
+        return d.getFullYear() + '-' +
+          String(d.getMonth() + 1).padStart(2, '0') + '-' +
+          String(d.getDate()).padStart(2, '0');
+      }
+
       function dateFromOffset(daysAgo) {
         var d = new Date();
         d.setDate(d.getDate() - daysAgo);
@@ -1187,21 +1326,50 @@
         return p[0] + '년 ' + parseInt(p[1], 10) + '월 ' + parseInt(p[2], 10) + '일';
       }
 
-      function populateViewDateSelect() {
+      function populateViewDateSelect(dates) {
+        dates = dates || [];
         el.viewDateSelect.innerHTML = '';
-        for (var d = 0; d < VIEW_DATE_DAYS; d++) {
-          var key = dateFromOffset(d);
+        if (!dates.length) {
+          el.viewDateSelect.disabled = true;
+          var emptyOpt = document.createElement('option');
+          emptyOpt.value = '';
+          emptyOpt.textContent = '작성된 일지가 없습니다';
+          el.viewDateSelect.appendChild(emptyOpt);
+          return;
+        }
+        el.viewDateSelect.disabled = false;
+        dates.forEach(function (key) {
           var opt = document.createElement('option');
           opt.value = key;
           opt.textContent = formatDateOptionLabel(key);
           el.viewDateSelect.appendChild(opt);
-        }
-        if (viewDate && el.viewDateSelect.querySelector('option[value="' + viewDate + '"]')) {
+        });
+        var today = todayStr();
+        if (dates.indexOf(viewDate) >= 0) {
           el.viewDateSelect.value = viewDate;
+        } else if (dates.indexOf(today) >= 0) {
+          saveViewDate(today);
+          el.viewDateSelect.value = today;
         } else {
-          el.viewDateSelect.value = todayStr();
-          viewDate = todayStr();
+          saveViewDate(dates[0]);
+          el.viewDateSelect.value = dates[0];
         }
+      }
+
+      function refreshDiaryDates() {
+        if (!currentUser) {
+          populateViewDateSelect([]);
+          return Promise.resolve();
+        }
+        return runSilent('getTaskDates', [currentUser])
+          .then(function (dates) {
+            populateViewDateSelect(dates || []);
+            updateDateBadge();
+            syncSidebarSectionFromViewDate();
+          })
+          .catch(function () {
+            populateViewDateSelect([]);
+          });
       }
 
       function updateDateBadge() {
@@ -1213,15 +1381,60 @@
         }
       }
 
+      function updateTomorrowPanelVisibility() {
+        var showTomorrow = !!currentUser && viewDate === todayStr() &&
+          el.taskCard && el.taskCard.style.display !== 'none';
+        if (el.tomorrowTaskCard) {
+          if (showTomorrow) {
+            el.tomorrowTaskCard.classList.add('visible');
+            if (el.tomorrowDateBadge) {
+              el.tomorrowDateBadge.textContent = '내일 · ' + tomorrowStr();
+            }
+          } else {
+            el.tomorrowTaskCard.classList.remove('visible');
+          }
+        }
+      }
+
+      function renderTomorrowTasks(tasks) {
+        if (!el.tomorrowTaskList) return;
+        el.tomorrowTaskList.innerHTML = '';
+        el.tomorrowTaskLoading.style.display = 'none';
+        (tasks || []).forEach(function (t) {
+          el.tomorrowTaskList.appendChild(buildTaskItem(t, 'tomorrow'));
+        });
+        el.tomorrowEmptyTasks.style.display = (tasks || []).length === 0 ? '' : 'none';
+        saveTomorrowTasksCache(tasks || []);
+      }
+
+      function loadTomorrowTasks() {
+        if (!currentUser || viewDate !== todayStr()) return Promise.resolve();
+        var cached = loadTomorrowTasksCache();
+        if (cached) {
+          renderTomorrowTasks(cached);
+        } else if (!el.tomorrowTaskList.querySelector('.task-item')) {
+          renderTomorrowTasks([]);
+        }
+        return runSilent('getTasks', [currentUser, tomorrowStr()])
+          .then(function (tasks) {
+            renderTomorrowTasks(tasks);
+          })
+          .catch(function (e) {
+            renderTomorrowTasks(loadTomorrowTasksCache() || []);
+            if (!loadTomorrowTasksCache()) showError(e.message || String(e));
+          });
+      }
+
       function loadViewDateTasks() {
         if (!currentUser) return Promise.resolve();
+        updateTomorrowPanelVisibility();
         var cached = loadTasksCache();
         if (cached) {
           renderTasks(cached);
         } else {
           showTaskSkeleton();
         }
-        return runSilent('getTasks', [currentUser, viewDate])
+        var mainPromise = runSilent('getTasks', [currentUser, viewDate])
           .then(function (tasks) {
             renderTasks(tasks);
             saveTasksCache(tasks);
@@ -1233,6 +1446,10 @@
             el.taskLoading.style.display = 'none';
             if (!loadTasksCache()) showError(e.message || String(e));
           });
+        if (viewDate !== todayStr()) {
+          return mainPromise;
+        }
+        return Promise.all([mainPromise, loadTomorrowTasks()]);
       }
 
       function onViewDateChange() {
@@ -1533,6 +1750,24 @@
         } catch (e) { return null; }
       }
 
+      function saveTomorrowTasksCache(tasks) {
+        if (!currentUser) return;
+        try {
+          localStorage.setItem(
+            CACHE_TASKS + currentUser + '_' + tomorrowStr(),
+            JSON.stringify(tasks || [])
+          );
+        } catch (e) { /* ignore */ }
+      }
+
+      function loadTomorrowTasksCache() {
+        if (!currentUser) return null;
+        try {
+          var raw = localStorage.getItem(CACHE_TASKS + currentUser + '_' + tomorrowStr());
+          return raw ? JSON.parse(raw) : null;
+        } catch (e) { return null; }
+      }
+
       function saveSidebarCache(status) {
         try {
           localStorage.setItem(CACHE_SIDEBAR + todayStr(), JSON.stringify(status || {}));
@@ -1595,12 +1830,22 @@
           el.mainView.style.display = 'block';
         }
         if (!currentUser) return;
+        if (users.length) loadSidebarPerUser();
+        updateTomorrowPanelVisibility();
         var cachedTasks = loadTasksCache();
         if (cachedTasks) {
           el.taskLoading.style.display = 'none';
           renderTasks(cachedTasks);
         } else {
           showTaskSkeleton();
+        }
+        if (viewDate === todayStr()) {
+          var cachedTomorrow = loadTomorrowTasksCache();
+          if (cachedTomorrow) {
+            renderTomorrowTasks(cachedTomorrow);
+          } else {
+            renderTomorrowTasks([]);
+          }
         }
       }
 
@@ -1615,6 +1860,7 @@
 
             if (userName) {
               if (users.length > 0 && users.indexOf(userName) === -1) {
+                if (el.taskDiaryRow) el.taskDiaryRow.style.display = 'none';
                 el.taskCard.style.display = 'none';
                 el.chartCard.style.display = 'none';
                 setNameLocked(false);
@@ -1625,6 +1871,10 @@
               applySavedNameToSelect();
               renderTasks(data.tasks || []);
               saveTasksCache(data.tasks);
+              if (users.length) loadSidebarPerUser();
+              return refreshDiaryDates().then(function () {
+                if (viewDate === todayStr()) return loadTomorrowTasks();
+              });
             }
 
             if (users.length) {
@@ -1689,9 +1939,11 @@
       function statFromCacheEntry(date, entry) {
         var total = entry.total || 0;
         var score = entry.score != null ? entry.score : (entry.completed || 0);
+        var completed = entry.completed != null ? entry.completed : 0;
         return {
           date: date,
           total: total,
+          completed: completed,
           score: score,
           percent: entry.percent != null ? entry.percent : calcProgressPercent(total, score)
         };
@@ -1702,7 +1954,7 @@
         return dates.map(function (d) {
           if (selectedOverride && d === anchor) return selectedOverride;
           if (cache.days[d]) return statFromCacheEntry(d, cache.days[d]);
-          return { date: d, total: 0, score: 0, percent: 0 };
+          return { date: d, total: 0, completed: 0, score: 0, percent: 0 };
         });
       }
 
@@ -1711,21 +1963,55 @@
         var score = stat.score != null ? stat.score : (stat.completed || 0);
         cache.days[stat.date] = {
           total: stat.total,
+          completed: stat.completed != null ? stat.completed : 0,
           score: score,
           percent: stat.percent != null ? stat.percent : calcProgressPercent(stat.total, score)
         };
       }
 
+      var chartBarCountPluginRegistered = false;
+
+      function ensureBarCountPlugin() {
+        if (chartBarCountPluginRegistered || !window.Chart) return;
+        chartBarCountPluginRegistered = true;
+        Chart.register({
+          id: 'barCountLabels',
+          afterDatasetsDraw: function (ch, _args, opts) {
+            opts = opts || {};
+            var stats = opts.stats;
+            if (!stats || !stats.length) return;
+            var ctx = ch.ctx;
+            var meta = ch.getDatasetMeta(0);
+            meta.data.forEach(function (bar, i) {
+              var s = stats[i];
+              if (!s || !s.total) return;
+              var label = s.completed + '/' + s.total;
+              if (typeof bar.x !== 'number' || typeof bar.y !== 'number') return;
+              ctx.save();
+              ctx.font = '600 11px "Segoe UI", "Malgun Gothic", sans-serif';
+              ctx.fillStyle = '#e8edf4';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'bottom';
+              ctx.fillText(label, bar.x, bar.y - 5);
+              ctx.restore();
+            });
+          }
+        });
+      }
+
       function updateViewDateChartFromTasks(tasks) {
         var total = (tasks || []).length;
+        var completed = 0;
         var score = 0;
         (tasks || []).forEach(function (t) {
+          if (isTaskCompleted(t)) completed++;
           score += progressWeightForState(getTaskState(t));
         });
         var anchor = viewDate || todayStr();
         var stat = {
           date: anchor,
           total: total,
+          completed: completed,
           score: score,
           percent: calcProgressPercent(total, score)
         };
@@ -1735,7 +2021,58 @@
         return stat;
       }
 
-      function renderChartFromStats(stats, token) {
+      function chartAnimationOptions() {
+        return {
+          duration: 480,
+          easing: 'easeOutQuart',
+          y: { duration: 480, easing: 'easeOutQuart', delay: 0 },
+          x: { duration: 0 },
+          colors: { duration: 0 }
+        };
+      }
+
+      function barColorsForPercent(percent) {
+        var p = Number(percent) || 0;
+        if (p <= 30) {
+          return {
+            bg: 'rgba(245, 158, 11, 0.85)',
+            border: 'rgba(245, 158, 11, 1)'
+          };
+        }
+        if (p <= 75) {
+          return {
+            bg: 'rgba(34, 197, 94, 0.85)',
+            border: 'rgba(34, 197, 94, 1)'
+          };
+        }
+        return {
+          bg: 'rgba(59, 130, 246, 0.85)',
+          border: 'rgba(59, 130, 246, 1)'
+        };
+      }
+
+      function applyTodayPercentColor(percent) {
+        if (!el.todayPercent) return;
+        var p = Number(percent) || 0;
+        el.todayPercent.classList.remove('pct-low', 'pct-mid', 'pct-high');
+        if (p <= 30) el.todayPercent.classList.add('pct-low');
+        else if (p <= 75) el.todayPercent.classList.add('pct-mid');
+        else el.todayPercent.classList.add('pct-high');
+      }
+
+      function barColorsFromStats(stats) {
+        var backgrounds = [];
+        var borders = [];
+        (stats || []).forEach(function (s) {
+          var c = barColorsForPercent(s.percent);
+          backgrounds.push(c.bg);
+          borders.push(c.border);
+        });
+        return { backgrounds: backgrounds, borders: borders };
+      }
+
+      function renderChartFromStats(stats, token, opts) {
+        opts = opts || {};
         if (!stats) return;
         if (token !== undefined && token !== chartLoadToken) return;
         var labels = stats.map(function (s) {
@@ -1743,8 +2080,23 @@
           return parseInt(p[1], 10) + '/' + parseInt(p[2], 10);
         });
         var data = stats.map(function (s) { return s.percent; });
+        var colors = barColorsFromStats(stats);
+
+        if (chart && !opts.replace) {
+          chart.data.labels = labels;
+          chart.data.datasets[0].data = data;
+          chart.data.datasets[0].backgroundColor = colors.backgrounds;
+          chart.data.datasets[0].borderColor = colors.borders;
+          chart.options.plugins.barCountLabels.stats = stats;
+          chart.update(opts.animate === false ? 'none' : 'active');
+          hideChartOverlay();
+          el.chartErrorMsg.classList.remove('show');
+          return;
+        }
 
         if (chart) chart.destroy();
+        ensureBarCountPlugin();
+        var anim = chartAnimationOptions();
         var ctx = document.getElementById('progressChart').getContext('2d');
         chart = new Chart(ctx, {
           type: 'bar',
@@ -1753,8 +2105,8 @@
             datasets: [{
               label: '완료율 (%)',
               data: data,
-              backgroundColor: 'rgba(59, 130, 246, 0.7)',
-              borderColor: 'rgba(59, 130, 246, 1)',
+              backgroundColor: colors.backgrounds,
+              borderColor: colors.borders,
               borderWidth: 1,
               borderRadius: 4
             }]
@@ -1762,6 +2114,18 @@
           options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: {
+              duration: anim.duration,
+              easing: anim.easing
+            },
+            animations: {
+              y: anim.y,
+              x: anim.x,
+              colors: anim.colors
+            },
+            layout: {
+              padding: { top: 20 }
+            },
             scales: {
               y: {
                 beginAtZero: true,
@@ -1770,13 +2134,13 @@
               }
             },
             plugins: {
+              barCountLabels: { stats: stats },
               legend: { display: false },
               tooltip: {
                 callbacks: {
                   afterLabel: function (ctx) {
                     var s = stats[ctx.dataIndex];
-                    var scoreLabel = (s.score % 1) ? s.score.toFixed(1) : String(s.score);
-                    return '반영 ' + scoreLabel + ' / 전체 ' + s.total + ' (세모 50%)';
+                    return '완료 ' + (s.completed || 0) + ' / 작성 ' + s.total;
                   }
                 }
               }
@@ -1785,6 +2149,13 @@
         });
         hideChartOverlay();
         el.chartErrorMsg.classList.remove('show');
+      }
+
+      function hasChartCacheData() {
+        if (!currentUser) return false;
+        var cache = loadChartCache();
+        var dates = getChartDateRange();
+        return dates.some(function (d) { return !!cache.days[d]; });
       }
 
       function showChartOverlay(message, isInitial) {
@@ -1805,21 +2176,6 @@
         el.chartWrap.style.display = 'block';
       }
 
-      function showChartFromCacheIfAny(token) {
-        if (!currentUser) return false;
-        var cache = loadChartCache();
-        var dates = getChartDateRange();
-        var hasCached = dates.some(function (d) { return !!cache.days[d]; });
-        if (!hasCached) return false;
-
-        el.chartCard.style.display = 'block';
-        el.chartWrap.style.display = 'block';
-        ensureChartJs().then(function () {
-          if (token !== undefined && token !== chartLoadToken) return;
-          renderChartFromStats(buildChartStats(cache, dates), token);
-        });
-        return true;
-      }
 
       function scheduleChartLoad() {
         setTimeout(function () { loadChartAsync(); }, 200);
@@ -1942,6 +2298,38 @@
         }
       }
 
+
+      function hasAnyYesterdayDiary() {
+        var cache = loadSidebarUsersCache();
+        if (cache && cache.users) {
+          for (var k in cache.users) {
+            if (!Object.prototype.hasOwnProperty.call(cache.users, k)) continue;
+            var y = cache.users[k].yesterday;
+            if (y && y.hasItems) return true;
+          }
+        }
+        var rows = el.diaryYesterdayList
+          ? el.diaryYesterdayList.querySelectorAll('.sidebar-item')
+          : [];
+        for (var i = 0; i < rows.length; i++) {
+          if (rows[i].classList.contains('has-items-only') ||
+              rows[i].classList.contains('has-checked')) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      function updateYesterdaySectionVisibility() {
+        var show = hasAnyYesterdayDiary();
+        if (el.sidebarYesterdayBlock) {
+          el.sidebarYesterdayBlock.style.display = show ? '' : 'none';
+        }
+        if (el.sidebarYesterdayDivider) {
+          el.sidebarYesterdayDivider.style.display = show ? '' : 'none';
+        }
+      }
+
       function renderSidebarShell(userList, cached) {
         el.sidebarTodayDate.textContent = todayStr();
         el.sidebarYesterdayDate.textContent = yesterdayStr();
@@ -1967,6 +2355,7 @@
           }
         });
         updateSidebarActiveState();
+        updateYesterdaySectionVisibility();
       }
 
       function loadSidebarPerUser() {
@@ -1978,8 +2367,8 @@
         var cached = loadSidebarUsersCache();
         renderSidebarShell(users, cached);
 
-        users.forEach(function (name) {
-          runSilent('getUserDiaryStatus', [name, todayStr()])
+        var loads = users.map(function (name) {
+          return runSilent('getUserDiaryStatus', [name, todayStr()])
             .then(function (data) {
               applySidebarUserStatus(name, data.today, data.yesterday);
               saveUserSidebarCache(name, data);
@@ -1989,6 +2378,9 @@
               var emptyItem = normalizeDiaryItem({ name: name });
               applySidebarUserStatus(name, emptyItem, emptyItem);
             });
+        });
+        Promise.all(loads).then(function () {
+          updateYesterdaySectionVisibility();
         });
       }
 
@@ -2101,22 +2493,25 @@
       }
 
       function showEncourageToast(message) {
-        if (!message || !el.encourageToast) return;
+        if (!message || !el.encourageOverlay || !el.encourageToast) return;
         clearTimeout(encourageToastTimer);
         clearTimeout(encourageFadeTimer);
+        var overlay = el.encourageOverlay;
         var toast = el.encourageToast;
         toast.textContent = message;
-        toast.classList.remove('fade-out');
-        void toast.offsetWidth;
-        toast.classList.add('show');
+        overlay.setAttribute('aria-hidden', 'false');
+        overlay.classList.remove('fade-out');
+        void overlay.offsetWidth;
+        overlay.classList.add('show');
         encourageToastTimer = setTimeout(function () {
-          toast.classList.remove('show');
-          toast.classList.add('fade-out');
+          overlay.classList.remove('show');
+          overlay.classList.add('fade-out');
           encourageFadeTimer = setTimeout(function () {
+            overlay.classList.remove('fade-out');
+            overlay.setAttribute('aria-hidden', 'true');
             toast.textContent = '';
-            toast.classList.remove('fade-out');
-          }, 480);
-        }, 2800);
+          }, 420);
+        }, 2600);
       }
 
       function maybeToastForWrite(count) {
@@ -2147,11 +2542,13 @@
         }
         var pct = calcProgressPercent(total, score);
         el.todayPercent.textContent = pct + '%';
+        applyTodayPercentColor(pct);
         el.todayCount.textContent = done + '/' + total;
-        el.emptyTasks.style.display = total === 0 ? 'block' : 'none';
+        el.emptyTasks.style.display = total === 0 ? '' : 'none';
       }
 
-      function buildTaskItem(t) {
+      function buildTaskItem(t, panel) {
+        panel = panel || 'today';
         var state = getTaskState(t);
         var li = document.createElement('li');
         var classes = ['task-item'];
@@ -2194,7 +2591,8 @@
         if (!t.pending && t.id) {
           stateBtn.addEventListener('click', function (e) {
             e.preventDefault();
-            onCycleTask(t.id);
+            if (panel === 'tomorrow') onCycleTomorrowTask(t.id);
+            else onCycleTask(t.id);
           });
 
           var delBtn = document.createElement('button');
@@ -2206,7 +2604,8 @@
           delBtn.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            onDeleteTask(t.id);
+            if (panel === 'tomorrow') onDeleteTomorrowTask(t.id);
+            else onDeleteTask(t.id);
           });
           content.appendChild(delBtn);
         }
@@ -2246,6 +2645,28 @@
           });
       }
 
+      function onCycleTomorrowTask(taskId) {
+        var li = el.tomorrowTaskList.querySelector('[data-task-id="' + taskId + '"]');
+        if (!li || li.classList.contains('is-modifying') || li.classList.contains('is-pending')) {
+          return;
+        }
+        var prevState = li.dataset.state || 'none';
+        var next = nextStateClient(prevState);
+        applyTaskRowState(li, next);
+
+        var modEl = showTaskModifying(li);
+        runSilent('cycleTaskState', [currentUser, taskId])
+          .then(function (tasks) {
+            clearTaskModifying(li, modEl);
+            renderTomorrowTasks(tasks);
+          })
+          .catch(function (e) {
+            applyTaskRowState(li, prevState);
+            clearTaskModifying(li, modEl);
+            showError(e.message || String(e));
+          });
+      }
+
       function showTaskDeleting(li) {
         li.classList.add('is-deleting');
         var stateBtn = li.querySelector('.task-state-btn');
@@ -2265,7 +2686,6 @@
       }
 
       function onDeleteTask(taskId) {
-        if (!confirm('이 할 일을 삭제할까요?')) return;
         var li = el.taskList.querySelector('[data-task-id="' + taskId + '"]');
         if (!li) return;
 
@@ -2278,6 +2698,33 @@
             setTimeout(function () {
               renderTasks(tasks);
               refreshChartLocal(tasks);
+              refreshDiaryDates();
+            }, 220);
+          })
+          .catch(function (e) {
+            li.classList.remove('is-deleting');
+            li.style.opacity = '1';
+            var stateBtn = li.querySelector('.task-state-btn');
+            if (stateBtn) stateBtn.disabled = false;
+            var delBtn = li.querySelector('.task-delete');
+            if (delBtn) delBtn.style.display = '';
+            if (deletingEl && deletingEl.parentNode) deletingEl.parentNode.removeChild(deletingEl);
+            showError(e.message || String(e));
+          });
+      }
+
+      function onDeleteTomorrowTask(taskId) {
+        var li = el.tomorrowTaskList.querySelector('[data-task-id="' + taskId + '"]');
+        if (!li) return;
+
+        var deletingEl = showTaskDeleting(li);
+
+        runSilent('deleteTask', [currentUser, taskId])
+          .then(function (tasks) {
+            li.style.transition = 'opacity 0.22s ease';
+            li.style.opacity = '0';
+            setTimeout(function () {
+              renderTomorrowTasks(tasks);
             }, 220);
           })
           .catch(function (e) {
@@ -2307,7 +2754,10 @@
         }
       }
 
-      function addPendingTask(text) {
+      function addPendingTask(text, panel) {
+        panel = panel || 'today';
+        var listEl = panel === 'tomorrow' ? el.tomorrowTaskList : el.taskList;
+        var emptyEl = panel === 'tomorrow' ? el.tomorrowEmptyTasks : el.emptyTasks;
         var tempId = 'p' + (++pendingIdCounter) + '-' + Date.now();
         var item = buildTaskItem({
           text: text,
@@ -2315,12 +2765,14 @@
           pending: true,
           tempId: tempId,
           isNew: true
-        });
-        el.emptyTasks.style.display = 'none';
-        el.taskList.appendChild(item);
-        updateTaskSummary();
-        if (currentUser) {
-          patchTodaySidebarFromTasks(getTodayTasksFromDOM());
+        }, panel);
+        emptyEl.style.display = 'none';
+        listEl.appendChild(item);
+        if (panel === 'today') {
+          updateTaskSummary();
+          if (currentUser) {
+            patchTodaySidebarFromTasks(getTodayTasksFromDOM());
+          }
         }
         return tempId;
       }
@@ -2332,11 +2784,14 @@
         return tasks.length ? tasks[tasks.length - 1] : null;
       }
 
-      function finalizePendingTask(tempId, tasks) {
-        var pendingLi = el.taskList.querySelector('[data-temp-id="' + tempId + '"]');
+      function finalizePendingTask(tempId, tasks, panel) {
+        panel = panel || 'today';
+        var listEl = panel === 'tomorrow' ? el.tomorrowTaskList : el.taskList;
+        var renderFn = panel === 'tomorrow' ? renderTomorrowTasks : renderTasks;
+        var pendingLi = listEl.querySelector('[data-temp-id="' + tempId + '"]');
         if (!pendingLi) {
-          renderTasks(tasks);
-          maybeToastForWrite((tasks || []).length);
+          renderFn(tasks);
+          if (panel === 'today') maybeToastForWrite((tasks || []).length);
           return;
         }
         var text = pendingLi.querySelector('.task-text').textContent;
@@ -2351,17 +2806,22 @@
         setTimeout(function () {
           if (!serverTask) {
             pendingLi.remove();
-            updateTaskSummary();
+            if (panel === 'today') updateTaskSummary();
+            else renderFn(tasks);
             return;
           }
-          var newLi = buildTaskItem(serverTask);
+          var newLi = buildTaskItem(serverTask, panel);
           pendingLi.replaceWith(newLi);
-          var done = 0;
-          tasks.forEach(function (t) { if (isTaskCompleted(t)) done++; });
-          updateTaskSummary(done, tasks.length);
-          saveTasksCache(tasks);
-          patchTodaySidebarFromTasks(tasks);
-          maybeToastForWrite(tasks.length);
+          if (panel === 'today') {
+            var done = 0;
+            tasks.forEach(function (t) { if (isTaskCompleted(t)) done++; });
+            updateTaskSummary(done, tasks.length);
+            saveTasksCache(tasks);
+            patchTodaySidebarFromTasks(tasks);
+            maybeToastForWrite(tasks.length);
+          } else {
+            renderFn(tasks);
+          }
         }, savingEl ? 480 : 0);
       }
 
@@ -2402,7 +2862,6 @@
         var hasCachedDays = dates.some(function (d) { return !!cache.days[d]; });
 
         if (hasCachedDays) {
-          showChartFromCacheIfAny(token);
           showChartOverlay('갱신 중...', false);
         } else {
           showChartOverlay('그래프 불러오는 중...', true);
@@ -2435,7 +2894,7 @@
             cache = loadChartCache();
             cacheDayStat(cache, endStat);
             saveChartCache(cache);
-            renderChartFromStats(buildChartStats(cache, dates), token);
+            renderChartFromStats(buildChartStats(cache, dates), token, { replace: true });
           })
           .catch(function () {
             if (token !== chartLoadToken) return;
@@ -2454,24 +2913,32 @@
         var cache = loadChartCache();
         var selectedStat = updateViewDateChartFromTasks(tasks);
         ensureChartJs().then(function () {
-          renderChartFromStats(buildChartStats(cache, dates, selectedStat), token);
+          if (token !== chartLoadToken) return;
+          var stats = buildChartStats(cache, dates, selectedStat);
+          renderChartFromStats(stats, token, {
+            replace: !chart,
+            animate: !!chart
+          });
         });
       }
 
       function showTaskUIShell() {
         el.mainView.style.display = 'block';
-        el.taskCard.style.display = 'block';
+        if (el.taskDiaryRow) el.taskDiaryRow.style.display = 'flex';
+        el.taskCard.style.display = 'flex';
         updateDateBadge();
+        updateTomorrowPanelVisibility();
         setNameLocked(true);
         el.displayName.textContent = currentUser;
         el.nameHint.textContent = '할 일을 입력하고 Enter를 누르세요.';
         el.chartCard.style.display = 'block';
-        if (showChartFromCacheIfAny()) {
+        if (hasChartCacheData()) {
           showChartOverlay('갱신 중...', false);
         } else {
           showChartOverlay('그래프 불러오는 중...', true);
         }
         el.todayPercent.textContent = '0%';
+        applyTodayPercentColor(0);
         el.todayCount.textContent = '0/0';
       }
 
@@ -2479,7 +2946,12 @@
         showTaskUIShell();
         if (users.length > 0) el.userSelect.value = currentUser;
         applyCachedBootData();
-        bootstrapFromServer(currentUser).then(scheduleChartLoad);
+        bootstrapFromServer(currentUser)
+          .then(function () { return refreshDiaryDates(); })
+          .then(function () {
+            if (viewDate === todayStr()) return loadTomorrowTasks();
+          })
+          .then(scheduleChartLoad);
         el.taskInput.focus();
       }
 
@@ -2495,6 +2967,27 @@
         showTaskUI();
       }
 
+      function addTomorrowTask() {
+        var text = el.tomorrowTaskInput.value.trim();
+        if (!text) return;
+        el.tomorrowTaskInput.value = '';
+        el.tomorrowTaskInput.focus();
+        var tempId = addPendingTask(text, 'tomorrow');
+        var dateStr = tomorrowStr();
+
+        runSilent('addTask', [currentUser, text, dateStr])
+          .then(function (tasks) {
+            finalizePendingTask(tempId, tasks, 'tomorrow');
+            saveTomorrowTasksCache(tasks);
+          })
+          .catch(function (e) {
+            var pendingLi = el.tomorrowTaskList.querySelector('[data-temp-id="' + tempId + '"]');
+            if (pendingLi) pendingLi.remove();
+            renderTomorrowTasks(loadTomorrowTasksCache() || []);
+            showError(e.message || String(e));
+          });
+      }
+
       function addTask() {
         var text = el.taskInput.value.trim();
         if (!text) return;
@@ -2507,6 +3000,7 @@
             finalizePendingTask(tempId, tasks);
             saveTasksCache(tasks);
             refreshChartLocal(tasks);
+            refreshDiaryDates();
             runSilent('getDayProgress', [currentUser, viewDate || todayStr()])
               .then(function (s) {
                 var cache = loadChartCache();
@@ -2585,6 +3079,7 @@
         setNameLocked(false);
         applySavedNameToSelect();
         if (users.length === 0) el.userName.value = currentUser;
+        if (el.taskDiaryRow) el.taskDiaryRow.style.display = 'none';
         el.taskCard.style.display = 'none';
         el.chartCard.style.display = 'none';
         el.nameHint.textContent = '이름을 선택하면 이 기기에 저장되어 다음 접속 시 자동으로 선택됩니다.';
@@ -2596,6 +3091,15 @@
           addTask();
         }
       });
+
+      if (el.tomorrowTaskInput) {
+        el.tomorrowTaskInput.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            addTomorrowTask();
+          }
+        });
+      }
 
       el.addUserBtn.addEventListener('click', function () {
         var name = el.newUserName.value.trim();
@@ -2618,7 +3122,7 @@
 
       el.todayLabel.textContent = formatTodayKorean();
       viewDate = loadViewDate();
-      populateViewDateSelect();
+      populateViewDateSelect([]);
       syncSidebarSectionFromViewDate();
       el.viewDateSelect.addEventListener('change', onViewDateChange);
 
@@ -2645,6 +3149,12 @@
       }
 
       bootstrapFromServer(savedOnBoot || '')
+        .then(function () {
+          if (!savedOnBoot) return;
+          return refreshDiaryDates().then(function () {
+            if (viewDate === todayStr()) return loadTomorrowTasks();
+          });
+        })
         .then(function () {
           if (!savedOnBoot) prefetchChartJs();
         })
