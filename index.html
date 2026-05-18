@@ -187,6 +187,10 @@
       min-width: 0;
     }
     .container { max-width: 560px; margin: 0 auto; }
+    .title-block {
+      position: relative;
+      margin-bottom: 28px;
+    }
     h1 {
       font-size: 1.5rem;
       font-weight: 700;
@@ -200,7 +204,40 @@
       text-align: center;
       color: var(--muted);
       font-size: 0.85rem;
-      margin-bottom: 28px;
+      margin-bottom: 0;
+    }
+    .encourage-toast {
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%) translateY(8px);
+      z-index: 20;
+      max-width: min(100%, 420px);
+      width: max-content;
+      padding: 10px 16px;
+      border-radius: 10px;
+      background: rgba(26, 35, 50, 0.96);
+      border: 1px solid rgba(34, 197, 94, 0.55);
+      color: #bbf7d0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-align: center;
+      line-height: 1.45;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.45s ease, transform 0.45s ease, visibility 0.45s ease;
+    }
+    .encourage-toast.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+    .encourage-toast.fade-out {
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(-50%) translateY(-6px);
     }
     .card {
       background: var(--card);
@@ -622,8 +659,11 @@
     </aside>
     <div class="main-area">
   <div class="container">
-    <h1 id="pageTitle">프로의 일지</h1>
-    <p class="subtitle" id="todayLabel"></p>
+    <div class="title-block">
+      <p id="encourageToast" class="encourage-toast" role="status" aria-live="polite"></p>
+      <h1 id="pageTitle">프로의 일지</h1>
+      <p class="subtitle" id="todayLabel"></p>
+    </div>
 
     <div id="errorBox" class="error"></div>
 
@@ -1016,9 +1056,12 @@
       var busyHideTimer = null;
       var chartLoadToken = 0;
       var pendingIdCounter = 0;
+      var encourageToastTimer = null;
+      var encourageFadeTimer = null;
 
       var el = {
         title: document.getElementById('pageTitle'),
+        encourageToast: document.getElementById('encourageToast'),
         todayLabel: document.getElementById('todayLabel'),
         errorBox: document.getElementById('errorBox'),
         mainView: document.getElementById('mainView'),
@@ -1938,6 +1981,97 @@
         return Promise.resolve();
       }
 
+      function isViewingToday() {
+        return viewDate === todayStr();
+      }
+
+      function getTaskProgressFromDOM() {
+        var done = 0;
+        var total = 0;
+        el.taskList.querySelectorAll('.task-item').forEach(function (li) {
+          total++;
+          if (li.dataset.state === 'checked') done++;
+        });
+        var pct = total > 0 ? Math.round((done / total) * 100) : 0;
+        return { done: done, total: total, pct: pct };
+      }
+
+      function messageForWriteCount(count) {
+        var table = {
+          1: '오늘의 첫 할 일! 시작이 반이에요 ✨',
+          2: '두 가지를 적었어요. 차근차근 해봐요!',
+          3: '세 가지 계획! 오늘도 프로다운 하루예요 📝',
+          4: '네 가지 할 일. 계획이 탄탄해요!',
+          5: '다섯 개나 적었네요. 멋진 하루가 될 거예요!',
+          6: '여섯 가지! 하나씩만 해도 충분해요.',
+          7: '일곱 가지 할 일. 오늘도 화이팅!'
+        };
+        if (table[count]) return table[count];
+        if (count >= 8) {
+          return '할 일 ' + count + '개! 많아도 하나씩이면 돼요 💪';
+        }
+        return '할 일을 적었어요. 오늘도 잘해봐요!';
+      }
+
+      function messageForCheckProgress(before, after) {
+        var delta = after.pct - before.pct;
+        if (after.total > 0 && after.done === after.total) {
+          return '오늘 할 일 전부 완료! 최고의 프로예요 🎉';
+        }
+        if (before.done === 0 && after.done === 1) {
+          return '첫 체크! 오늘의 시작을 했어요 ✓';
+        }
+        if (before.pct < 50 && after.pct >= 50) {
+          return '절반 이상 완료! 이 기세로 가요!';
+        }
+        if (delta >= 50) {
+          return '완료율이 ' + delta + '%나 올랐어요! 대단해요!';
+        }
+        if (delta >= 34) {
+          return '완료율이 크게 올랐어요! 정말 잘하고 있어요!';
+        }
+        if (delta >= 25) {
+          return '완료율 +' + delta + '%! 순조롭게 가고 있어요.';
+        }
+        if (delta >= 15) {
+          return '완료율이 올랐어요. 좋은 흐름이에요!';
+        }
+        if (delta > 0) {
+          return '체크 하나 더! 완료율 ' + after.pct + '% 👍';
+        }
+        return '체크 완료! 계속 해봐요.';
+      }
+
+      function showEncourageToast(message) {
+        if (!message || !el.encourageToast) return;
+        clearTimeout(encourageToastTimer);
+        clearTimeout(encourageFadeTimer);
+        var toast = el.encourageToast;
+        toast.textContent = message;
+        toast.classList.remove('fade-out');
+        void toast.offsetWidth;
+        toast.classList.add('show');
+        encourageToastTimer = setTimeout(function () {
+          toast.classList.remove('show');
+          toast.classList.add('fade-out');
+          encourageFadeTimer = setTimeout(function () {
+            toast.textContent = '';
+            toast.classList.remove('fade-out');
+          }, 480);
+        }, 2800);
+      }
+
+      function maybeToastForWrite(count) {
+        if (!isViewingToday() || count < 1) return;
+        showEncourageToast(messageForWriteCount(count));
+      }
+
+      function maybeToastForCheck(before) {
+        if (!isViewingToday()) return;
+        var after = getTaskProgressFromDOM();
+        showEncourageToast(messageForCheckProgress(before, after));
+      }
+
       function updateTaskSummary(done, total) {
         if (typeof done !== 'number' || typeof total !== 'number') {
           done = 0;
@@ -2025,9 +2159,12 @@
         }
         var prevState = li.dataset.state || 'none';
         var next = nextStateClient(prevState);
+        var progressBefore = getTaskProgressFromDOM();
+        var becameChecked = next === 'checked' && prevState !== 'checked';
         applyTaskRowState(li, next);
         updateTaskSummary();
         patchTodaySidebarFromTasks(getTodayTasksFromDOM());
+        if (becameChecked) maybeToastForCheck(progressBefore);
 
         var modEl = showTaskModifying(li);
         runSilent('cycleTaskState', [currentUser, taskId])
@@ -2134,6 +2271,7 @@
         var pendingLi = el.taskList.querySelector('[data-temp-id="' + tempId + '"]');
         if (!pendingLi) {
           renderTasks(tasks);
+          maybeToastForWrite((tasks || []).length);
           return;
         }
         var text = pendingLi.querySelector('.task-text').textContent;
@@ -2158,6 +2296,7 @@
           updateTaskSummary(done, tasks.length);
           saveTasksCache(tasks);
           patchTodaySidebarFromTasks(tasks);
+          maybeToastForWrite(tasks.length);
         }, savingEl ? 480 : 0);
       }
 
