@@ -1646,7 +1646,6 @@
   <script>
     (function () {
       var STORAGE_KEY = 'proDiary_userName';
-      var STORAGE_VIEW_DATE = 'proDiary_viewDate';
       var STORAGE_THEME = 'proDiary_theme';
       var THEME_IDS = ['sunrise', 'electric', 'lime', 'sky', 'ember'];
       var DEFAULT_THEME = 'ember';
@@ -1819,19 +1818,15 @@
           String(d.getDate()).padStart(2, '0');
       }
 
-      function loadViewDate() {
-        try {
-          var saved = localStorage.getItem(STORAGE_VIEW_DATE);
-          if (saved) return saved;
-        } catch (e) { /* ignore */ }
-        return todayStr();
-      }
-
       function saveViewDate(dateStr) {
         viewDate = dateStr;
-        try {
-          localStorage.setItem(STORAGE_VIEW_DATE, dateStr);
-        } catch (e) { /* ignore */ }
+      }
+
+      function clearViewDateSelect() {
+        if (!el.viewDateSelect) return;
+        if (el.viewDateSelect.querySelector('option[value=""]')) {
+          el.viewDateSelect.value = '';
+        }
       }
 
       function formatDateOptionLabel(dateStr) {
@@ -1845,13 +1840,15 @@
 
       function populateViewDateSelect(dates) {
         dates = dates || [];
+        var keepValue = el.viewDateSelect ? el.viewDateSelect.value : '';
         el.viewDateSelect.innerHTML = '';
+        var placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = dates.length ? '날짜 선택' : '작성된 일지가 없습니다';
+        el.viewDateSelect.appendChild(placeholder);
         if (!dates.length) {
           el.viewDateSelect.disabled = true;
-          var emptyOpt = document.createElement('option');
-          emptyOpt.value = '';
-          emptyOpt.textContent = '작성된 일지가 없습니다';
-          el.viewDateSelect.appendChild(emptyOpt);
+          el.viewDateSelect.value = '';
           return;
         }
         el.viewDateSelect.disabled = false;
@@ -1861,15 +1858,10 @@
           opt.textContent = formatDateOptionLabel(key);
           el.viewDateSelect.appendChild(opt);
         });
-        var today = todayStr();
-        if (dates.indexOf(viewDate) >= 0) {
-          el.viewDateSelect.value = viewDate;
-        } else if (dates.indexOf(today) >= 0) {
-          saveViewDate(today);
-          el.viewDateSelect.value = today;
+        if (keepValue && dates.indexOf(keepValue) >= 0) {
+          el.viewDateSelect.value = keepValue;
         } else {
-          saveViewDate(dates[0]);
-          el.viewDateSelect.value = dates[0];
+          el.viewDateSelect.value = '';
         }
       }
 
@@ -1890,6 +1882,9 @@
       }
 
       function updateDateBadge() {
+        if (el.todayLabel) {
+          el.todayLabel.textContent = formatDateKorean(viewDate);
+        }
         if (!el.dateBadge) return;
         if (viewDate === todayStr()) {
           el.dateBadge.textContent = '오늘 · ' + viewDate;
@@ -1984,6 +1979,7 @@
       function syncSidebarSectionFromViewDate() {
         if (viewDate === todayStr()) activeSidebarSection = 'today';
         else if (viewDate === yesterdayStr()) activeSidebarSection = 'yesterday';
+        else activeSidebarSection = 'custom';
       }
 
       function viewDateForSidebarSection(section) {
@@ -2179,10 +2175,15 @@
         saveSidebarCache(cache);
       }
 
-      function formatTodayKorean() {
-        var d = new Date();
+      function formatDateKorean(dateStr) {
+        var p = String(dateStr || todayStr()).split('-');
+        var d = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
         var days = ['일', '월', '화', '수', '목', '금', '토'];
         return d.getFullYear() + '년 ' + (d.getMonth() + 1) + '월 ' + d.getDate() + '일 (' + days[d.getDay()] + ')';
+      }
+
+      function formatTodayKorean() {
+        return formatDateKorean(todayStr());
       }
 
       function run(fn, args, message) {
@@ -3017,9 +3018,7 @@
         saveUserName(name);
         currentUser = name;
         saveViewDate(targetDate);
-        if (el.viewDateSelect.querySelector('option[value="' + targetDate + '"]')) {
-          el.viewDateSelect.value = targetDate;
-        }
+        clearViewDateSelect();
         updateDateBadge();
 
         if (!sameUser || el.taskCard.style.display === 'none') {
@@ -3577,6 +3576,9 @@
           return;
         }
         saveUserName(name);
+        activeSidebarSection = 'today';
+        saveViewDate(todayStr());
+        clearViewDateSelect();
         showTaskUI();
       }
 
@@ -3735,11 +3737,11 @@
 
       el.closeAdminBtn.addEventListener('click', closeAdmin);
 
-      el.todayLabel.textContent = formatTodayKorean();
       initThemePicker();
-      viewDate = loadViewDate();
+      viewDate = todayStr();
+      activeSidebarSection = 'today';
+      updateDateBadge();
       populateViewDateSelect([]);
-      syncSidebarSectionFromViewDate();
       el.viewDateSelect.addEventListener('change', onViewDateChange);
 
       el.sidebarTodayDate.textContent = todayStr();
