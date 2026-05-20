@@ -823,6 +823,7 @@
       display: block;
       width: 100% !important;
       height: 100% !important;
+      cursor: pointer;
     }
     .chart-overlay {
       display: none;
@@ -1964,16 +1965,58 @@
         return Promise.all([mainPromise, loadTomorrowTasks()]);
       }
 
-      function onViewDateChange() {
-        var next = el.viewDateSelect.value;
-        if (!next || next === viewDate) return;
-        saveViewDate(next);
+      function scrollToTaskPanel() {
+        var target = el.taskDiaryRow || el.taskCard;
+        if (!target || target.style.display === 'none') return;
+        try {
+          target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } catch (e) {
+          target.scrollIntoView(true);
+        }
+      }
+
+      function navigateToViewDate(dateStr, opts) {
+        opts = opts || {};
+        if (!dateStr || !currentUser) return;
+        if (dateStr === viewDate) {
+          if (opts.scroll !== false) scrollToTaskPanel();
+          return;
+        }
+        saveViewDate(dateStr);
+        if (el.viewDateSelect) {
+          var matched = false;
+          for (var i = 0; i < el.viewDateSelect.options.length; i++) {
+            if (el.viewDateSelect.options[i].value === dateStr) {
+              el.viewDateSelect.value = dateStr;
+              matched = true;
+              break;
+            }
+          }
+          if (!matched) el.viewDateSelect.value = '';
+        }
         updateDateBadge();
         syncSidebarSectionFromViewDate();
         updateSidebarActiveState();
+        updateTomorrowPanelVisibility();
         if (!currentUser || el.taskCard.style.display === 'none') return;
         loadViewDateTasks();
         scheduleChartLoad();
+        if (opts.scroll !== false) scrollToTaskPanel();
+      }
+
+      function onChartBarClick(_evt, elements, ch) {
+        if (!elements || !elements.length || !ch) return;
+        var stats = (ch.options.plugins && ch.options.plugins.barCountLabels &&
+          ch.options.plugins.barCountLabels.stats) || [];
+        var s = stats[elements[0].index];
+        if (!s || !s.date) return;
+        navigateToViewDate(s.date);
+      }
+
+      function onViewDateChange() {
+        var next = el.viewDateSelect.value;
+        if (!next || next === viewDate) return;
+        navigateToViewDate(next, { scroll: false });
       }
 
       function syncSidebarSectionFromViewDate() {
@@ -2608,6 +2651,7 @@
           chart.data.datasets[0].backgroundColor = colors.backgrounds;
           chart.data.datasets[0].borderColor = colors.borders;
           chart.options.plugins.barCountLabels.stats = stats;
+          chart.options.onClick = onChartBarClick;
           chart.update(opts.animate === false ? 'none' : 'active');
           hideChartOverlay();
           el.chartErrorMsg.classList.remove('show');
@@ -2658,13 +2702,21 @@
               legend: { display: false },
               tooltip: {
                 callbacks: {
+                  title: function (items) {
+                    if (!items.length) return '';
+                    var s = stats[items[0].dataIndex];
+                    return s && s.date ? formatDateKorean(s.date) : items[0].label;
+                  },
                   afterLabel: function (ctx) {
                     var s = stats[ctx.dataIndex];
-                    return '완료 ' + (s.completed || 0) + ' / 작성 ' + s.total;
+                    var lines = ['완료 ' + (s.completed || 0) + ' / 작성 ' + s.total];
+                    lines.push('클릭하면 해당 날짜 할 일 보기');
+                    return lines;
                   }
                 }
               }
-            }
+            },
+            onClick: onChartBarClick
           }
         });
         hideChartOverlay();
