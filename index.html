@@ -13,6 +13,7 @@
       --radius-lg: 20px;
       --radius-xl: 26px;
       --ease: cubic-bezier(0.34, 1.2, 0.64, 1);
+      --sidebar-width: 216px;
     }
     /* 선셋 — 따뜻한 밝은 오렌지 */
     html[data-theme="sunrise"] {
@@ -134,6 +135,57 @@
       --shadow-sm: 0 2px 12px rgba(12, 45, 72, 0.08);
       --body-bg: var(--bg);
     }
+    /* 연필 — 누른 종이에 연필(검정)로 쓴 듯한 스케치 */
+    html[data-theme="sketch"] {
+      --bg: #efe4c4;
+      --bg-elevated: #f7f0dc;
+      --card: rgba(252, 247, 232, 0.94);
+      --card-solid: #fcf8ec;
+      --input-bg: #fffdf7;
+      --border: rgba(0, 0, 0, 0.32);
+      --border-strong: rgba(0, 0, 0, 0.62);
+      --text: #111111;
+      --muted: #3d3d3d;
+      --accent: #111111;
+      --accent-2: #333333;
+      --accent-soft: rgba(0, 0, 0, 0.08);
+      --accent-hover: #000000;
+      --electric: #222222;
+      --electric-soft: rgba(0, 0, 0, 0.1);
+      --success: #111111;
+      --success-soft: rgba(0, 0, 0, 0.1);
+      --danger: #111111;
+      --admin: #111111;
+      --pct-low: #c46f18;
+      --pct-mid: #2f7d47;
+      --pct-high: #2a5fad;
+      --sketch-pct-low-bg: rgba(196, 111, 24, 0.72);
+      --sketch-pct-low-border: rgba(160, 85, 15, 1);
+      --sketch-pct-mid-bg: rgba(47, 125, 71, 0.72);
+      --sketch-pct-mid-border: rgba(35, 100, 55, 1);
+      --sketch-pct-high-bg: rgba(42, 95, 173, 0.72);
+      --sketch-pct-high-border: rgba(28, 72, 140, 1);
+      --on-accent: #faf6eb;
+      --on-success: #faf6eb;
+      --shadow: 2px 3px 0 rgba(0, 0, 0, 0.14), 0 5px 16px rgba(0, 0, 0, 0.08);
+      --shadow-sm: 1px 2px 0 rgba(0, 0, 0, 0.12);
+      --body-bg:
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 27px,
+          rgba(0, 0, 0, 0.07) 27px,
+          rgba(0, 0, 0, 0.07) 28px
+        ),
+        radial-gradient(ellipse 90% 70% at 15% 5%, rgba(255, 250, 235, 0.85), transparent 55%),
+        radial-gradient(ellipse 70% 50% at 95% 95%, rgba(200, 190, 160, 0.1), transparent 50%),
+        linear-gradient(175deg, #f5ebd0 0%, #ebe0c0 45%, #e5d9b4 100%);
+      --title-gradient: none;
+      --radius-sm: 5px;
+      --radius: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+    }
     /* 파워 — 다크 오렌지 (기본) */
     html:not([data-theme]),
     html[data-theme="ember"] {
@@ -184,7 +236,7 @@
       min-height: 100vh;
     }
     .sidebar {
-      width: 216px;
+      width: var(--sidebar-width);
       flex-shrink: 0;
       background: var(--bg);
       border-right: 1px solid var(--border);
@@ -238,6 +290,197 @@
       color: var(--text);
       font-size: 0.88rem;
       margin-bottom: 0;
+    }
+    .rsidebar {
+      width: var(--sidebar-width);
+      flex-shrink: 0;
+      background: var(--bg);
+      border-left: 1px solid var(--border);
+      padding: 22px 16px;
+      position: sticky;
+      top: 0;
+      align-self: flex-start;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(16px);
+      z-index: 5;
+    }
+    .rsidebar-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--accent-hover);
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+      padding-left: 2px;
+    }
+    .rsidebar-tabs {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      list-style: none;
+      width: 100%;
+    }
+    .rsidebar-tab {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card-solid, var(--card));
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+      cursor: pointer;
+      transition: background 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease), transform 0.15s var(--ease);
+    }
+    .rsidebar-tab:hover {
+      border-color: var(--border-strong);
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .rsidebar-tab.active {
+      color: var(--accent-hover);
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      box-shadow: var(--shadow-sm);
+    }
+    .rsidebar-tab-icon {
+      font-size: 1.1rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .rsidebar-tab-label {
+      flex: 1;
+      text-align: left;
+    }
+    #processCard {
+      display: none;
+      flex-direction: column;
+      gap: 0;
+    }
+    #processCard.visible {
+      display: flex;
+    }
+    .process-table-wrap {
+      overflow-x: auto;
+      margin-top: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .process-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+      min-width: 640px;
+    }
+    .process-table th,
+    .process-table td {
+      border-bottom: 1px solid var(--border);
+      padding: 10px 10px;
+      vertical-align: middle;
+      text-align: left;
+    }
+    .process-table th {
+      background: var(--input-bg);
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .process-table tbody tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .process-table tfoot td {
+      background: var(--accent-soft);
+      font-weight: 700;
+      border-bottom: none;
+    }
+    .process-table .col-time {
+      width: 96px;
+      white-space: nowrap;
+    }
+    .process-table .col-total {
+      width: 88px;
+      text-align: center;
+    }
+    .process-table .process-group-total {
+      color: var(--accent-hover);
+      font-weight: 700;
+    }
+    .process-table .process-group-total.is-dash {
+      color: var(--muted);
+      font-weight: 400;
+    }
+    .process-table .col-delete {
+      width: 44px;
+      text-align: center;
+      padding: 6px 4px;
+    }
+    .process-table select,
+    .process-table input[type="text"],
+    .process-table input[type="number"] {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 0.85rem;
+      font-family: inherit;
+    }
+    .process-table input[type="number"] {
+      text-align: right;
+    }
+    .process-table input::placeholder {
+      color: var(--muted);
+      opacity: 0.7;
+    }
+    .process-row-delete {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 1.1rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+    .process-row-delete:hover {
+      color: var(--danger);
+      background: rgba(255, 92, 122, 0.12);
+    }
+    .process-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .process-empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 28px 12px;
+      font-size: 0.88rem;
+    }
+    .process-total-label {
+      color: var(--accent-hover);
+    }
+    #processTotalAll {
+      color: var(--accent-hover);
+      font-size: 0.95rem;
+    }
+    body.main-view-process .task-diary-row,
+    body.main-view-process #chartCard {
+      display: none !important;
     }
     .sidebar-title {
       font-size: 0.82rem;
@@ -364,6 +607,180 @@
       gap: 8px;
       flex-wrap: wrap;
       min-width: 0;
+    }
+    .process-saved-panel {
+      display: none;
+      margin-top: 14px;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+    }
+    .process-saved-panel.visible {
+      display: block;
+    }
+    .process-saved-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 0.88rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .process-saved-toggle:hover {
+      border-color: var(--border-strong);
+      background: var(--accent-soft);
+    }
+    .process-saved-toggle .chevron {
+      font-size: 0.72rem;
+      color: var(--muted);
+      transition: transform 0.2s ease;
+    }
+    .process-saved-panel.is-open .process-saved-toggle .chevron {
+      transform: rotate(180deg);
+    }
+    .process-saved-count {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .process-saved-list-wrap {
+      display: none;
+      margin-top: 8px;
+      max-height: 220px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--input-bg);
+    }
+    .process-saved-panel.is-open .process-saved-list-wrap {
+      display: block;
+    }
+    .process-saved-list {
+      list-style: none;
+    }
+    .process-saved-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .process-saved-item:last-child {
+      border-bottom: none;
+    }
+    .process-saved-item.active {
+      background: var(--accent-soft);
+    }
+    .process-saved-item-btn {
+      flex: 1;
+      min-width: 0;
+      text-align: left;
+      border: none;
+      background: none;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.86rem;
+      cursor: pointer;
+      padding: 0;
+    }
+    .process-saved-item-btn strong {
+      display: block;
+      font-weight: 700;
+    }
+    .process-saved-item-btn span {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .process-saved-item-del {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 1.1rem;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .process-saved-item-del:hover {
+      color: var(--danger);
+      background: rgba(255, 92, 122, 0.12);
+    }
+    .process-saved-empty {
+      padding: 16px 12px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+    .process-card-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px 12px;
+      margin-bottom: 12px;
+    }
+    .process-title-input {
+      flex: 1;
+      min-width: 140px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 1.05rem;
+      font-weight: 700;
+      font-family: inherit;
+    }
+    .process-date-field {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .process-date-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .process-written-date {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text);
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--input-bg);
+      white-space: nowrap;
+    }
+    .process-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+    .process-card-actions .btn {
+      white-space: nowrap;
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+    }
+    .btn-outline:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent-hover);
     }
     .pro-badge {
       display: inline-block;
@@ -1037,6 +1454,25 @@
         flex: 1;
         max-width: none;
       }
+      .rsidebar {
+        width: 100%;
+        min-height: auto;
+        position: static;
+        border-left: none;
+        border-top: 1px solid var(--border);
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        padding: 16px;
+      }
+      .rsidebar-tabs {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .rsidebar-tab {
+        width: auto;
+        flex: 1;
+        min-width: 140px;
+      }
     }
     .busy-overlay {
       display: none;
@@ -1071,10 +1507,256 @@
       color: var(--muted);
       font-size: 0.8rem;
     }
+    /* 연필 테마 — 궁서체·스케치 질감 */
+    html[data-theme="sketch"]::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.045;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    html[data-theme="sketch"] .app-layout {
+      position: relative;
+      z-index: 1;
+    }
+    html[data-theme="sketch"],
+    html[data-theme="sketch"] body,
+    html[data-theme="sketch"] button,
+    html[data-theme="sketch"] input,
+    html[data-theme="sketch"] select,
+    html[data-theme="sketch"] textarea,
+    html[data-theme="sketch"] table,
+    html[data-theme="sketch"] th,
+    html[data-theme="sketch"] td,
+    html[data-theme="sketch"] label,
+    html[data-theme="sketch"] h1,
+    html[data-theme="sketch"] h2,
+    html[data-theme="sketch"] p,
+    html[data-theme="sketch"] span,
+    html[data-theme="sketch"] li {
+      font-family: 'Gungsuh', 'GungSeo', 'Batang', '궁서', 'Nanum Myeongjo', serif;
+    }
+    html[data-theme="sketch"] body {
+      font-size: 1.02rem;
+      color: var(--text);
+    }
+    html[data-theme="sketch"] h1:not(.admin-hint) {
+      color: #111111;
+      background: none;
+      -webkit-text-fill-color: #111111;
+      font-weight: 700;
+      transform: rotate(-0.35deg);
+      text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.06);
+    }
+    html[data-theme="sketch"] .sidebar,
+    html[data-theme="sketch"] .rsidebar {
+      background: rgba(247, 240, 220, 0.97);
+      backdrop-filter: none;
+      border-color: #111111;
+      box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.08);
+    }
+    html[data-theme="sketch"] .sidebar-title,
+    html[data-theme="sketch"] .rsidebar-title {
+      color: #111111;
+    }
+    html[data-theme="sketch"] .card {
+      border: 2px solid #111111;
+      border-radius: 255px 12px 10px 14px / 10px 14px 12px 8px;
+      box-shadow:
+        3px 4px 0 rgba(0, 0, 0, 0.1),
+        inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+      color: var(--text);
+      transform: rotate(-0.12deg);
+      position: relative;
+    }
+    html[data-theme="sketch"] .card::after {
+      content: '';
+      position: absolute;
+      inset: 5px;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 255px 10px 8px 12px / 8px 10px 12px 6px;
+      pointer-events: none;
+      opacity: 0.55;
+    }
+    html[data-theme="sketch"] .card:hover {
+      box-shadow:
+        4px 5px 0 rgba(0, 0, 0, 0.12),
+        inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+    }
+    html[data-theme="sketch"] #taskCard {
+      transform: rotate(0.08deg);
+    }
+    html[data-theme="sketch"] #chartCard {
+      transform: rotate(-0.18deg);
+    }
+    html[data-theme="sketch"] #processCard {
+      transform: rotate(0.05deg);
+    }
+    html[data-theme="sketch"] input,
+    html[data-theme="sketch"] select,
+    html[data-theme="sketch"] textarea,
+    html[data-theme="sketch"] .process-table select,
+    html[data-theme="sketch"] .process-table input {
+      border: 1.5px solid #111111;
+      color: #111111;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+    html[data-theme="sketch"] input::placeholder,
+    html[data-theme="sketch"] textarea::placeholder {
+      color: #555555;
+    }
+    html[data-theme="sketch"] .link-btn {
+      color: #111111;
+    }
+    html[data-theme="sketch"] .link-btn:hover {
+      color: #000000;
+    }
+    html[data-theme="sketch"] .btn-primary {
+      background: #111111;
+      color: #faf6eb;
+      box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.22);
+      border: 1.5px solid #000000;
+    }
+    html[data-theme="sketch"] .btn-primary:hover {
+      background: #000000;
+    }
+    html[data-theme="sketch"] .task-item {
+      border-left: 3px solid #111111;
+      background: rgba(255, 253, 247, 0.5);
+      color: #111111;
+    }
+    html[data-theme="sketch"] .task-item.done .task-text {
+      color: #333333;
+    }
+    html[data-theme="sketch"] .task-state-btn {
+      border-color: #111111;
+      color: #111111;
+    }
+    html[data-theme="sketch"] .sidebar-item:hover {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    html[data-theme="sketch"] .sidebar-item.active {
+      background: var(--accent-soft);
+      outline: 1.5px dashed #111111;
+      outline-offset: -1px;
+    }
+    html[data-theme="sketch"] .sidebar-check {
+      border-color: #111111;
+    }
+    html[data-theme="sketch"] .sidebar-item.has-checked .sidebar-check {
+      background: var(--pct-mid);
+      border-color: var(--pct-mid);
+    }
+    html[data-theme="sketch"] .sidebar-item.has-items-only .sidebar-check {
+      border-color: var(--pct-low);
+      box-shadow: 0 0 0 1px rgba(196, 111, 24, 0.25);
+    }
+    html[data-theme="sketch"] .rsidebar-tab {
+      border: 1.5px solid #111111;
+      color: #111111;
+    }
+    html[data-theme="sketch"] .rsidebar-tab.active {
+      outline: 1.5px dashed #111111;
+      outline-offset: 2px;
+      color: #000000;
+    }
+    html[data-theme="sketch"] .process-table-wrap {
+      border-radius: 4px 10px 6px 8px / 8px 4px 10px 6px;
+      box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+    html[data-theme="sketch"] .process-table {
+      border: 2px solid #111111;
+      color: #111111;
+      border-radius: 3px 8px 5px 7px / 7px 3px 8px 5px;
+    }
+    html[data-theme="sketch"] .process-table th,
+    html[data-theme="sketch"] .process-table td {
+      border-bottom: 1px solid #111111;
+      color: #111111;
+    }
+    html[data-theme="sketch"] .process-table th {
+      border-bottom: 2px solid #111111;
+      background: rgba(239, 228, 196, 0.65);
+      color: #111111;
+    }
+    html[data-theme="sketch"] .process-table tfoot td {
+      border-top: 2px solid #111111;
+      color: #111111;
+    }
+    html[data-theme="sketch"] .process-group-total:not(.is-dash) {
+      color: #111111;
+      text-decoration: underline;
+      text-decoration-style: wavy;
+      text-decoration-color: rgba(0, 0, 0, 0.25);
+      text-underline-offset: 3px;
+    }
+    html[data-theme="sketch"] .process-table tbody tr:hover {
+      background: rgba(255, 253, 245, 0.7);
+    }
+    html[data-theme="sketch"] .date-badge,
+    html[data-theme="sketch"] .summary-box {
+      border: 1.5px dashed #111111;
+      color: #111111;
+    }
+    html[data-theme="sketch"] .summary-box .num:not(.pct-low):not(.pct-mid):not(.pct-high) {
+      color: #111111;
+    }
+    html[data-theme="sketch"] .summary-box .num.pct-low,
+    html[data-theme="sketch"] #todayPercent.pct-low {
+      color: var(--pct-low) !important;
+    }
+    html[data-theme="sketch"] .summary-box .num.pct-mid,
+    html[data-theme="sketch"] #todayPercent.pct-mid {
+      color: var(--pct-mid) !important;
+    }
+    html[data-theme="sketch"] .summary-box .num.pct-high,
+    html[data-theme="sketch"] #todayPercent.pct-high {
+      color: var(--pct-high) !important;
+    }
+    html[data-theme="sketch"] .task-item.state-triangle .task-state-btn {
+      border-color: var(--pct-low);
+      color: var(--pct-low);
+    }
+    html[data-theme="sketch"] .task-item.done .task-state-btn {
+      border-color: var(--pct-mid);
+      color: var(--pct-mid);
+    }
+    html[data-theme="sketch"] .encourage-popup {
+      border: 2px solid #111111;
+      color: #111111;
+      box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.14);
+    }
+    html[data-theme="sketch"] .chart-wrap {
+      background: rgba(255, 253, 247, 0.75);
+      border: 2px solid #111111;
+      border-radius: 6px 12px 8px 10px / 10px 6px 12px 8px;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+    }
+    html[data-theme="sketch"] .task-input-wrap input,
+    html[data-theme="sketch"] .date-badge {
+      border-radius: 255px 8px 10px 6px / 6px 10px 8px 12px;
+    }
+    html[data-theme="sketch"] .btn-primary {
+      border-radius: 255px 10px 8px 12px / 8px 12px 10px 6px;
+    }
+    html[data-theme="sketch"] .error.show {
+      color: #111111;
+      border-color: #111111;
+      background: rgba(0, 0, 0, 0.06);
+    }
+    html[data-theme="sketch"] .process-row-delete {
+      color: #111111;
+    }
+    html[data-theme="sketch"] .process-row-delete:hover {
+      color: #000000;
+      background: rgba(0, 0, 0, 0.08);
+    }
   </style>
   <script>
     (function () {
-      var THEMES = ['sunrise', 'electric', 'lime', 'sky', 'ember'];
+      var THEMES = ['sunrise', 'electric', 'lime', 'sky', 'sketch', 'ember'];
       try {
         var t = localStorage.getItem('proDiary_theme');
         if (t && THEMES.indexOf(t) !== -1 && t !== 'ember') {
@@ -1114,6 +1796,7 @@
           <option value="electric">전기</option>
           <option value="lime">라임</option>
           <option value="sky">스카이</option>
+          <option value="sketch">연필</option>
         </select>
       </div>
       <div class="sidebar-date-picker">
@@ -1145,6 +1828,16 @@
             <span id="userProBadgeWrap" class="pro-badge-wrap user-pro-badge-wrap" aria-label="프로 뱃지"></span>
           </div>
           <button type="button" class="link-btn" id="changeNameBtn">이름 변경</button>
+        </div>
+        <div class="process-saved-panel" id="processSavedPanel">
+          <button type="button" class="process-saved-toggle" id="processSavedToggle" aria-expanded="false">
+            <span>저장된 공정표</span>
+            <span class="process-saved-count" id="processSavedCount">0개</span>
+            <span class="chevron" aria-hidden="true">▼</span>
+          </button>
+          <div class="process-saved-list-wrap" id="processSavedListWrap">
+            <ul class="process-saved-list" id="processSavedList"></ul>
+          </div>
         </div>
         <p class="hint" id="nameHint">이름을 선택하면 이 컴퓨터·브라우저에 저장되어, 다음 접속 시 마지막으로 선택한 이름이 자동으로 선택됩니다.</p>
       </div>
@@ -1197,6 +1890,49 @@
         </div>
         <p class="chart-error-msg" id="chartErrorMsg"></p>
       </div>
+
+      <div class="card" id="processCard">
+        <div class="process-card-header">
+          <input type="text" class="process-title-input" id="processTitleInput" value="공정표" aria-label="공정표 이름" maxlength="80">
+          <div class="process-date-field">
+            <span class="process-date-label">일자</span>
+            <span class="process-written-date" id="processWrittenDate" aria-live="polite"></span>
+          </div>
+          <div class="process-card-actions">
+            <button type="button" class="btn btn-outline" id="newProcessDraftBtn">새로 만들기</button>
+            <button type="button" class="btn btn-primary" id="saveProcessSheetBtn">저장</button>
+          </div>
+        </div>
+        <p class="hint" style="margin-top:0;">목표·실제 시간은 분 단위입니다. 전체 시간은 <strong>연속된 같은 작업 구분</strong>의 목표 시간 합입니다. <strong>저장</strong>하면 이름·일자로 보관되며, 왼쪽 일지 날짜와는 별도입니다.</p>
+        <div class="process-table-wrap">
+          <table class="process-table" id="processTable">
+            <thead>
+              <tr>
+                <th>작업 구분</th>
+                <th>작업 내용</th>
+                <th class="col-time">목표 시간</th>
+                <th class="col-time">실제 시간</th>
+                <th class="col-total">전체 시간</th>
+                <th class="col-delete" aria-label="행 삭제"></th>
+              </tr>
+            </thead>
+            <tbody id="processTableBody"></tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2" class="process-total-label">전체 시간</td>
+                <td id="processTotalTarget">0분</td>
+                <td id="processTotalActual">0분</td>
+                <td id="processTotalAll">—</td>
+                <td class="col-delete"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <p class="process-empty" id="processEmpty" style="display:none;">행이 없습니다. 아래 <strong>추가</strong> 버튼으로 작업을 등록하세요.</p>
+        <div class="process-actions">
+          <button type="button" class="btn btn-primary" id="addProcessRowBtn">추가</button>
+        </div>
+      </div>
     </div>
 
     <div class="card admin-panel" id="adminPanel">
@@ -1213,8 +1949,20 @@
 
   </div>
     </div>
+    <aside class="rsidebar" id="rsidebar" aria-label="오른쪽 메뉴">
+      <p class="rsidebar-title">메뉴</p>
+      <nav class="rsidebar-tabs">
+        <button type="button" class="rsidebar-tab" id="diaryTabBtn" aria-pressed="true" title="일지">
+          <span class="rsidebar-tab-icon" aria-hidden="true">📓</span>
+          <span class="rsidebar-tab-label">일지</span>
+        </button>
+        <button type="button" class="rsidebar-tab" id="ganttTabBtn" aria-pressed="false" aria-controls="processCard" title="공정표">
+          <span class="rsidebar-tab-icon" aria-hidden="true">📋</span>
+          <span class="rsidebar-tab-label">공정표</span>
+        </button>
+      </nav>
+    </aside>
   </div>
-
 
   <div id="encourageOverlay" class="encourage-overlay" aria-hidden="true">
     <p id="encourageToast" class="encourage-popup" role="status" aria-live="polite"></p>
@@ -1648,7 +2396,7 @@
     (function () {
       var STORAGE_KEY = 'proDiary_userName';
       var STORAGE_THEME = 'proDiary_theme';
-      var THEME_IDS = ['sunrise', 'electric', 'lime', 'sky', 'ember'];
+      var THEME_IDS = ['sunrise', 'electric', 'lime', 'sky', 'sketch', 'ember'];
       var DEFAULT_THEME = 'ember';
 
       function getSavedTheme() {
@@ -1657,6 +2405,10 @@
           if (t && THEME_IDS.indexOf(t) !== -1) return t;
         } catch (e) { /* ignore */ }
         return DEFAULT_THEME;
+      }
+
+      function isSketchTheme() {
+        return document.documentElement.getAttribute('data-theme') === 'sketch';
       }
 
       function applyTheme(themeId) {
@@ -1671,6 +2423,22 @@
         } catch (e) { /* ignore */ }
         var sel = document.getElementById('themeSelect');
         if (sel && sel.value !== id) sel.value = id;
+        refreshChartColorsForTheme();
+      }
+
+      function refreshChartColorsForTheme() {
+        if (!chart || !chart.data || !chart.data.datasets[0]) return;
+        var stats = chart.options.plugins &&
+          chart.options.plugins.barCountLabels &&
+          chart.options.plugins.barCountLabels.stats;
+        if (!stats || !stats.length) return;
+        var colors = barColorsFromStats(stats);
+        var style = getChartBarDatasetStyle();
+        chart.data.datasets[0].backgroundColor = colors.backgrounds;
+        chart.data.datasets[0].borderColor = colors.borders;
+        chart.data.datasets[0].borderWidth = style.borderWidth;
+        chart.data.datasets[0].borderRadius = style.borderRadius;
+        chart.update('none');
       }
 
       function initThemePicker() {
@@ -1683,6 +2451,16 @@
       }
       var CACHE_USERS = 'proDiary_users';
       var CACHE_SIDEBAR = 'proDiary_sidebar_';
+      var CACHE_PROCESS = 'proDiary_process_';
+      var CACHE_PROCESS_INDEX = 'proDiary_processIndex_';
+      var processSheetsState = { editingId: '', draftRows: [], sheets: [], editSnapshot: null };
+      var processSavedListOpen = false;
+      var PROCESS_CATEGORIES = [
+        '재단', 'CAD', 'CAM', '3D 프린터', 'CNC', '밀링', '선반', '일반가공', '락카', '조립'
+      ];
+      var mainViewMode = 'diary';
+      var processRows = [];
+      var processRowIdCounter = 0;
       var CACHE_TASKS = 'proDiary_tasks_';
       var CACHE_CHART = 'proDiary_chart_';
       var CHART_DAYS = 14;
@@ -1757,7 +2535,25 @@
         diaryTodayList: document.getElementById('diaryTodayList'),
         diaryYesterdayList: document.getElementById('diaryYesterdayList'),
         sidebarYesterdayBlock: document.getElementById('sidebarYesterdayBlock'),
-        sidebarYesterdayDivider: document.getElementById('sidebarYesterdayDivider')
+        sidebarYesterdayDivider: document.getElementById('sidebarYesterdayDivider'),
+        diaryTabBtn: document.getElementById('diaryTabBtn'),
+        ganttTabBtn: document.getElementById('ganttTabBtn'),
+        processCard: document.getElementById('processCard'),
+        processTableBody: document.getElementById('processTableBody'),
+        processEmpty: document.getElementById('processEmpty'),
+        addProcessRowBtn: document.getElementById('addProcessRowBtn'),
+        processTotalTarget: document.getElementById('processTotalTarget'),
+        processTotalActual: document.getElementById('processTotalActual'),
+        processTotalAll: document.getElementById('processTotalAll'),
+        processTitleInput: document.getElementById('processTitleInput'),
+        processWrittenDate: document.getElementById('processWrittenDate'),
+        newProcessDraftBtn: document.getElementById('newProcessDraftBtn'),
+        saveProcessSheetBtn: document.getElementById('saveProcessSheetBtn'),
+        processSavedPanel: document.getElementById('processSavedPanel'),
+        processSavedToggle: document.getElementById('processSavedToggle'),
+        processSavedCount: document.getElementById('processSavedCount'),
+        processSavedListWrap: document.getElementById('processSavedListWrap'),
+        processSavedList: document.getElementById('processSavedList')
       };
 
       function setBusy(active, message) {
@@ -2002,6 +2798,703 @@
         loadViewDateTasks();
         scheduleChartLoad();
         if (opts.scroll !== false) scrollToTaskPanel();
+      }
+
+      function parseProcessMinutes(val) {
+        var n = parseInt(String(val == null ? '' : val).trim(), 10);
+        return isNaN(n) || n < 0 ? 0 : n;
+      }
+
+      function formatProcessMinutes(total) {
+        total = parseProcessMinutes(total);
+        return total + '분';
+      }
+
+      function normalizeProcessSheet(sheet) {
+        var savedDate = sheet.savedDate || sheet.date || todayStr();
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(savedDate)) savedDate = todayStr();
+        return {
+          id: sheet.id || ('ps-' + Date.now()),
+          name: String(sheet.name || '공정표').trim() || '공정표',
+          savedDate: savedDate,
+          rows: Array.isArray(sheet.rows) ? sheet.rows.map(normalizeProcessRow) : []
+        };
+      }
+
+      function loadProcessSheetsState() {
+        if (!currentUser) {
+          processSheetsState = { editingId: '', draftRows: [], sheets: [] };
+          return;
+        }
+        try {
+          var raw = localStorage.getItem(CACHE_PROCESS_INDEX + currentUser);
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            processSheetsState = {
+              editingId: parsed.editingId || parsed.activeId || '',
+              draftRows: [],
+              sheets: (parsed.sheets || []).map(normalizeProcessSheet)
+            };
+          } else {
+            processSheetsState = { editingId: '', draftRows: [], sheets: [] };
+            migrateLegacyProcessStorage();
+          }
+        } catch (e) {
+          processSheetsState = { editingId: '', draftRows: [], sheets: [] };
+        }
+        if (processSheetsState.editingId &&
+          !processSheetsState.sheets.some(function (s) { return s.id === processSheetsState.editingId; })) {
+          processSheetsState.editingId = '';
+        }
+      }
+
+      function saveProcessSheetsState() {
+        if (!currentUser) return;
+        try {
+          localStorage.setItem(CACHE_PROCESS_INDEX + currentUser, JSON.stringify({
+            editingId: processSheetsState.editingId,
+            sheets: processSheetsState.sheets
+          }));
+        } catch (e) { /* ignore */ }
+      }
+
+      function migrateLegacyProcessStorage() {
+        if (!currentUser) return;
+        var prefix = CACHE_PROCESS + currentUser + '_';
+        var found = [];
+        var i;
+        for (i = 0; i < localStorage.length; i++) {
+          var key = localStorage.key(i);
+          if (!key || key.indexOf(prefix) !== 0) continue;
+          var suffix = key.slice(prefix.length);
+          try {
+            var parsed = JSON.parse(localStorage.getItem(key));
+            if (Array.isArray(parsed)) {
+              found.push({ key: key, suffix: suffix, rows: parsed });
+            }
+          } catch (e) { /* ignore */ }
+        }
+        if (!found.length) return;
+        found.sort(function (a, b) { return b.suffix.localeCompare(a.suffix); });
+        found.forEach(function (item) {
+          var name = '공정표';
+          var savedDate = todayStr();
+          if (/^\d{4}-\d{2}-\d{2}$/.test(item.suffix)) {
+            savedDate = item.suffix;
+            name = formatDateOptionLabel(item.suffix);
+          }
+          processSheetsState.sheets.push(normalizeProcessSheet({
+            id: 'ps-' + item.suffix,
+            name: name,
+            savedDate: savedDate,
+            rows: item.rows
+          }));
+          localStorage.removeItem(item.key);
+        });
+        saveProcessSheetsState();
+      }
+
+      function getProcessSheetById(id) {
+        for (var i = 0; i < processSheetsState.sheets.length; i++) {
+          if (processSheetsState.sheets[i].id === id) return processSheetsState.sheets[i];
+        }
+        return null;
+      }
+
+      function syncProcessRowsToEditingTarget(rows) {
+        rows = (rows || []).map(normalizeProcessRow);
+        if (processSheetsState.editingId) {
+          var sheet = getProcessSheetById(processSheetsState.editingId);
+          if (sheet) sheet.rows = rows;
+        } else {
+          processSheetsState.draftRows = rows;
+        }
+      }
+
+      function getProcessRowsForEditing() {
+        if (processSheetsState.editingId) {
+          var sheet = getProcessSheetById(processSheetsState.editingId);
+          return sheet ? (sheet.rows || []).map(normalizeProcessRow) : [];
+        }
+        return (processSheetsState.draftRows || []).map(normalizeProcessRow);
+      }
+
+      function formatProcessWrittenDate(dateStr) {
+        dateStr = dateStr || todayStr();
+        if (dateStr === todayStr()) {
+          return '오늘 · ' + dateStr;
+        }
+        return formatDateOptionLabel(dateStr);
+      }
+
+      function setProcessEditorFields(name, savedDate) {
+        if (el.processTitleInput) {
+          el.processTitleInput.value = name || '공정표';
+        }
+        if (el.processWrittenDate) {
+          el.processWrittenDate.textContent = formatProcessWrittenDate(savedDate);
+        }
+      }
+
+      function updateProcessSavedPanelVisibility() {
+        if (!el.processSavedPanel) return;
+        var show = el.nameCard.classList.contains('name-locked') && mainViewMode === 'process';
+        el.processSavedPanel.classList.toggle('visible', show);
+        if (!show) {
+          el.processSavedPanel.classList.remove('is-open');
+          processSavedListOpen = false;
+          if (el.processSavedToggle) el.processSavedToggle.setAttribute('aria-expanded', 'false');
+        }
+      }
+
+      function setProcessEditSnapshot(sheet) {
+        if (!sheet) {
+          processSheetsState.editSnapshot = null;
+          return;
+        }
+        processSheetsState.editSnapshot = {
+          id: sheet.id,
+          name: sheet.name,
+          savedDate: sheet.savedDate,
+          rows: (sheet.rows || []).map(normalizeProcessRow)
+        };
+      }
+
+      function restoreSheetFromSnapshot(sheetId) {
+        var snap = processSheetsState.editSnapshot;
+        if (!snap || snap.id !== sheetId) return;
+        var sheet = getProcessSheetById(sheetId);
+        if (!sheet) return;
+        sheet.name = snap.name;
+        sheet.savedDate = snap.savedDate;
+        sheet.rows = snap.rows.map(normalizeProcessRow);
+      }
+
+      function toggleProcessSavedList() {
+        processSavedListOpen = !processSavedListOpen;
+        if (el.processSavedPanel) {
+          el.processSavedPanel.classList.toggle('is-open', processSavedListOpen);
+        }
+        if (el.processSavedToggle) {
+          el.processSavedToggle.setAttribute('aria-expanded', processSavedListOpen ? 'true' : 'false');
+        }
+      }
+
+      function renderProcessSavedList() {
+        if (!el.processSavedList) return;
+        el.processSavedList.innerHTML = '';
+        var sheets = processSheetsState.sheets.slice().sort(function (a, b) {
+          return b.savedDate.localeCompare(a.savedDate) || b.name.localeCompare(a.name);
+        });
+        if (el.processSavedCount) {
+          el.processSavedCount.textContent = sheets.length + '개';
+        }
+        if (!sheets.length) {
+          var empty = document.createElement('li');
+          empty.className = 'process-saved-empty';
+          empty.textContent = '저장된 공정표가 없습니다. 작성 후 저장 버튼을 눌러주세요.';
+          el.processSavedList.appendChild(empty);
+          return;
+        }
+        sheets.forEach(function (sheet) {
+          var li = document.createElement('li');
+          li.className = 'process-saved-item';
+          if (sheet.id === processSheetsState.editingId) li.classList.add('active');
+
+          var openBtn = document.createElement('button');
+          openBtn.type = 'button';
+          openBtn.className = 'process-saved-item-btn';
+          openBtn.innerHTML = '<strong>' + escapeHtml(sheet.name) + '</strong><span>' +
+            formatDateOptionLabel(sheet.savedDate) + '</span>';
+          openBtn.addEventListener('click', function () {
+            openSavedProcessSheet(sheet.id);
+          });
+
+          var delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'process-saved-item-del';
+          delBtn.title = '삭제';
+          delBtn.setAttribute('aria-label', '공정표 삭제');
+          delBtn.textContent = '×';
+          delBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            deleteSavedProcessSheet(sheet.id);
+          });
+
+          li.appendChild(openBtn);
+          li.appendChild(delBtn);
+          el.processSavedList.appendChild(li);
+        });
+      }
+
+      function escapeHtml(str) {
+        return String(str || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function openSavedProcessSheet(sheetId) {
+        persistProcessRowsToMemory();
+        var sheet = getProcessSheetById(sheetId);
+        if (!sheet) return;
+        processSheetsState.editingId = sheet.id;
+        setProcessEditSnapshot(sheet);
+        setProcessEditorFields(sheet.name, sheet.savedDate);
+        processRows = (sheet.rows || []).map(normalizeProcessRow);
+        renderProcessTable(processRows);
+        renderProcessSavedList();
+        if (mainViewMode !== 'process') {
+          showProcessView();
+        }
+      }
+
+      function deleteSavedProcessSheet(sheetId) {
+        var sheet = getProcessSheetById(sheetId);
+        if (!sheet) return;
+        if (!confirm('"' + sheet.name + '" (' + formatDateOptionLabel(sheet.savedDate) + ') 공정표를 삭제할까요?')) {
+          return;
+        }
+        processSheetsState.sheets = processSheetsState.sheets.filter(function (s) {
+          return s.id !== sheetId;
+        });
+        if (processSheetsState.editingId === sheetId) {
+          newProcessDraft(false);
+        }
+        saveProcessSheetsState();
+        renderProcessSavedList();
+      }
+
+      function newProcessDraft(confirmReset) {
+        if (confirmReset !== false) {
+          persistProcessRowsToMemory();
+          var hasRows = getProcessRowsForEditing().length > 0;
+          if (hasRows && !confirm('작성 중인 내용을 지우고 새 공정표를 만드시겠습니까?')) {
+            return;
+          }
+        }
+        processSheetsState.editingId = '';
+        processSheetsState.draftRows = [];
+        processSheetsState.editSnapshot = null;
+        setProcessEditorFields('공정표', todayStr());
+        renderProcessTable([]);
+        renderProcessSavedList();
+      }
+
+      function persistProcessRowsToMemory() {
+        if (mainViewMode !== 'process' && !el.processTableBody) return;
+        processRows = collectProcessRowsFromDOM();
+        syncProcessRowsToEditingTarget(processRows);
+      }
+
+      function saveProcessSheet() {
+        if (!currentUser) {
+          showError('이름을 선택한 뒤 저장할 수 있습니다.');
+          return;
+        }
+        var name = el.processTitleInput ? el.processTitleInput.value.trim() : '';
+        if (!name) {
+          showError('공정표 이름을 입력해주세요.');
+          return;
+        }
+        processRows = collectProcessRowsFromDOM();
+        var rows = processRows.map(normalizeProcessRow);
+        var sheet = null;
+        var savedDate;
+        var existing = processSheetsState.editingId
+          ? getProcessSheetById(processSheetsState.editingId)
+          : null;
+        var sameNameAsLoaded = existing && existing.name === name;
+
+        if (existing && sameNameAsLoaded) {
+          savedDate = existing.savedDate || todayStr();
+          existing.name = name;
+          existing.rows = rows;
+          sheet = existing;
+          setProcessEditSnapshot(sheet);
+        } else {
+          if (existing) {
+            restoreSheetFromSnapshot(existing.id);
+          }
+          savedDate = todayStr();
+          sheet = normalizeProcessSheet({
+            id: 'ps-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+            name: name,
+            savedDate: savedDate,
+            rows: rows
+          });
+          processSheetsState.sheets.push(sheet);
+          processSheetsState.editingId = sheet.id;
+          setProcessEditSnapshot(sheet);
+        }
+        saveProcessSheetsState();
+        setProcessEditorFields(name, savedDate);
+        renderProcessSavedList();
+        processSavedListOpen = true;
+        if (el.processSavedPanel) el.processSavedPanel.classList.add('is-open');
+        if (el.processSavedToggle) el.processSavedToggle.setAttribute('aria-expanded', 'true');
+        showError('공정표가 저장되었습니다: ' + name + ' (' + formatDateOptionLabel(savedDate) + ')');
+        el.errorBox.style.background = 'rgba(34, 197, 94, 0.15)';
+        el.errorBox.style.color = '#86efac';
+      }
+
+      function normalizeProcessRow(row) {
+        return {
+          id: row.id || ('pr' + (++processRowIdCounter)),
+          category: String(row.category || ''),
+          content: String(row.content || ''),
+          targetMin: row.targetMin === '' || row.targetMin == null ? '' : String(row.targetMin),
+          actualMin: row.actualMin === '' || row.actualMin == null ? '' : String(row.actualMin)
+        };
+      }
+
+      function saveProcessRowsCache(rows) {
+        syncProcessRowsToEditingTarget(rows);
+      }
+
+      function loadProcessRowsCache() {
+        return getProcessRowsForEditing();
+      }
+
+      function collectProcessRowsFromDOM() {
+        if (!el.processTableBody) return [];
+        var rows = [];
+        el.processTableBody.querySelectorAll('tr[data-process-id]').forEach(function (tr) {
+          var id = tr.getAttribute('data-process-id');
+          var categoryEl = tr.querySelector('.process-category');
+          var contentEl = tr.querySelector('.process-content');
+          var targetEl = tr.querySelector('.process-target');
+          var actualEl = tr.querySelector('.process-actual');
+          rows.push(normalizeProcessRow({
+            id: id,
+            category: categoryEl ? categoryEl.value : '',
+            content: contentEl ? contentEl.value : '',
+            targetMin: targetEl ? targetEl.value : '',
+            actualMin: actualEl ? actualEl.value : ''
+          }));
+        });
+        return rows;
+      }
+
+      function persistProcessRows() {
+        persistProcessRowsToMemory();
+      }
+
+      function calcProcessTotals(rows) {
+        var targetSum = 0;
+        var actualSum = 0;
+        (rows || []).forEach(function (r) {
+          targetSum += parseProcessMinutes(r.targetMin);
+          actualSum += parseProcessMinutes(r.actualMin);
+        });
+        return { targetSum: targetSum, actualSum: actualSum };
+      }
+
+      /** 연속된 같은 작업 구분만 한 묶음(다른 구분이 끼면 별도 묶음) */
+      function computeProcessBlocks(rows) {
+        var blocks = [];
+        rows = rows || [];
+        var i = 0;
+        while (i < rows.length) {
+          var cat = String(rows[i].category || '').trim();
+          var start = i;
+          var targetSum = 0;
+          var actualSum = 0;
+
+          if (!cat) {
+            targetSum = parseProcessMinutes(rows[i].targetMin);
+            actualSum = parseProcessMinutes(rows[i].actualMin);
+            blocks.push({
+              start: start,
+              end: i,
+              category: '',
+              targetSum: targetSum,
+              actualSum: actualSum
+            });
+            i++;
+            continue;
+          }
+
+          while (i < rows.length && String(rows[i].category || '').trim() === cat) {
+            targetSum += parseProcessMinutes(rows[i].targetMin);
+            actualSum += parseProcessMinutes(rows[i].actualMin);
+            i++;
+          }
+          blocks.push({
+            start: start,
+            end: i - 1,
+            category: cat,
+            targetSum: targetSum,
+            actualSum: actualSum
+          });
+        }
+        return blocks;
+      }
+
+      function applyProcessGroupTotalsToDOM(rows) {
+        if (!el.processTableBody) return;
+        rows = rows || collectProcessRowsFromDOM();
+        var blocks = computeProcessBlocks(rows);
+
+        rows.forEach(function (row, idx) {
+          var tr = el.processTableBody.querySelector('[data-process-id="' + row.id + '"]');
+          if (!tr) return;
+          var td = tr.querySelector('.process-group-total');
+          if (!td) return;
+
+          var block = null;
+          for (var b = 0; b < blocks.length; b++) {
+            if (idx >= blocks[b].start && idx <= blocks[b].end) {
+              block = blocks[b];
+              break;
+            }
+          }
+          if (!block) {
+            td.textContent = '—';
+            td.classList.add('is-dash');
+            td.removeAttribute('title');
+            return;
+          }
+
+          if (idx === block.start) {
+            td.textContent = formatProcessMinutes(block.targetSum);
+            td.classList.remove('is-dash');
+            if (block.category) {
+              td.title = block.category + ' · 연속 ' + (block.end - block.start + 1) + '행 합계';
+            } else {
+              td.title = '목표 시간 합계';
+            }
+          } else {
+            td.textContent = '—';
+            td.classList.add('is-dash');
+            td.removeAttribute('title');
+          }
+        });
+      }
+
+      function updateProcessTotals(rows) {
+        rows = rows || processRows;
+        var t = calcProcessTotals(rows);
+        if (el.processTotalTarget) el.processTotalTarget.textContent = formatProcessMinutes(t.targetSum);
+        if (el.processTotalActual) el.processTotalActual.textContent = formatProcessMinutes(t.actualSum);
+        if (el.processTotalAll) el.processTotalAll.textContent = '—';
+        applyProcessGroupTotalsToDOM(rows);
+      }
+
+      function buildCategorySelectOptions(selected) {
+        var html = '<option value="">선택</option>';
+        PROCESS_CATEGORIES.forEach(function (c) {
+          html += '<option value="' + c + '"' + (c === selected ? ' selected' : '') + '>' + c + '</option>';
+        });
+        return html;
+      }
+
+      function bindProcessRowEvents(tr) {
+        var inputs = tr.querySelectorAll('select, input');
+        inputs.forEach(function (inp) {
+          inp.addEventListener('change', onProcessRowChange);
+          inp.addEventListener('input', onProcessRowChange);
+        });
+        var delBtn = tr.querySelector('.process-row-delete');
+        if (delBtn) {
+          delBtn.addEventListener('click', function () {
+            var id = tr.getAttribute('data-process-id');
+            removeProcessRow(id);
+          });
+        }
+      }
+
+      function onProcessRowChange() {
+        processRows = collectProcessRowsFromDOM();
+        updateProcessTotals(processRows);
+        syncProcessRowsToEditingTarget(processRows);
+        if (el.processEmpty) {
+          el.processEmpty.style.display = processRows.length ? 'none' : '';
+        }
+      }
+
+      function buildProcessRowElement(row) {
+        row = normalizeProcessRow(row);
+        var tr = document.createElement('tr');
+        tr.setAttribute('data-process-id', row.id);
+
+        var tdCat = document.createElement('td');
+        var sel = document.createElement('select');
+        sel.className = 'process-category';
+        sel.innerHTML = buildCategorySelectOptions(row.category);
+        tdCat.appendChild(sel);
+
+        var tdContent = document.createElement('td');
+        var inpContent = document.createElement('input');
+        inpContent.type = 'text';
+        inpContent.className = 'process-content';
+        inpContent.placeholder = '작업 내용 입력';
+        inpContent.value = row.content;
+        tdContent.appendChild(inpContent);
+
+        var tdTarget = document.createElement('td');
+        tdTarget.className = 'col-time';
+        var inpTarget = document.createElement('input');
+        inpTarget.type = 'number';
+        inpTarget.min = '0';
+        inpTarget.step = '1';
+        inpTarget.className = 'process-target';
+        inpTarget.placeholder = '분';
+        inpTarget.value = row.targetMin === '' ? '' : row.targetMin;
+        tdTarget.appendChild(inpTarget);
+
+        var tdActual = document.createElement('td');
+        tdActual.className = 'col-time';
+        var inpActual = document.createElement('input');
+        inpActual.type = 'number';
+        inpActual.min = '0';
+        inpActual.step = '1';
+        inpActual.className = 'process-actual';
+        inpActual.placeholder = '분';
+        inpActual.value = row.actualMin === '' ? '' : row.actualMin;
+        tdActual.appendChild(inpActual);
+
+        var tdTotal = document.createElement('td');
+        tdTotal.className = 'col-total process-group-total is-dash';
+        tdTotal.textContent = '—';
+
+        var tdDel = document.createElement('td');
+        tdDel.className = 'col-delete';
+        var delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'process-row-delete';
+        delBtn.title = '행 삭제';
+        delBtn.setAttribute('aria-label', '행 삭제');
+        delBtn.textContent = '×';
+        tdDel.appendChild(delBtn);
+
+        tr.appendChild(tdCat);
+        tr.appendChild(tdContent);
+        tr.appendChild(tdTarget);
+        tr.appendChild(tdActual);
+        tr.appendChild(tdTotal);
+        tr.appendChild(tdDel);
+        bindProcessRowEvents(tr);
+        return tr;
+      }
+
+      function renderProcessTable(rows) {
+        if (!el.processTableBody) return;
+        processRows = (rows || []).map(normalizeProcessRow);
+        el.processTableBody.innerHTML = '';
+        processRows.forEach(function (row) {
+          el.processTableBody.appendChild(buildProcessRowElement(row));
+        });
+        updateProcessTotals(processRows);
+        if (el.processEmpty) {
+          el.processEmpty.style.display = processRows.length ? 'none' : '';
+        }
+      }
+
+      function loadAndRenderProcessTable() {
+        if (!currentUser) {
+          processRows = [];
+          renderProcessTable([]);
+          return;
+        }
+        loadProcessSheetsState();
+        if (processSheetsState.editingId) {
+          var sheet = getProcessSheetById(processSheetsState.editingId);
+          if (sheet) {
+            setProcessEditorFields(sheet.name, sheet.savedDate);
+            processRows = (sheet.rows || []).map(normalizeProcessRow);
+          } else {
+            newProcessDraft(false);
+            return;
+          }
+        } else {
+          setProcessEditorFields('공정표', todayStr());
+          processRows = getProcessRowsForEditing();
+        }
+        renderProcessTable(processRows);
+        renderProcessSavedList();
+        updateProcessSavedPanelVisibility();
+      }
+
+      function addProcessRow() {
+        if (!currentUser) {
+          showError('이름을 선택한 뒤 행을 추가할 수 있습니다.');
+          return;
+        }
+        persistProcessRows();
+        var row = normalizeProcessRow({ id: 'pr' + (++processRowIdCounter) });
+        processRows.push(row);
+        if (el.processTableBody) {
+          el.processTableBody.appendChild(buildProcessRowElement(row));
+        }
+        updateProcessTotals(processRows);
+        saveProcessRowsCache(processRows);
+        if (el.processEmpty) el.processEmpty.style.display = 'none';
+      }
+
+      function removeProcessRow(id) {
+        persistProcessRows();
+        processRows = processRows.filter(function (r) { return r.id !== id; });
+        var tr = el.processTableBody &&
+          el.processTableBody.querySelector('[data-process-id="' + id + '"]');
+        if (tr) tr.remove();
+        processRows = collectProcessRowsFromDOM();
+        updateProcessTotals(processRows);
+        saveProcessRowsCache(processRows);
+        if (el.processEmpty) {
+          el.processEmpty.style.display = processRows.length ? 'none' : '';
+        }
+      }
+
+      function applyMainViewMode() {
+        var isProcess = mainViewMode === 'process';
+        document.body.classList.toggle('main-view-process', isProcess);
+        if (el.processCard) {
+          el.processCard.classList.toggle('visible', isProcess);
+        }
+        if (el.ganttTabBtn) {
+          el.ganttTabBtn.classList.toggle('active', isProcess);
+          el.ganttTabBtn.setAttribute('aria-pressed', isProcess ? 'true' : 'false');
+        }
+        if (el.diaryTabBtn) {
+          el.diaryTabBtn.classList.toggle('active', !isProcess);
+          el.diaryTabBtn.setAttribute('aria-pressed', !isProcess ? 'true' : 'false');
+        }
+        if (!isProcess) {
+          if (el.taskCard && el.taskCard.style.display !== 'none') {
+            if (el.taskDiaryRow) el.taskDiaryRow.style.display = 'flex';
+            if (el.chartCard) el.chartCard.style.display = 'block';
+          }
+        } else {
+          loadProcessSheetsState();
+          if (!processSheetsState.editingId && !getProcessRowsForEditing().length) {
+            newProcessDraft(false);
+          } else {
+            loadAndRenderProcessTable();
+          }
+        }
+        updateProcessSavedPanelVisibility();
+      }
+
+      function showDiaryView() {
+        if (mainViewMode === 'diary') return;
+        persistProcessRowsToMemory();
+        mainViewMode = 'diary';
+        applyMainViewMode();
+      }
+
+      function showProcessView() {
+        if (!currentUser) {
+          showError('공정표를 보려면 먼저 이름을 선택해주세요.');
+          return;
+        }
+        if (!el.taskCard || el.taskCard.style.display === 'none') {
+          showError('일지 화면에서 이름을 선택한 뒤 공정표를 이용할 수 있습니다.');
+          return;
+        }
+        mainViewMode = 'process';
+        applyMainViewMode();
       }
 
       function onChartBarClick(_evt, elements, ch) {
@@ -2259,10 +3752,15 @@
           el.nameCard.classList.add('name-locked');
           el.displayName.textContent = currentUser;
           renderUserProBadges();
+          if (mainViewMode === 'process') {
+            loadProcessSheetsState();
+            renderProcessSavedList();
+          }
         } else {
           el.nameCard.classList.remove('name-locked');
           if (el.userProBadgeWrap) el.userProBadgeWrap.innerHTML = '';
         }
+        updateProcessSavedPanelVisibility();
       }
 
       function saveUserName(name) {
@@ -2551,8 +4049,12 @@
               var label = s.completed + '/' + s.total;
               if (typeof bar.x !== 'number' || typeof bar.y !== 'number') return;
               ctx.save();
-              ctx.font = '600 11px "Segoe UI", "Malgun Gothic", sans-serif';
-              ctx.fillStyle = '#c8cdd8';
+              ctx.font = document.documentElement.getAttribute('data-theme') === 'sketch'
+                ? '700 11px Gungsuh, Batang, serif'
+                : '600 11px "Segoe UI", "Malgun Gothic", sans-serif';
+              ctx.fillStyle = document.documentElement.getAttribute('data-theme') === 'sketch'
+                ? '#111111'
+                : '#c8cdd8';
               ctx.textAlign = 'center';
               ctx.textBaseline = 'bottom';
               ctx.fillText(label, bar.x, bar.y - 5);
@@ -2596,6 +4098,24 @@
 
       function barColorsForPercent(percent) {
         var p = Number(percent) || 0;
+        if (isSketchTheme()) {
+          if (p <= 30) {
+            return {
+              bg: 'rgba(196, 111, 24, 0.72)',
+              border: 'rgba(160, 85, 15, 1)'
+            };
+          }
+          if (p <= 75) {
+            return {
+              bg: 'rgba(47, 125, 71, 0.72)',
+              border: 'rgba(35, 100, 55, 1)'
+            };
+          }
+          return {
+            bg: 'rgba(42, 95, 173, 0.72)',
+            border: 'rgba(28, 72, 140, 1)'
+          };
+        }
         if (p <= 30) {
           return {
             bg: 'rgba(255, 176, 32, 0.88)',
@@ -2612,6 +4132,16 @@
           bg: 'rgba(77, 159, 255, 0.88)',
           border: 'rgba(77, 159, 255, 1)'
         };
+      }
+
+      function getChartBarDatasetStyle() {
+        if (isSketchTheme()) {
+          return {
+            borderWidth: 2.5,
+            borderRadius: { topLeft: 4, topRight: 6, bottomLeft: 2, bottomRight: 3 }
+          };
+        }
+        return { borderWidth: 1, borderRadius: 4 };
       }
 
       function applyTodayPercentColor(percent) {
@@ -2644,12 +4174,15 @@
         });
         var data = stats.map(function (s) { return s.percent; });
         var colors = barColorsFromStats(stats);
+        var barStyle = getChartBarDatasetStyle();
 
         if (chart && !opts.replace) {
           chart.data.labels = labels;
           chart.data.datasets[0].data = data;
           chart.data.datasets[0].backgroundColor = colors.backgrounds;
           chart.data.datasets[0].borderColor = colors.borders;
+          chart.data.datasets[0].borderWidth = barStyle.borderWidth;
+          chart.data.datasets[0].borderRadius = barStyle.borderRadius;
           chart.options.plugins.barCountLabels.stats = stats;
           chart.options.onClick = onChartBarClick;
           chart.update(opts.animate === false ? 'none' : 'active');
@@ -2671,8 +4204,8 @@
               data: data,
               backgroundColor: colors.backgrounds,
               borderColor: colors.borders,
-              borderWidth: 1,
-              borderRadius: 4
+              borderWidth: barStyle.borderWidth,
+              borderRadius: barStyle.borderRadius
             }]
           },
           options: {
@@ -3078,9 +4611,12 @@
         } else {
           loadViewDateTasks();
           scheduleChartLoad();
+          if (mainViewMode === 'process') {
+            loadAndRenderProcessTable();
+          }
         }
         updateSidebarActiveState();
-        el.taskInput.focus();
+        if (mainViewMode === 'diary') el.taskInput.focus();
       }
 
       function switchToUser(name) {
@@ -3604,6 +5140,7 @@
         el.todayPercent.textContent = '0%';
         applyTodayPercentColor(0);
         el.todayCount.textContent = '0/0';
+        applyMainViewMode();
       }
 
       function showTaskUI() {
@@ -3745,6 +5282,7 @@
         }
       });
       el.changeNameBtn.addEventListener('click', function () {
+        showDiaryView();
         setNameLocked(false);
         applySavedNameToSelect();
         if (users.length === 0) el.userName.value = currentUser;
@@ -3788,6 +5326,43 @@
       });
 
       el.closeAdminBtn.addEventListener('click', closeAdmin);
+
+      if (el.diaryTabBtn) {
+        el.diaryTabBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          showDiaryView();
+        });
+      }
+      if (el.ganttTabBtn) {
+        el.ganttTabBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          showProcessView();
+        });
+      }
+      if (el.addProcessRowBtn) {
+        el.addProcessRowBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          addProcessRow();
+        });
+      }
+      if (el.processSavedToggle) {
+        el.processSavedToggle.addEventListener('click', function (e) {
+          e.preventDefault();
+          toggleProcessSavedList();
+        });
+      }
+      if (el.newProcessDraftBtn) {
+        el.newProcessDraftBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          newProcessDraft(true);
+        });
+      }
+      if (el.saveProcessSheetBtn) {
+        el.saveProcessSheetBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          saveProcessSheet();
+        });
+      }
 
       initThemePicker();
       viewDate = todayStr();
