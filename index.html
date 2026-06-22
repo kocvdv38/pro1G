@@ -418,6 +418,76 @@
       color: var(--muted);
       font-weight: 400;
     }
+    .process-table .col-move {
+      width: 58px;
+      text-align: center;
+      padding: 6px 2px;
+      white-space: nowrap;
+    }
+    .process-row-drag-handle {
+      display: block;
+      margin: 0 auto 3px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      line-height: 1;
+      letter-spacing: -0.08em;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+    }
+    .process-row-drag-handle:hover {
+      color: var(--accent-hover);
+    }
+    .process-row-drag-handle:active {
+      cursor: grabbing;
+    }
+    tr.process-row-dragging {
+      opacity: 0.45;
+    }
+    tr.process-row-drag-over-before td {
+      box-shadow: inset 0 2px 0 var(--accent-hover);
+    }
+    tr.process-row-drag-over-after td {
+      box-shadow: inset 0 -2px 0 var(--accent-hover);
+    }
+    .process-table tbody tr[data-process-id] td {
+      cursor: grab;
+    }
+    .process-table tbody tr[data-process-id] select,
+    .process-table tbody tr[data-process-id] input,
+    .process-table tbody tr[data-process-id] button {
+      cursor: auto;
+    }
+    tr.process-row-dragging td {
+      cursor: grabbing;
+    }
+    .process-row-move {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 2px;
+      vertical-align: middle;
+    }
+    .process-row-move-btn {
+      width: 22px;
+      height: 18px;
+      padding: 0;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.65rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+    .process-row-move-btn:hover:not(:disabled) {
+      color: var(--accent-hover);
+      background: var(--accent-soft);
+    }
+    .process-row-move-btn:disabled {
+      opacity: 0.25;
+      cursor: default;
+    }
     .process-table .col-delete {
       width: 44px;
       text-align: center;
@@ -473,6 +543,16 @@
     }
     .process-total-label {
       color: var(--accent-hover);
+    }
+    .process-table tfoot .process-category-total-row td {
+      background: var(--surface);
+      font-weight: 600;
+      font-size: 0.85rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .process-category-total-label {
+      color: var(--text);
+      padding-left: 1.25rem;
     }
     #processTotalAll {
       color: var(--accent-hover);
@@ -1913,16 +1993,18 @@
                 <th class="col-time">목표 시간</th>
                 <th class="col-time">실제 시간</th>
                 <th class="col-total">전체 시간</th>
+                <th class="col-move" aria-label="행 이동"></th>
                 <th class="col-delete" aria-label="행 삭제"></th>
               </tr>
             </thead>
             <tbody id="processTableBody"></tbody>
-            <tfoot>
-              <tr>
+            <tfoot id="processTableFoot">
+              <tr class="process-grand-total">
                 <td colspan="2" class="process-total-label">전체 시간</td>
                 <td id="processTotalTarget">0분</td>
                 <td id="processTotalActual">0분</td>
                 <td id="processTotalAll">—</td>
+                <td class="col-move"></td>
                 <td class="col-delete"></td>
               </tr>
             </tfoot>
@@ -2456,11 +2538,12 @@
       var processSheetsState = { editingId: '', draftRows: [], sheets: [], editSnapshot: null };
       var processSavedListOpen = false;
       var PROCESS_CATEGORIES = [
-        '재단', 'CAD', 'CAM', '3D 프린터', 'CNC', '밀링', '선반', '일반가공', '락카', '조립'
+        '재단', 'CAD', 'CAM', '3D 프린터', 'CNC', '밀링', '선반', '일반가공', '도색', '조립'
       ];
       var mainViewMode = 'diary';
       var processRows = [];
       var processRowIdCounter = 0;
+      var processRowDragId = null;
       var CACHE_TASKS = 'proDiary_tasks_';
       var CACHE_CHART = 'proDiary_chart_';
       var CHART_DAYS = 14;
@@ -2540,6 +2623,7 @@
         ganttTabBtn: document.getElementById('ganttTabBtn'),
         processCard: document.getElementById('processCard'),
         processTableBody: document.getElementById('processTableBody'),
+        processTableFoot: document.getElementById('processTableFoot'),
         processEmpty: document.getElementById('processEmpty'),
         addProcessRowBtn: document.getElementById('addProcessRowBtn'),
         processTotalTarget: document.getElementById('processTotalTarget'),
@@ -3140,9 +3224,11 @@
       }
 
       function normalizeProcessRow(row) {
+        var category = String(row.category || '');
+        if (category === '락카') category = '도색';
         return {
           id: row.id || ('pr' + (++processRowIdCounter)),
-          category: String(row.category || ''),
+          category: category,
           content: String(row.content || ''),
           targetMin: row.targetMin === '' || row.targetMin == null ? '' : String(row.targetMin),
           actualMin: row.actualMin === '' || row.actualMin == null ? '' : String(row.actualMin)
@@ -3189,6 +3275,73 @@
           actualSum += parseProcessMinutes(r.actualMin);
         });
         return { targetSum: targetSum, actualSum: actualSum };
+      }
+
+      function calcProcessCategoryTotals(rows) {
+        var map = {};
+        (rows || []).forEach(function (r) {
+          var cat = String(r.category || '').trim();
+          if (!cat) return;
+          if (!map[cat]) {
+            map[cat] = { category: cat, targetSum: 0, actualSum: 0 };
+          }
+          map[cat].targetSum += parseProcessMinutes(r.targetMin);
+          map[cat].actualSum += parseProcessMinutes(r.actualMin);
+        });
+        var list = [];
+        PROCESS_CATEGORIES.forEach(function (c) {
+          if (map[c]) {
+            list.push(map[c]);
+            delete map[c];
+          }
+        });
+        Object.keys(map).sort().forEach(function (k) {
+          list.push(map[k]);
+        });
+        return list;
+      }
+
+      function renderProcessCategoryTotals(rows) {
+        if (!el.processTableFoot) return;
+        el.processTableFoot.querySelectorAll('.process-category-total-row').forEach(function (tr) {
+          tr.remove();
+        });
+        var categories = calcProcessCategoryTotals(rows);
+        categories.forEach(function (item) {
+          var tr = document.createElement('tr');
+          tr.className = 'process-category-total-row';
+
+          var tdLabel = document.createElement('td');
+          tdLabel.colSpan = 2;
+          tdLabel.className = 'process-category-total-label';
+          tdLabel.textContent = item.category;
+
+          var tdTarget = document.createElement('td');
+          tdTarget.className = 'col-time';
+          tdTarget.textContent = formatProcessMinutes(item.targetSum);
+
+          var tdActual = document.createElement('td');
+          tdActual.className = 'col-time';
+          tdActual.textContent = formatProcessMinutes(item.actualSum);
+
+          var tdAll = document.createElement('td');
+          tdAll.className = 'col-total';
+          tdAll.textContent = '—';
+
+          var tdMove = document.createElement('td');
+          tdMove.className = 'col-move';
+
+          var tdDel = document.createElement('td');
+          tdDel.className = 'col-delete';
+
+          tr.appendChild(tdLabel);
+          tr.appendChild(tdTarget);
+          tr.appendChild(tdActual);
+          tr.appendChild(tdAll);
+          tr.appendChild(tdMove);
+          tr.appendChild(tdDel);
+          el.processTableFoot.appendChild(tr);
+        });
       }
 
       /** 연속된 같은 작업 구분만 한 묶음(다른 구분이 끼면 별도 묶음) */
@@ -3280,6 +3433,7 @@
         if (el.processTotalActual) el.processTotalActual.textContent = formatProcessMinutes(t.actualSum);
         if (el.processTotalAll) el.processTotalAll.textContent = '—';
         applyProcessGroupTotalsToDOM(rows);
+        renderProcessCategoryTotals(rows);
       }
 
       function buildCategorySelectOptions(selected) {
@@ -3290,12 +3444,152 @@
         return html;
       }
 
+      function clearProcessRowDragState() {
+        processRowDragId = null;
+        if (!el.processTableBody) return;
+        el.processTableBody.querySelectorAll('tr[data-process-id]').forEach(function (tr) {
+          tr.classList.remove('process-row-dragging', 'process-row-drag-over-before', 'process-row-drag-over-after');
+          tr.removeAttribute('data-drop-after');
+        });
+      }
+
+      function reorderProcessRowsInArray(rows, fromIdx, toIdx) {
+        if (fromIdx < 0 || toIdx < 0 || fromIdx >= rows.length || toIdx >= rows.length) return rows;
+        if (fromIdx === toIdx) return rows;
+        var item = rows.splice(fromIdx, 1)[0];
+        if (fromIdx < toIdx) toIdx--;
+        rows.splice(toIdx, 0, item);
+        return rows;
+      }
+
+      function applyProcessRowReorder(fromIdx, toIdx) {
+        if (fromIdx === toIdx) return;
+        persistProcessRows();
+        processRows = collectProcessRowsFromDOM();
+        processRows = reorderProcessRowsInArray(processRows, fromIdx, toIdx);
+        renderProcessTable(processRows);
+        saveProcessRowsCache(processRows);
+      }
+
+      function findProcessRowIndex(rows, id) {
+        for (var i = 0; i < rows.length; i++) {
+          if (rows[i].id === id) return i;
+        }
+        return -1;
+      }
+
+      function reorderProcessRowById(draggedId, targetId, dropAfter) {
+        processRows = collectProcessRowsFromDOM();
+        var fromIdx = findProcessRowIndex(processRows, draggedId);
+        var toIdx = findProcessRowIndex(processRows, targetId);
+        if (fromIdx < 0 || toIdx < 0) return;
+        if (dropAfter) toIdx++;
+        applyProcessRowReorder(fromIdx, toIdx);
+      }
+
+      function moveProcessRow(id, direction) {
+        processRows = collectProcessRowsFromDOM();
+        var idx = findProcessRowIndex(processRows, id);
+        if (idx < 0) return;
+        var newIdx = idx + direction;
+        if (newIdx < 0 || newIdx >= processRows.length) return;
+        applyProcessRowReorder(idx, newIdx);
+      }
+
+      function canStartProcessRowDrag(target, tr) {
+        if (!target || !tr) return false;
+        if (target.closest('.process-row-drag-handle')) return true;
+        if (target.closest('select, input, button, textarea, a, label')) return false;
+        return tr.contains(target);
+      }
+
+      function bindProcessRowDragEvents(tr) {
+        tr.draggable = true;
+
+        tr.addEventListener('dragstart', function (e) {
+          if (!canStartProcessRowDrag(e.target, tr)) {
+            e.preventDefault();
+            return;
+          }
+          processRowDragId = tr.getAttribute('data-process-id');
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', processRowDragId);
+          tr.classList.add('process-row-dragging');
+        });
+
+        tr.addEventListener('dragend', function () {
+          clearProcessRowDragState();
+        });
+
+        tr.addEventListener('dragover', function (e) {
+          if (!processRowDragId || processRowDragId === tr.getAttribute('data-process-id')) return;
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          var rect = tr.getBoundingClientRect();
+          var after = e.clientY > rect.top + rect.height / 2;
+          tr.classList.remove('process-row-drag-over-before', 'process-row-drag-over-after');
+          tr.classList.add(after ? 'process-row-drag-over-after' : 'process-row-drag-over-before');
+          tr.setAttribute('data-drop-after', after ? '1' : '0');
+        });
+
+        tr.addEventListener('dragleave', function (e) {
+          if (tr.contains(e.relatedTarget)) return;
+          tr.classList.remove('process-row-drag-over-before', 'process-row-drag-over-after');
+          tr.removeAttribute('data-drop-after');
+        });
+
+        tr.addEventListener('drop', function (e) {
+          e.preventDefault();
+          var draggedId = e.dataTransfer.getData('text/plain') || processRowDragId;
+          var targetId = tr.getAttribute('data-process-id');
+          var dropAfter = tr.getAttribute('data-drop-after') === '1';
+          clearProcessRowDragState();
+          if (!draggedId || draggedId === targetId) return;
+          reorderProcessRowById(draggedId, targetId, dropAfter);
+        });
+      }
+
+      function initProcessTableBodyDragDrop() {
+        if (!el.processTableBody || el.processTableBody._processDragBound) return;
+        el.processTableBody._processDragBound = true;
+
+        el.processTableBody.addEventListener('dragover', function (e) {
+          if (!processRowDragId) return;
+          if (e.target.closest('tr[data-process-id]')) return;
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+        });
+
+        el.processTableBody.addEventListener('drop', function (e) {
+          if (!processRowDragId || e.target.closest('tr[data-process-id]')) return;
+          e.preventDefault();
+          var draggedId = e.dataTransfer.getData('text/plain') || processRowDragId;
+          processRows = collectProcessRowsFromDOM();
+          var fromIdx = findProcessRowIndex(processRows, draggedId);
+          clearProcessRowDragState();
+          if (fromIdx < 0) return;
+          applyProcessRowReorder(fromIdx, processRows.length - 1);
+        });
+      }
+
       function bindProcessRowEvents(tr) {
         var inputs = tr.querySelectorAll('select, input');
         inputs.forEach(function (inp) {
           inp.addEventListener('change', onProcessRowChange);
           inp.addEventListener('input', onProcessRowChange);
         });
+        var upBtn = tr.querySelector('.process-row-move-up');
+        if (upBtn) {
+          upBtn.addEventListener('click', function () {
+            moveProcessRow(tr.getAttribute('data-process-id'), -1);
+          });
+        }
+        var downBtn = tr.querySelector('.process-row-move-down');
+        if (downBtn) {
+          downBtn.addEventListener('click', function () {
+            moveProcessRow(tr.getAttribute('data-process-id'), 1);
+          });
+        }
         var delBtn = tr.querySelector('.process-row-delete');
         if (delBtn) {
           delBtn.addEventListener('click', function () {
@@ -3303,6 +3597,7 @@
             removeProcessRow(id);
           });
         }
+        bindProcessRowDragEvents(tr);
       }
 
       function onProcessRowChange() {
@@ -3314,8 +3609,10 @@
         }
       }
 
-      function buildProcessRowElement(row) {
+      function buildProcessRowElement(row, rowIndex, rowCount) {
         row = normalizeProcessRow(row);
+        rowIndex = typeof rowIndex === 'number' ? rowIndex : 0;
+        rowCount = typeof rowCount === 'number' ? rowCount : 1;
         var tr = document.createElement('tr');
         tr.setAttribute('data-process-id', row.id);
 
@@ -3359,6 +3656,34 @@
         tdTotal.className = 'col-total process-group-total is-dash';
         tdTotal.textContent = '—';
 
+        var tdMove = document.createElement('td');
+        tdMove.className = 'col-move';
+        var dragHandle = document.createElement('span');
+        dragHandle.className = 'process-row-drag-handle';
+        dragHandle.title = '드래그하여 이동';
+        dragHandle.setAttribute('aria-label', '드래그하여 이동');
+        dragHandle.textContent = '⠿';
+        var moveWrap = document.createElement('span');
+        moveWrap.className = 'process-row-move';
+        var upBtn = document.createElement('button');
+        upBtn.type = 'button';
+        upBtn.className = 'process-row-move-btn process-row-move-up';
+        upBtn.title = '위로';
+        upBtn.setAttribute('aria-label', '위로 이동');
+        upBtn.textContent = '▲';
+        upBtn.disabled = rowIndex <= 0;
+        var downBtn = document.createElement('button');
+        downBtn.type = 'button';
+        downBtn.className = 'process-row-move-btn process-row-move-down';
+        downBtn.title = '아래로';
+        downBtn.setAttribute('aria-label', '아래로 이동');
+        downBtn.textContent = '▼';
+        downBtn.disabled = rowIndex >= rowCount - 1;
+        moveWrap.appendChild(upBtn);
+        moveWrap.appendChild(downBtn);
+        tdMove.appendChild(dragHandle);
+        tdMove.appendChild(moveWrap);
+
         var tdDel = document.createElement('td');
         tdDel.className = 'col-delete';
         var delBtn = document.createElement('button');
@@ -3374,6 +3699,7 @@
         tr.appendChild(tdTarget);
         tr.appendChild(tdActual);
         tr.appendChild(tdTotal);
+        tr.appendChild(tdMove);
         tr.appendChild(tdDel);
         bindProcessRowEvents(tr);
         return tr;
@@ -3381,10 +3707,11 @@
 
       function renderProcessTable(rows) {
         if (!el.processTableBody) return;
+        initProcessTableBodyDragDrop();
         processRows = (rows || []).map(normalizeProcessRow);
         el.processTableBody.innerHTML = '';
-        processRows.forEach(function (row) {
-          el.processTableBody.appendChild(buildProcessRowElement(row));
+        processRows.forEach(function (row, idx) {
+          el.processTableBody.appendChild(buildProcessRowElement(row, idx, processRows.length));
         });
         updateProcessTotals(processRows);
         if (el.processEmpty) {
@@ -3426,7 +3753,7 @@
         var row = normalizeProcessRow({ id: 'pr' + (++processRowIdCounter) });
         processRows.push(row);
         if (el.processTableBody) {
-          el.processTableBody.appendChild(buildProcessRowElement(row));
+          el.processTableBody.appendChild(buildProcessRowElement(row, processRows.length - 1, processRows.length));
         }
         updateProcessTotals(processRows);
         saveProcessRowsCache(processRows);
