@@ -6,6 +6,7 @@
   <title>프로의 일지</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
   <style>
     :root {
       --radius-sm: 10px;
@@ -393,6 +394,7 @@
       font-size: 0.75rem;
       font-weight: 700;
       white-space: nowrap;
+      text-align: center;
     }
     .process-table tbody tr:hover {
       background: rgba(255, 255, 255, 0.03);
@@ -405,6 +407,14 @@
     .process-table .col-time {
       width: 96px;
       white-space: nowrap;
+      text-align: center;
+    }
+    .process-table .col-category {
+      text-align: center;
+    }
+    .process-table .col-category select {
+      text-align: center;
+      text-align-last: center;
     }
     .process-table .col-total {
       width: 88px;
@@ -532,7 +542,6 @@
     .process-actions {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       gap: 12px;
       margin-top: 14px;
     }
@@ -542,26 +551,525 @@
       padding: 28px 12px;
       font-size: 0.88rem;
     }
-    .process-total-label {
-      color: var(--accent-hover);
-    }
     .process-table tfoot .process-category-total-row td {
-      background: var(--surface);
       font-weight: 600;
       font-size: 0.85rem;
       border-bottom: 1px solid var(--border);
+      text-align: center;
     }
-    .process-category-total-label {
+    .process-table tfoot .process-category-total-row.band-plain td {
+      background: transparent;
+    }
+    .process-table tfoot .process-category-total-row.band-shade td {
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .process-table tfoot .process-category-total-row .process-category-total-label {
       color: var(--text);
-      padding-left: 1.25rem;
+      text-align: center;
+    }
+    .process-table tfoot .process-grand-total td {
+      border-bottom: 2px solid var(--border);
+      text-align: center;
+    }
+    .process-table tfoot .process-grand-total .process-total-label {
+      color: var(--accent-hover);
+      text-align: center;
+    }
+    .process-table tfoot .process-category-section-row td {
+      background: transparent;
+      border-top: 2px solid var(--border);
+      font-weight: 700;
+      font-size: 0.86rem;
+      color: var(--accent-hover);
+      padding: 10px 12px;
+      letter-spacing: -0.01em;
+      text-align: center;
     }
     #processTotalAll {
       color: var(--accent-hover);
       font-size: 0.95rem;
     }
     body.main-view-process .task-diary-row,
-    body.main-view-process #chartCard {
+    body.main-view-process #chartCard,
+    body.main-view-feedback .task-diary-row,
+    body.main-view-feedback #chartCard,
+    body.main-view-scoring .task-diary-row,
+    body.main-view-scoring #chartCard {
       display: none !important;
+    }
+    #feedbackCard {
+      display: none;
+      flex-direction: column;
+      gap: 0;
+    }
+    #feedbackCard.visible {
+      display: flex;
+    }
+    .feedback-card-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 12px 16px;
+      margin-bottom: 12px;
+    }
+    .feedback-meta-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .feedback-meta-field input {
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 0.86rem;
+      min-width: 120px;
+    }
+    .feedback-card-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .feedback-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card-solid, var(--card));
+    }
+    .feedback-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+      min-width: 680px;
+    }
+    .feedback-table th,
+    .feedback-table td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      vertical-align: middle;
+    }
+    .feedback-table th {
+      background: var(--input-bg);
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .feedback-table .fb-num {
+      width: 44px;
+      text-align: center;
+      font-weight: 700;
+      background: var(--surface);
+    }
+    .feedback-table .fb-photo {
+      width: 34%;
+      min-width: 180px;
+      text-align: center;
+      vertical-align: middle;
+      padding: 10px;
+    }
+    .feedback-table .fb-label {
+      width: 72px;
+      text-align: center;
+      font-weight: 700;
+      background: var(--surface);
+      white-space: nowrap;
+    }
+    .feedback-photo-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      min-height: 160px;
+      justify-content: center;
+    }
+    .feedback-photo-preview {
+      max-width: 100%;
+      max-height: 200px;
+      object-fit: contain;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: #fff;
+      cursor: pointer;
+    }
+    .feedback-photo-preview:hover {
+      opacity: 0.9;
+    }
+    .feedback-photo-placeholder {
+      color: var(--muted);
+      font-size: 0.82rem;
+      padding: 24px 8px;
+      cursor: pointer;
+    }
+    .feedback-photo-placeholder:hover {
+      color: var(--text);
+    }
+    .feedback-photo-input {
+      font-size: 0.78rem;
+      max-width: 100%;
+    }
+    .feedback-photo-input.is-hidden {
+      display: none;
+    }
+    .feedback-photo-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      justify-content: center;
+    }
+    .feedback-image-editor-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 12000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .feedback-image-editor-modal.visible {
+      display: flex;
+    }
+    .feedback-image-editor-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(8, 10, 16, 0.72);
+      backdrop-filter: blur(4px);
+    }
+    .feedback-image-editor-panel {
+      position: relative;
+      z-index: 1;
+      width: min(720px, 100%);
+      max-height: calc(100vh - 32px);
+      overflow: auto;
+      background: var(--card-solid, var(--card));
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: 18px 18px 16px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+    }
+    .feedback-image-editor-panel h2 {
+      margin: 0 0 6px;
+      font-size: 1.05rem;
+    }
+    .feedback-image-editor-hint {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+    .feedback-image-editor-stage {
+      width: 100%;
+      max-height: min(52vh, 480px);
+      background: #111;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .feedback-image-editor-stage img {
+      display: block;
+      max-width: 100%;
+    }
+    .feedback-image-editor-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .feedback-image-editor-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .feedback-text-input {
+      width: 100%;
+      min-height: 72px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--input-bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.86rem;
+      line-height: 1.45;
+      resize: vertical;
+    }
+    .feedback-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    .feedback-row-delete {
+      margin-top: 6px;
+      padding: 4px 8px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+    .feedback-row-delete:hover {
+      color: var(--danger);
+      background: rgba(255, 92, 122, 0.12);
+    }
+    #scoringCard {
+      display: none;
+      flex-direction: column;
+      gap: 0;
+    }
+    #scoringCard.visible {
+      display: flex;
+    }
+    .scoring-card-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 12px 16px;
+      margin-bottom: 12px;
+    }
+    .scoring-card-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .score-column-settings {
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--input-bg);
+      padding: 10px 12px;
+    }
+    .score-column-settings summary {
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.86rem;
+      color: var(--text);
+    }
+    .score-column-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 8px 12px;
+      margin-top: 10px;
+    }
+    .score-column-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: var(--text);
+    }
+    .score-column-toggle input {
+      accent-color: var(--accent);
+    }
+    .score-column-toggle.is-off {
+      opacity: 0.55;
+    }
+    .scoring-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card-solid, var(--card));
+    }
+    .scoring-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      min-width: 860px;
+    }
+    .scoring-table th,
+    .scoring-table td {
+      border: 1px solid var(--border);
+      padding: 7px 8px;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .scoring-table thead th {
+      background: var(--input-bg);
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.78rem;
+    }
+    .scoring-table .score-group-header {
+      background: var(--accent-soft);
+      color: var(--text);
+      border-left: 2px solid var(--border-strong);
+      border-right: 2px solid var(--border-strong);
+    }
+    .scoring-table .score-group-start {
+      border-left: 2px solid var(--border-strong);
+    }
+    .scoring-table .score-group-end {
+      border-right: 2px solid var(--border-strong);
+    }
+    .scoring-table .score-round-col {
+      width: 108px;
+      min-width: 108px;
+      background: var(--input-bg);
+      color: var(--text);
+      font-weight: 700;
+      white-space: nowrap;
+      padding: 6px;
+      vertical-align: middle;
+    }
+    .score-round-cell {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-height: 28px;
+    }
+    .scoring-table .score-round-cell .score-input.score-round-label {
+      flex: 1 1 auto;
+      min-width: 0;
+      height: 28px;
+      min-height: 28px;
+      padding: 0 6px;
+      margin: 0;
+      line-height: 1;
+      font-weight: 600;
+      box-sizing: border-box;
+    }
+    .score-round-del {
+      flex: 0 0 28px;
+      width: 28px;
+      height: 28px;
+      min-height: 28px;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--card-solid, var(--card));
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      align-self: center;
+    }
+    .score-round-del:hover {
+      color: var(--danger);
+      border-color: rgba(255, 92, 122, 0.45);
+      background: rgba(255, 92, 122, 0.12);
+    }
+    .scoring-table .score-max-row td {
+      background: var(--input-bg);
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+    .scoring-table .score-total-col {
+      background: var(--accent-soft);
+      color: var(--accent-hover);
+      font-weight: 700;
+      border-left: 2px solid var(--border-strong);
+      min-width: 72px;
+    }
+    .scoring-table .score-sub-label {
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+    .scoring-table thead .score-input.score-group-input {
+      font-weight: 700;
+      background: transparent;
+      border-color: transparent;
+      min-width: 72px;
+    }
+    .scoring-table thead .score-input.score-group-input:focus {
+      background: var(--input-bg);
+      border-color: var(--border);
+    }
+    .scoring-table thead .score-input.score-label-input {
+      font-weight: 600;
+      font-size: 0.78rem;
+      background: transparent;
+      border-color: transparent;
+      min-width: 64px;
+      padding: 4px 6px;
+    }
+    .scoring-table thead .score-input.score-label-input:focus {
+      background: var(--card-solid, var(--card));
+      border-color: var(--border);
+    }
+    .scoring-table thead .score-input.score-max-input {
+      font-weight: 600;
+      font-size: 0.78rem;
+      color: var(--muted);
+      background: transparent;
+      border-color: transparent;
+      min-width: 48px;
+      padding: 4px 6px;
+    }
+    .scoring-table thead .score-input.score-max-input:focus {
+      background: var(--card-solid, var(--card));
+      border-color: var(--border);
+      color: var(--text);
+    }
+    .scoring-table tbody td {
+      background: transparent;
+    }
+    .scoring-table tbody tr:hover td {
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .scoring-table .score-input {
+      width: 100%;
+      min-width: 56px;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 0.82rem;
+      text-align: center;
+      font-family: inherit;
+    }
+    .scoring-table .score-input::placeholder {
+      color: var(--muted);
+      opacity: 0.7;
+    }
+    .scoring-table .score-input:focus {
+      outline: none;
+      border-color: var(--border-strong);
+      box-shadow: 0 0 0 2px var(--accent-soft);
+    }
+    .scoring-table .score-total-cell {
+      font-weight: 700;
+      color: var(--accent-hover);
+    }
+    .scoring-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .score-chart-wrap {
+      margin-top: 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card-solid, var(--card));
+      padding: 14px 12px 10px;
+    }
+    .score-chart-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin: 0 0 10px;
+      color: var(--text);
+    }
+    .score-chart-canvas-wrap {
+      position: relative;
+      height: 280px;
     }
     .sidebar-title {
       font-size: 0.82rem;
@@ -852,16 +1360,6 @@
     }
     .process-card-actions .btn {
       white-space: nowrap;
-    }
-    .btn-outline {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--border-strong);
-    }
-    .btn-outline:hover {
-      background: var(--accent-soft);
-      border-color: var(--accent);
-      color: var(--accent-hover);
     }
     .pro-badge {
       display: inline-block;
@@ -1390,6 +1888,73 @@
       color: var(--text);
       letter-spacing: -0.02em;
     }
+    .diary-actions {
+      display: none;
+    }
+    .name-display .btn.context-print-btn {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      font-size: 0.82rem;
+    }
+    .diary-print-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 12000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .diary-print-modal.visible {
+      display: flex;
+    }
+    .diary-print-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(8, 10, 16, 0.72);
+      backdrop-filter: blur(4px);
+    }
+    .diary-print-panel {
+      position: relative;
+      z-index: 1;
+      width: min(420px, 100%);
+      background: var(--card-solid, var(--card));
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: 18px 18px 16px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+    }
+    .diary-print-panel h2 {
+      margin: 0 0 6px;
+      font-size: 1.05rem;
+    }
+    .diary-print-panel .hint {
+      margin: 0 0 14px;
+    }
+    .diary-print-panel label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .diary-print-panel select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 0.9rem;
+      font-family: inherit;
+      margin-bottom: 16px;
+    }
+    .diary-print-modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
     .summary {
       display: flex;
       gap: 12px;
@@ -1437,6 +2002,16 @@
     .btn-primary:hover {
       background: var(--accent-hover);
       box-shadow: 0 6px 20px var(--accent-soft);
+    }
+    .btn.btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+    }
+    .btn.btn-outline:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent-hover);
     }
     .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
     .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
@@ -1908,7 +2483,7 @@
             <strong id="displayName"></strong>
             <span id="userProBadgeWrap" class="pro-badge-wrap user-pro-badge-wrap" aria-label="프로 뱃지"></span>
           </div>
-          <button type="button" class="link-btn" id="changeNameBtn">이름 변경</button>
+          <button type="button" class="btn btn-outline context-print-btn" id="contextPrintBtn">인쇄</button>
         </div>
         <div class="process-saved-panel" id="processSavedPanel">
           <button type="button" class="process-saved-toggle" id="processSavedToggle" aria-expanded="false">
@@ -1918,6 +2493,26 @@
           </button>
           <div class="process-saved-list-wrap" id="processSavedListWrap">
             <ul class="process-saved-list" id="processSavedList"></ul>
+          </div>
+        </div>
+        <div class="process-saved-panel" id="feedbackSavedPanel">
+          <button type="button" class="process-saved-toggle" id="feedbackSavedToggle" aria-expanded="false">
+            <span>저장된 자가피드백</span>
+            <span class="process-saved-count" id="feedbackSavedCount">0개</span>
+            <span class="chevron" aria-hidden="true">▼</span>
+          </button>
+          <div class="process-saved-list-wrap" id="feedbackSavedListWrap">
+            <ul class="process-saved-list" id="feedbackSavedList"></ul>
+          </div>
+        </div>
+        <div class="process-saved-panel" id="scoreSavedPanel">
+          <button type="button" class="process-saved-toggle" id="scoreSavedToggle" aria-expanded="false">
+            <span>저장된 채점결과</span>
+            <span class="process-saved-count" id="scoreSavedCount">0개</span>
+            <span class="chevron" aria-hidden="true">▼</span>
+          </button>
+          <div class="process-saved-list-wrap" id="scoreSavedListWrap">
+            <ul class="process-saved-list" id="scoreSavedList"></ul>
           </div>
         </div>
         <p class="hint" id="nameHint">이름을 선택하면 이 컴퓨터·브라우저에 저장되어, 다음 접속 시 마지막으로 선택한 이름이 자동으로 선택됩니다.</p>
@@ -1960,6 +2555,7 @@
         </div>
       </div>
 
+
       <div class="card" id="chartCard" style="display:none;">
         <p class="section-title">📈 나의 성장 그래프</p>
         <div class="chart-wrap" id="chartWrap">
@@ -1989,10 +2585,10 @@
           <table class="process-table" id="processTable">
             <thead>
               <tr>
-                <th>작업 구분</th>
+                <th class="col-category">작업 구분</th>
                 <th>작업 내용</th>
                 <th class="col-time">목표 시간</th>
-                <th class="col-time">실제 시간</th>
+                <th class="col-time">실제 작업 시간</th>
                 <th class="col-total">동일 작업 연계 시간</th>
                 <th class="col-move" aria-label="행 이동"></th>
                 <th class="col-delete" aria-label="행 삭제"></th>
@@ -2002,9 +2598,9 @@
             <tfoot id="processTableFoot">
               <tr class="process-grand-total">
                 <td colspan="2" class="process-total-label">전체 시간</td>
-                <td id="processTotalTarget">0분</td>
-                <td id="processTotalActual">0분</td>
-                <td id="processTotalAll">—</td>
+                <td id="processTotalTarget" class="col-time">0분</td>
+                <td id="processTotalActual" class="col-time">0분</td>
+                <td id="processTotalAll" class="col-total">—</td>
                 <td class="col-move"></td>
                 <td class="col-delete"></td>
               </tr>
@@ -2014,7 +2610,76 @@
         <p class="process-empty" id="processEmpty" style="display:none;">행이 없습니다. 아래 <strong>추가</strong> 버튼으로 작업을 등록하세요.</p>
         <div class="process-actions">
           <button type="button" class="btn btn-primary" id="addProcessRowBtn">추가</button>
-          <button type="button" class="btn btn-outline" id="printProcessSheetBtn">인쇄</button>
+        </div>
+      </div>
+
+      <div class="card" id="feedbackCard">
+        <div class="feedback-card-header">
+          <label class="feedback-meta-field">
+            <span>작품명</span>
+            <input type="text" id="feedbackWorkNameInput" placeholder="작품 이름" maxlength="80">
+          </label>
+          <label class="feedback-meta-field">
+            <span>차수</span>
+            <input type="text" id="feedbackRoundInput" placeholder="예: 2차" maxlength="20">
+          </label>
+          <label class="feedback-meta-field">
+            <span>기록일</span>
+            <input type="text" id="feedbackDateInput" readonly>
+          </label>
+          <div class="feedback-card-actions">
+            <button type="button" class="btn btn-outline" id="newFeedbackDraftBtn">새로 만들기</button>
+            <button type="button" class="btn btn-primary" id="saveFeedbackBtn">저장</button>
+          </div>
+        </div>
+        <p class="hint" style="margin-top:0;">사진은 <strong>500KB 이하</strong>로 자동 압축됩니다. 사진을 클릭하면 <strong>회전·영역 선택</strong> 편집이 가능합니다.</p>
+        <div class="feedback-table-wrap">
+          <table class="feedback-table" id="feedbackTable">
+            <thead>
+              <tr>
+                <th class="fb-num">구분</th>
+                <th class="fb-photo">사진</th>
+                <th colspan="2">원인 · 해결책</th>
+              </tr>
+            </thead>
+            <tbody id="feedbackTableBody"></tbody>
+          </table>
+        </div>
+        <div class="feedback-actions">
+          <button type="button" class="btn btn-primary" id="addFeedbackRowBtn">항목 추가</button>
+        </div>
+      </div>
+
+      <div class="card" id="scoringCard">
+        <div class="scoring-card-header">
+          <label class="feedback-meta-field">
+            <span>작품명</span>
+            <input type="text" id="scoreWorkNameInput" placeholder="작품 이름" maxlength="80">
+          </label>
+          <div class="scoring-card-actions">
+            <button type="button" class="btn btn-outline" id="newScoreDraftBtn">새로 만들기</button>
+            <button type="button" class="btn btn-primary" id="saveScoreSheetBtn">저장</button>
+          </div>
+        </div>
+        <p class="hint" style="margin-top:0;">회차별 점수를 입력하세요. <strong>항목 표시 설정</strong>에서 필요한 채점 항목만 켜고 끌 수 있습니다.</p>
+        <details class="score-column-settings" id="scoreColumnSettings">
+          <summary>항목 표시 설정</summary>
+          <div class="score-column-grid" id="scoreColumnGrid"></div>
+        </details>
+        <div class="scoring-table-wrap">
+          <table class="scoring-table" id="scoringTable">
+            <thead id="scoringTableHead"></thead>
+            <tbody id="scoringTableBody"></tbody>
+          </table>
+          <div class="scoring-actions">
+            <button type="button" class="btn btn-primary" id="addScoreRoundBtn">회차 추가</button>
+          </div>
+        </div>
+        <div class="score-chart-wrap">
+          <p class="score-chart-title">회차별 점수 변화</p>
+          <div class="score-chart-canvas-wrap">
+            <canvas id="scoreChart" aria-label="회차별 점수 그래프"></canvas>
+          </div>
         </div>
       </div>
     </div>
@@ -2044,6 +2709,14 @@
           <span class="rsidebar-tab-icon" aria-hidden="true">📋</span>
           <span class="rsidebar-tab-label">공정표</span>
         </button>
+        <button type="button" class="rsidebar-tab" id="feedbackTabBtn" aria-pressed="false" aria-controls="feedbackCard" title="자가피드백">
+          <span class="rsidebar-tab-icon" aria-hidden="true">📝</span>
+          <span class="rsidebar-tab-label">자가피드백</span>
+        </button>
+        <button type="button" class="rsidebar-tab" id="scoringTabBtn" aria-pressed="false" aria-controls="scoringCard" title="채점결과">
+          <span class="rsidebar-tab-icon" aria-hidden="true">📊</span>
+          <span class="rsidebar-tab-label">채점결과</span>
+        </button>
       </nav>
     </aside>
   </div>
@@ -2056,6 +2729,39 @@
     <div class="busy-spinner"></div>
     <p class="busy-message" id="busyMessage">진행 중...</p>
     <p class="busy-sub">잠시만 기다려 주세요</p>
+  </div>
+
+  <div id="diaryPrintModal" class="diary-print-modal" aria-hidden="true" role="dialog" aria-labelledby="diaryPrintTitle">
+    <div class="diary-print-backdrop" id="diaryPrintBackdrop"></div>
+    <div class="diary-print-panel">
+      <h2 id="diaryPrintTitle">월별 일지 인쇄</h2>
+      <p class="hint">기록이 있는 월을 선택한 뒤 인쇄하세요.</p>
+      <label for="diaryPrintMonthSelect">월 선택</label>
+      <select id="diaryPrintMonthSelect" aria-label="인쇄할 월 선택"></select>
+      <div class="diary-print-modal-actions">
+        <button type="button" class="btn btn-outline" id="diaryPrintCancelBtn">취소</button>
+        <button type="button" class="btn btn-primary" id="diaryPrintConfirmBtn">인쇄</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="feedbackImageEditorModal" class="feedback-image-editor-modal" aria-hidden="true" role="dialog" aria-labelledby="feedbackImageEditorTitle">
+    <div class="feedback-image-editor-backdrop" id="feedbackImageEditorBackdrop"></div>
+    <div class="feedback-image-editor-panel">
+      <h2 id="feedbackImageEditorTitle">사진 편집</h2>
+      <p class="feedback-image-editor-hint">드래그하여 원하는 부분을 선택하고, 회전 버튼으로 방향을 맞춘 뒤 <strong>적용</strong>을 누르세요.</p>
+      <div class="feedback-image-editor-stage">
+        <img id="feedbackEditorImage" src="" alt="편집할 사진">
+      </div>
+      <div class="feedback-image-editor-tools">
+        <button type="button" class="btn btn-outline" id="feedbackEditorRotateLeft">↺ 왼쪽 회전</button>
+        <button type="button" class="btn btn-outline" id="feedbackEditorRotateRight">↻ 오른쪽 회전</button>
+      </div>
+      <div class="feedback-image-editor-actions">
+        <button type="button" class="btn btn-outline" id="feedbackEditorCancel">취소</button>
+        <button type="button" class="btn btn-primary" id="feedbackEditorApply">적용</button>
+      </div>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -2364,6 +3070,32 @@
     return Object.keys(set).sort(function (a, b) { return b.localeCompare(a); });
   }
 
+  async function getUserMonthTasks(userName, yearMonth) {
+    userName = String(userName || '').trim();
+    yearMonth = String(yearMonth || '').trim();
+    if (!/^\d{4}-\d{2}$/.test(yearMonth)) {
+      throw new Error('월 형식이 올바르지 않습니다.');
+    }
+    var user = await getUserByName(userName);
+    if (!user) return [];
+    var parts = yearMonth.split('-');
+    var y = parseInt(parts[0], 10);
+    var m = parseInt(parts[1], 10);
+    var lastDay = new Date(y, m, 0).getDate();
+    var start = yearMonth + '-01';
+    var end = yearMonth + '-' + String(lastDay).padStart(2, '0');
+    var db = requireConfig();
+    var res = await db.from('tasks')
+      .select('task_date, text, state, created_at')
+      .eq('user_id', user.id)
+      .gte('task_date', start)
+      .lte('task_date', end)
+      .order('task_date', { ascending: true })
+      .order('created_at', { ascending: true });
+    if (res.error) throw new Error(res.error.message);
+    return res.data || [];
+  }
+
   function shiftDateStr(dateStr, dayDelta) {
     var d = new Date(dateStr + 'T12:00:00');
     d.setDate(d.getDate() + dayDelta);
@@ -2569,6 +3301,220 @@
     return getProcessSheets(userName);
   }
 
+  function normalizeFeedbackRowPayload(row) {
+    return {
+      id: String(row.id || ''),
+      photo: String(row.photo || ''),
+      cause: String(row.cause || ''),
+      solution: String(row.solution || '')
+    };
+  }
+
+  function mapFeedbackSheetRow(row) {
+    var savedDate = String(row.saved_date || row.savedDate || formatDate(new Date())).substring(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(savedDate)) savedDate = formatDate(new Date());
+    var rows = [];
+    if (Array.isArray(row.rows)) {
+      rows = row.rows.map(normalizeFeedbackRowPayload);
+    }
+    return {
+      id: row.id,
+      workName: String(row.work_name || row.workName || '').trim(),
+      round: String(row.round || '').trim(),
+      savedDate: savedDate,
+      rows: rows
+    };
+  }
+
+  async function getFeedbackSheets(userName) {
+    userName = String(userName || '').trim();
+    if (!userName) return [];
+    var user = await getUserByName(userName);
+    if (!user) return [];
+
+    var db = requireConfig();
+    var res = await db.from('feedback_sheets')
+      .select('id, work_name, round, saved_date, rows, created_at, updated_at')
+      .eq('user_id', user.id)
+      .order('saved_date', { ascending: false })
+      .order('updated_at', { ascending: false });
+    if (res.error) throw new Error(res.error.message);
+    return (res.data || []).map(mapFeedbackSheetRow);
+  }
+
+  async function saveFeedbackSheet(userName, sheet) {
+    userName = String(userName || '').trim();
+    if (!userName) throw new Error('이름을 선택해주세요.');
+    if (!sheet || !String(sheet.workName || '').trim()) {
+      throw new Error('작품명을 입력해주세요.');
+    }
+
+    var user = await getUserByName(userName);
+    if (!user) throw new Error('등록되지 않은 사용자입니다.');
+
+    var savedDate = sheet.savedDate || formatDate(new Date());
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(savedDate)) savedDate = formatDate(new Date());
+
+    var payload = {
+      user_id: user.id,
+      work_name: String(sheet.workName || '').trim(),
+      round: String(sheet.round || '').trim(),
+      saved_date: savedDate,
+      rows: (sheet.rows || []).map(normalizeFeedbackRowPayload),
+      updated_at: new Date().toISOString()
+    };
+
+    var db = requireConfig();
+    var sheetId = sheet.id;
+    if (isUuid(sheetId)) {
+      var upd = await db.from('feedback_sheets')
+        .update({
+          work_name: payload.work_name,
+          round: payload.round,
+          saved_date: payload.saved_date,
+          rows: payload.rows,
+          updated_at: payload.updated_at
+        })
+        .eq('id', sheetId)
+        .eq('user_id', user.id)
+        .select('id, work_name, round, saved_date, rows')
+        .maybeSingle();
+      if (upd.error) throw new Error(upd.error.message);
+      if (!upd.data) throw new Error('저장할 자가피드백을 찾을 수 없습니다.');
+      return mapFeedbackSheetRow(upd.data);
+    }
+
+    var ins = await db.from('feedback_sheets')
+      .insert(payload)
+      .select('id, work_name, round, saved_date, rows')
+      .single();
+    if (ins.error) throw new Error(ins.error.message);
+    return mapFeedbackSheetRow(ins.data);
+  }
+
+  async function deleteFeedbackSheet(userName, sheetId) {
+    userName = String(userName || '').trim();
+    sheetId = String(sheetId || '').trim();
+    if (!userName) throw new Error('이름을 선택해주세요.');
+    if (!sheetId) throw new Error('삭제할 자가피드백을 찾을 수 없습니다.');
+
+    var user = await getUserByName(userName);
+    if (!user) throw new Error('등록되지 않은 사용자입니다.');
+
+    var db = requireConfig();
+    var del = await db.from('feedback_sheets')
+      .delete()
+      .eq('id', sheetId)
+      .eq('user_id', user.id)
+      .select('id');
+    if (del.error) throw new Error(del.error.message);
+    if (!del.data || !del.data.length) throw new Error('삭제할 자가피드백을 찾을 수 없습니다.');
+    return getFeedbackSheets(userName);
+  }
+
+  function normalizeScoreRoundPayload(round) {
+    round = round || {};
+    return {
+      id: String(round.id || ''),
+      label: String(round.label || ''),
+      scores: round.scores && typeof round.scores === 'object' ? round.scores : {}
+    };
+  }
+
+  function mapScoreSheetRow(row) {
+    var savedDate = String(row.saved_date || row.savedDate || formatDate(new Date())).substring(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(savedDate)) savedDate = formatDate(new Date());
+    return {
+      id: row.id,
+      workName: String(row.work_name || row.workName || '채점결과').trim() || '채점결과',
+      savedDate: savedDate,
+      columnSettings: row.column_settings || row.columnSettings || {},
+      rounds: Array.isArray(row.rounds) ? row.rounds.map(normalizeScoreRoundPayload) : []
+    };
+  }
+
+  async function getScoreSheets(userName) {
+    userName = String(userName || '').trim();
+    if (!userName) return [];
+    var user = await getUserByName(userName);
+    if (!user) return [];
+
+    var db = requireConfig();
+    var res = await db.from('score_sheets')
+      .select('id, work_name, saved_date, column_settings, rounds, created_at, updated_at')
+      .eq('user_id', user.id)
+      .order('updated_at', { ascending: false });
+    if (res.error) throw new Error(res.error.message);
+    return (res.data || []).map(mapScoreSheetRow);
+  }
+
+  async function saveScoreSheet(userName, sheet) {
+    userName = String(userName || '').trim();
+    if (!userName) throw new Error('이름을 선택해주세요.');
+
+    var user = await getUserByName(userName);
+    if (!user) throw new Error('등록되지 않은 사용자입니다.');
+
+    var savedDate = sheet.savedDate || formatDate(new Date());
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(savedDate)) savedDate = formatDate(new Date());
+
+    var payload = {
+      user_id: user.id,
+      work_name: String(sheet.workName || '채점결과').trim() || '채점결과',
+      saved_date: savedDate,
+      column_settings: sheet.columnSettings || {},
+      rounds: (sheet.rounds || []).map(normalizeScoreRoundPayload),
+      updated_at: new Date().toISOString()
+    };
+
+    var db = requireConfig();
+    var sheetId = sheet.id;
+    if (isUuid(sheetId)) {
+      var upd = await db.from('score_sheets')
+        .update({
+          work_name: payload.work_name,
+          saved_date: payload.saved_date,
+          column_settings: payload.column_settings,
+          rounds: payload.rounds,
+          updated_at: payload.updated_at
+        })
+        .eq('id', sheetId)
+        .eq('user_id', user.id)
+        .select('id, work_name, saved_date, column_settings, rounds')
+        .maybeSingle();
+      if (upd.error) throw new Error(upd.error.message);
+      if (!upd.data) throw new Error('저장할 채점결과를 찾을 수 없습니다.');
+      return mapScoreSheetRow(upd.data);
+    }
+
+    var ins = await db.from('score_sheets')
+      .insert(payload)
+      .select('id, work_name, saved_date, column_settings, rounds')
+      .single();
+    if (ins.error) throw new Error(ins.error.message);
+    return mapScoreSheetRow(ins.data);
+  }
+
+  async function deleteScoreSheet(userName, sheetId) {
+    userName = String(userName || '').trim();
+    sheetId = String(sheetId || '').trim();
+    if (!userName) throw new Error('이름을 선택해주세요.');
+    if (!sheetId) throw new Error('삭제할 채점결과를 찾을 수 없습니다.');
+
+    var user = await getUserByName(userName);
+    if (!user) throw new Error('등록되지 않은 사용자입니다.');
+
+    var db = requireConfig();
+    var del = await db.from('score_sheets')
+      .delete()
+      .eq('id', sheetId)
+      .eq('user_id', user.id)
+      .select('id');
+    if (del.error) throw new Error(del.error.message);
+    if (!del.data || !del.data.length) throw new Error('삭제할 채점결과를 찾을 수 없습니다.');
+    return getScoreSheets(userName);
+  }
+
   global.ProDiaryApi = {
     isReady: function () {
       return Boolean(global.SUPABASE_URL && global.SUPABASE_ANON_KEY &&
@@ -2586,10 +3532,17 @@
     getDayProgress: getDayProgress,
     getBootstrapData: getBootstrapData,
     getTaskDates: getTaskDates,
+    getUserMonthTasks: getUserMonthTasks,
     getProBadges: getProBadges,
     getProcessSheets: getProcessSheets,
     saveProcessSheet: saveProcessSheet,
-    deleteProcessSheet: deleteProcessSheet
+    deleteProcessSheet: deleteProcessSheet,
+    getFeedbackSheets: getFeedbackSheets,
+    saveFeedbackSheet: saveFeedbackSheet,
+    deleteFeedbackSheet: deleteFeedbackSheet,
+    getScoreSheets: getScoreSheets,
+    saveScoreSheet: saveScoreSheet,
+    deleteScoreSheet: deleteScoreSheet
   };
 })(window);
 
@@ -2655,8 +3608,30 @@
       var CACHE_SIDEBAR = 'proDiary_sidebar_';
       var CACHE_PROCESS = 'proDiary_process_';
       var CACHE_PROCESS_INDEX = 'proDiary_processIndex_';
+      var CACHE_FEEDBACK = 'proDiary_feedback_';
+      var CACHE_FEEDBACK_INDEX = 'proDiary_feedbackIndex_';
+      var CACHE_SCORE_INDEX = 'proDiary_scoreIndex_';
       var processSheetsState = { editingId: '', draftRows: [], sheets: [], editSnapshot: null };
+      var feedbackSheetsState = { editingId: '', sheets: [] };
+      var scoreSheetsState = { editingId: '', sheets: [] };
+      var scoreSheetState = { id: '', workName: '채점결과', savedDate: '', columnSettings: {}, rounds: [] };
+      var scoreRoundIdCounter = 0;
+      var scoreChart = null;
+      var scoreChartRenderToken = 0;
+      var DEFAULT_SCORE_COLUMNS = [
+        { id: 't1_3d', group: '1과제', label: '3D 채점', maxScore: 3 },
+        { id: 't1_2d', group: '1과제', label: '2D 채점', maxScore: 7 },
+        { id: 't1_cam', group: '1과제', label: 'CAM 채점', maxScore: 5 },
+        { id: 't2_dim', group: '2과제', label: '치수정밀도', maxScore: 59 },
+        { id: 't2_paint', group: '2과제', label: '페인팅 상태', maxScore: 10 },
+        { id: 't2_p3d', group: '2과제', label: '3D 프린팅 부품', maxScore: 3 },
+        { id: 't2_comp', group: '2과제', label: '전체적인 완성도', maxScore: 10 },
+        { id: 't2_safe', group: '2과제', label: '안전', maxScore: 3 }
+      ];
+      var DEFAULT_SCORE_ROUND_COUNT = 3;
       var processSavedListOpen = false;
+      var feedbackSavedListOpen = false;
+      var scoreSavedListOpen = false;
       var PROCESS_CATEGORIES = [
         '재단', 'CAD', 'CAM', '3D 프린터', 'CNC', '밀링', '선반', '일반가공', '도색', '조립'
       ];
@@ -2664,6 +3639,13 @@
       var processRows = [];
       var processRowIdCounter = 0;
       var processRowDragId = null;
+      var feedbackRows = [];
+      var feedbackRowIdCounter = 0;
+      var DEFAULT_FEEDBACK_ROW_COUNT = 3;
+      var MAX_FEEDBACK_PHOTO_BYTES = 500 * 1024;
+      var MAX_FEEDBACK_PHOTO_INPUT_BYTES = 15 * 1024 * 1024;
+      var cropperJsPromise = null;
+      var feedbackImageEditorState = { cropper: null, photoBox: null, row: null };
       var CACHE_TASKS = 'proDiary_tasks_';
       var CACHE_CHART = 'proDiary_chart_';
       var CHART_DAYS = 14;
@@ -2702,7 +3684,7 @@
         userName: document.getElementById('userName'),
         displayName: document.getElementById('displayName'),
         userProBadgeWrap: document.getElementById('userProBadgeWrap'),
-        changeNameBtn: document.getElementById('changeNameBtn'),
+        contextPrintBtn: document.getElementById('contextPrintBtn'),
         nameHint: document.getElementById('nameHint'),
         taskDiaryRow: document.getElementById('taskDiaryRow'),
         taskCard: document.getElementById('taskCard'),
@@ -2719,6 +3701,11 @@
         todayPercent: document.getElementById('todayPercent'),
         todayCount: document.getElementById('todayCount'),
         chartCard: document.getElementById('chartCard'),
+        diaryPrintModal: document.getElementById('diaryPrintModal'),
+        diaryPrintBackdrop: document.getElementById('diaryPrintBackdrop'),
+        diaryPrintMonthSelect: document.getElementById('diaryPrintMonthSelect'),
+        diaryPrintCancelBtn: document.getElementById('diaryPrintCancelBtn'),
+        diaryPrintConfirmBtn: document.getElementById('diaryPrintConfirmBtn'),
         chartWrap: document.getElementById('chartWrap'),
         chartOverlay: document.getElementById('chartOverlay'),
         chartOverlayText: document.getElementById('chartOverlayText'),
@@ -2741,12 +3728,15 @@
         sidebarYesterdayDivider: document.getElementById('sidebarYesterdayDivider'),
         diaryTabBtn: document.getElementById('diaryTabBtn'),
         ganttTabBtn: document.getElementById('ganttTabBtn'),
+        feedbackTabBtn: document.getElementById('feedbackTabBtn'),
+        scoringTabBtn: document.getElementById('scoringTabBtn'),
         processCard: document.getElementById('processCard'),
+        feedbackCard: document.getElementById('feedbackCard'),
+        scoringCard: document.getElementById('scoringCard'),
         processTableBody: document.getElementById('processTableBody'),
         processTableFoot: document.getElementById('processTableFoot'),
         processEmpty: document.getElementById('processEmpty'),
         addProcessRowBtn: document.getElementById('addProcessRowBtn'),
-        printProcessSheetBtn: document.getElementById('printProcessSheetBtn'),
         processTotalTarget: document.getElementById('processTotalTarget'),
         processTotalActual: document.getElementById('processTotalActual'),
         processTotalAll: document.getElementById('processTotalAll'),
@@ -2754,11 +3744,43 @@
         processWrittenDate: document.getElementById('processWrittenDate'),
         newProcessDraftBtn: document.getElementById('newProcessDraftBtn'),
         saveProcessSheetBtn: document.getElementById('saveProcessSheetBtn'),
+        feedbackWorkNameInput: document.getElementById('feedbackWorkNameInput'),
+        feedbackRoundInput: document.getElementById('feedbackRoundInput'),
+        feedbackDateInput: document.getElementById('feedbackDateInput'),
+        feedbackTableBody: document.getElementById('feedbackTableBody'),
+        saveFeedbackBtn: document.getElementById('saveFeedbackBtn'),
+        newFeedbackDraftBtn: document.getElementById('newFeedbackDraftBtn'),
+        addFeedbackRowBtn: document.getElementById('addFeedbackRowBtn'),
         processSavedPanel: document.getElementById('processSavedPanel'),
         processSavedToggle: document.getElementById('processSavedToggle'),
         processSavedCount: document.getElementById('processSavedCount'),
         processSavedListWrap: document.getElementById('processSavedListWrap'),
-        processSavedList: document.getElementById('processSavedList')
+        processSavedList: document.getElementById('processSavedList'),
+        feedbackSavedPanel: document.getElementById('feedbackSavedPanel'),
+        feedbackSavedToggle: document.getElementById('feedbackSavedToggle'),
+        feedbackSavedCount: document.getElementById('feedbackSavedCount'),
+        feedbackSavedListWrap: document.getElementById('feedbackSavedListWrap'),
+        feedbackSavedList: document.getElementById('feedbackSavedList'),
+        scoreSavedPanel: document.getElementById('scoreSavedPanel'),
+        scoreSavedToggle: document.getElementById('scoreSavedToggle'),
+        scoreSavedCount: document.getElementById('scoreSavedCount'),
+        scoreSavedListWrap: document.getElementById('scoreSavedListWrap'),
+        scoreSavedList: document.getElementById('scoreSavedList'),
+        feedbackImageEditorModal: document.getElementById('feedbackImageEditorModal'),
+        feedbackImageEditorBackdrop: document.getElementById('feedbackImageEditorBackdrop'),
+        feedbackEditorImage: document.getElementById('feedbackEditorImage'),
+        feedbackEditorRotateLeft: document.getElementById('feedbackEditorRotateLeft'),
+        feedbackEditorRotateRight: document.getElementById('feedbackEditorRotateRight'),
+        feedbackEditorCancel: document.getElementById('feedbackEditorCancel'),
+        feedbackEditorApply: document.getElementById('feedbackEditorApply'),
+        scoreWorkNameInput: document.getElementById('scoreWorkNameInput'),
+        saveScoreSheetBtn: document.getElementById('saveScoreSheetBtn'),
+        newScoreDraftBtn: document.getElementById('newScoreDraftBtn'),
+        scoreColumnGrid: document.getElementById('scoreColumnGrid'),
+        scoringTableHead: document.getElementById('scoringTableHead'),
+        scoringTableBody: document.getElementById('scoringTableBody'),
+        addScoreRoundBtn: document.getElementById('addScoreRoundBtn'),
+        scoreChartCanvas: document.getElementById('scoreChart')
       };
 
       function setBusy(active, message) {
@@ -3010,8 +4032,20 @@
         return isNaN(n) || n < 0 ? 0 : n;
       }
 
+      function formatProcessHours(total) {
+        total = parseProcessMinutes(total);
+        var hours = Math.round((total / 60) * 10) / 10;
+        if (hours === Math.floor(hours)) {
+          return Math.floor(hours) + 'h';
+        }
+        return hours.toFixed(1) + 'h';
+      }
+
       function formatProcessMinutes(total) {
         total = parseProcessMinutes(total);
+        if (total > 60) {
+          return total + '분 (' + formatProcessHours(total) + ')';
+        }
         return total + '분';
       }
 
@@ -3268,13 +4302,37 @@
       }
 
       function updateProcessSavedPanelVisibility() {
-        if (!el.processSavedPanel) return;
-        var show = el.nameCard.classList.contains('name-locked') && mainViewMode === 'process';
-        el.processSavedPanel.classList.toggle('visible', show);
-        if (!show) {
-          el.processSavedPanel.classList.remove('is-open');
-          processSavedListOpen = false;
-          if (el.processSavedToggle) el.processSavedToggle.setAttribute('aria-expanded', 'false');
+        var locked = el.nameCard && el.nameCard.classList.contains('name-locked');
+        if (el.processSavedPanel) {
+          var showProcess = locked && mainViewMode === 'process';
+          el.processSavedPanel.classList.toggle('visible', showProcess);
+          if (!showProcess) {
+            el.processSavedPanel.classList.remove('is-open');
+            processSavedListOpen = false;
+            if (el.processSavedToggle) el.processSavedToggle.setAttribute('aria-expanded', 'false');
+          }
+        }
+        if (el.feedbackSavedPanel) {
+          var showFeedback = locked && mainViewMode === 'feedback';
+          el.feedbackSavedPanel.classList.toggle('visible', showFeedback);
+          if (!showFeedback) {
+            el.feedbackSavedPanel.classList.remove('is-open');
+            feedbackSavedListOpen = false;
+            if (el.feedbackSavedToggle) el.feedbackSavedToggle.setAttribute('aria-expanded', 'false');
+          } else {
+            renderFeedbackSavedList();
+          }
+        }
+        if (el.scoreSavedPanel) {
+          var showScoring = locked && mainViewMode === 'scoring';
+          el.scoreSavedPanel.classList.toggle('visible', showScoring);
+          if (!showScoring) {
+            el.scoreSavedPanel.classList.remove('is-open');
+            scoreSavedListOpen = false;
+            if (el.scoreSavedToggle) el.scoreSavedToggle.setAttribute('aria-expanded', 'false');
+          } else {
+            renderScoreSavedList();
+          }
         }
       }
 
@@ -3577,13 +4635,35 @@
 
       function renderProcessCategoryTotals(rows) {
         if (!el.processTableFoot) return;
-        el.processTableFoot.querySelectorAll('.process-category-total-row').forEach(function (tr) {
+        el.processTableFoot.querySelectorAll('.process-category-section-row, .process-category-total-row').forEach(function (tr) {
           tr.remove();
         });
         var categories = calcProcessCategoryTotals(rows);
-        categories.forEach(function (item) {
+        if (!categories.length) return;
+
+        var insertAfter = el.processTableFoot.querySelector('.process-grand-total');
+
+        function appendRow(tr) {
+          if (insertAfter) {
+            insertAfter.insertAdjacentElement('afterend', tr);
+          } else {
+            el.processTableFoot.appendChild(tr);
+          }
+          insertAfter = tr;
+        }
+
+        var headerTr = document.createElement('tr');
+        headerTr.className = 'process-category-section-row';
+        var tdHeader = document.createElement('td');
+        tdHeader.colSpan = 7;
+        tdHeader.className = 'process-category-section-label';
+        tdHeader.textContent = '작업 구분별 누적 시간';
+        headerTr.appendChild(tdHeader);
+        appendRow(headerTr);
+
+        categories.forEach(function (item, idx) {
           var tr = document.createElement('tr');
-          tr.className = 'process-category-total-row';
+          tr.className = 'process-category-total-row ' + (idx % 2 === 0 ? 'band-plain' : 'band-shade');
 
           var tdLabel = document.createElement('td');
           tdLabel.colSpan = 2;
@@ -3614,7 +4694,7 @@
           tr.appendChild(tdAll);
           tr.appendChild(tdMove);
           tr.appendChild(tdDel);
-          el.processTableFoot.appendChild(tr);
+          appendRow(tr);
         });
       }
 
@@ -3746,47 +4826,106 @@
         return '—';
       }
 
+      function getPrintCategoryBandClasses(rows) {
+        var classes = [];
+        var shaded = false;
+        var prevCat = null;
+        (rows || []).forEach(function (row, idx) {
+          var cat = String(row.category || '').trim();
+          if (idx > 0 && cat !== prevCat) {
+            shaded = !shaded;
+          }
+          prevCat = cat;
+          classes.push(shaded ? 'band-shade' : 'band-plain');
+        });
+        return classes;
+      }
+
+      function buildPrintBodyRowsHtml(rows, blocks, bandClasses) {
+        var html = [];
+        var i = 0;
+        rows = rows || [];
+        while (i < rows.length) {
+          var cat = String(rows[i].category || '').trim();
+          var start = i;
+          while (i < rows.length && String(rows[i].category || '').trim() === cat) {
+            i++;
+          }
+          var span = i - start;
+          for (var r = start; r < i; r++) {
+            var row = rows[r];
+            var rowClass = 'data-row ' + (bandClasses[r] || 'band-plain');
+            html.push('<tr class="' + rowClass + '">');
+            if (r === start) {
+              html.push('<td class="cat" rowspan="' + span + '">' + escapeHtml(cat) + '</td>');
+            }
+            html.push(
+              '<td class="content">' + escapeHtml(row.content) + '</td>' +
+              '<td class="num">' + escapeHtml(formatProcessCellMinutes(row.targetMin)) + '</td>' +
+              '<td class="num">' + escapeHtml(formatProcessCellMinutes(row.actualMin)) + '</td>' +
+              '<td class="num linked">' + escapeHtml(getProcessRowLinkedTimeDisplay(r, blocks)) + '</td>' +
+              '</tr>'
+            );
+          }
+        }
+        return html.join('');
+      }
+
       function buildProcessPrintHtml(rows) {
         var meta = getCurrentProcessSheetMeta();
         var blocks = computeProcessBlocks(rows);
         var totals = calcProcessTotals(rows);
         var categories = calcProcessCategoryTotals(rows);
-        var bodyRows = rows.map(function (row, idx) {
-          return '<tr>' +
-            '<td>' + escapeHtml(row.category || '') + '</td>' +
-            '<td>' + escapeHtml(row.content) + '</td>' +
-            '<td class="num">' + escapeHtml(formatProcessCellMinutes(row.targetMin)) + '</td>' +
-            '<td class="num">' + escapeHtml(formatProcessCellMinutes(row.actualMin)) + '</td>' +
-            '<td class="num linked">' + escapeHtml(getProcessRowLinkedTimeDisplay(idx, blocks)) + '</td>' +
-            '</tr>';
-        }).join('');
-        var categoryRows = categories.map(function (item) {
-          return '<tr class="subtotal">' +
-            '<td colspan="2">' + escapeHtml(item.category) + '</td>' +
-            '<td class="num">' + escapeHtml(formatProcessMinutes(item.targetSum)) + '</td>' +
-            '<td class="num">' + escapeHtml(formatProcessMinutes(item.actualSum)) + '</td>' +
-            '<td class="num">—</td>' +
-            '</tr>';
-        }).join('');
+        var bandClasses = getPrintCategoryBandClasses(rows);
+        var bodyRows = buildPrintBodyRowsHtml(rows, blocks, bandClasses);
+        var categoryRows = categories.length
+          ? '<tr class="section-header"><td colspan="5">작업 구분별 누적 시간</td></tr>' +
+            categories.map(function (item, idx) {
+              var rowClass = idx % 2 === 0 ? 'subtotal even' : 'subtotal odd';
+              return '<tr class="' + rowClass + '">' +
+                '<td colspan="2" class="cat">' + escapeHtml(item.category) + '</td>' +
+                '<td class="num">' + escapeHtml(formatProcessMinutes(item.targetSum)) + '</td>' +
+                '<td class="num">' + escapeHtml(formatProcessMinutes(item.actualSum)) + '</td>' +
+                '<td class="num">—</td>' +
+                '</tr>';
+            }).join('')
+          : '';
         var userLine = meta.user
           ? '<span>작성자: ' + escapeHtml(meta.user) + '</span>'
           : '';
         return '<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">' +
           '<title>' + escapeHtml(meta.title) + ' - 공정표</title>' +
           '<style>' +
-          '* { box-sizing: border-box; }' +
-          'body { font-family: "Pretendard", "Malgun Gothic", sans-serif; color: #111; margin: 24px; }' +
-          'h1 { margin: 0 0 8px; font-size: 1.35rem; }' +
+          '* { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }' +
+          'body { font-family: "Pretendard", "Malgun Gothic", sans-serif; color: #1a1a1a; margin: 24px; background: #fff; }' +
+          'h1 { margin: 0 0 8px; font-size: 1.35rem; color: #111; }' +
           '.meta { margin: 0 0 18px; color: #555; font-size: 0.9rem; display: flex; flex-wrap: wrap; gap: 12px 20px; }' +
-          'table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }' +
-          'th, td { border: 1px solid #333; padding: 8px 10px; vertical-align: top; }' +
-          'th { background: #f0f0f0; text-align: center; font-weight: 700; }' +
+          'table { width: 100%; border-collapse: collapse; font-size: 0.88rem; border-top: 2px solid #3d3d3d; border-bottom: 2px solid #3d3d3d; border-left: none; border-right: none; table-layout: fixed; }' +
+          'th, td { border: 1px solid #8a8a8a; padding: 9px 10px; vertical-align: middle; }' +
+          'th:first-child, td:first-child { border-left: none; }' +
+          'th:last-child, td:last-child { border-right: none; }' +
+          'col.col-cat { width: 12%; }' +
+          'col.col-content { width: 43%; }' +
+          'col.col-target { width: 12%; }' +
+          'col.col-actual { width: 14%; }' +
+          'col.col-linked { width: 19%; }' +
+          'thead th { background: #d9e2ef; color: #1a1a1a; text-align: center; font-weight: 700; border-bottom: 2px solid #3d3d3d; }' +
+          'tbody tr.data-row.band-plain td { background: #ffffff; }' +
+          'tbody tr.data-row.band-shade td { background: #e8eef6; }' +
+          'tbody td.cat { font-weight: 600; text-align: center; vertical-align: middle; }' +
+          'tbody td.content { text-align: left; }' +
+          'tbody td.num { text-align: center; white-space: nowrap; }' +
+          'tbody td.linked { font-weight: 700; }' +
+          'td.cat, th.cat { text-align: center; }' +
           'td.num { text-align: center; white-space: nowrap; }' +
-          'td.linked { font-weight: 700; }' +
-          'tr.subtotal td { background: #fafafa; font-weight: 600; }' +
-          'tr.grand-total td { background: #eee; font-weight: 700; }' +
-          'tr.grand-total .label { color: #222; }' +
-          '@media print { body { margin: 12mm; } @page { margin: 12mm; } }' +
+          'tfoot td { border-top: 1px solid #8a8a8a; }' +
+          'tr.grand-total td { background: #ffe8cc; font-weight: 700; text-align: center; border-top: 2px solid #3d3d3d; border-bottom: 2px solid #3d3d3d; }' +
+          'tr.grand-total .label { color: #7a3e00; }' +
+          'tr.section-header td { background: #ffffff; color: #1a2a44; font-weight: 700; border-top: 2px solid #3d3d3d; text-align: center; font-size: 0.92rem; }' +
+          'tr.subtotal td { font-weight: 600; text-align: center; }' +
+          'tr.subtotal.even td { background: #ffffff; }' +
+          'tr.subtotal.odd td { background: #eef2f7; }' +
+          '@media print { body { margin: 12mm; } @page { margin: 12mm; } table { page-break-inside: auto; } tr { page-break-inside: avoid; } }' +
           '</style></head><body>' +
           '<h1>' + escapeHtml(meta.title) + '</h1>' +
           '<p class="meta">' +
@@ -3795,18 +4934,26 @@
           '<span>인쇄: ' + escapeHtml(new Date().toLocaleString('ko-KR')) + '</span>' +
           '</p>' +
           '<table>' +
+          '<colgroup>' +
+          '<col class="col-cat">' +
+          '<col class="col-content">' +
+          '<col class="col-target">' +
+          '<col class="col-actual">' +
+          '<col class="col-linked">' +
+          '</colgroup>' +
           '<thead><tr>' +
-          '<th>작업 구분</th><th>작업 내용</th><th>목표 시간</th><th>실제 시간</th><th>동일 작업 연계 시간</th>' +
+          '<th class="cat">작업 구분</th><th class="content">작업 내용</th><th class="num">목표 시간</th><th class="num">실제 작업 시간</th><th class="num">동일 작업 연계 시간</th>' +
           '</tr></thead>' +
           '<tbody>' + bodyRows + '</tbody>' +
           '<tfoot>' +
-          categoryRows +
           '<tr class="grand-total">' +
-          '<td colspan="2" class="label">전체 시간</td>' +
+          '<td colspan="2" class="cat label">전체 시간</td>' +
           '<td class="num">' + escapeHtml(formatProcessMinutes(totals.targetSum)) + '</td>' +
           '<td class="num">' + escapeHtml(formatProcessMinutes(totals.actualSum)) + '</td>' +
           '<td class="num">—</td>' +
-          '</tr></tfoot>' +
+          '</tr>' +
+          categoryRows +
+          '</tfoot>' +
           '</table></body></html>';
       }
 
@@ -3834,6 +4981,617 @@
             if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
           }, 1000);
         }, 300);
+      }
+
+      function formatPrintMultiline(text) {
+        return escapeHtml(text || '').replace(/\n/g, '<br>');
+      }
+
+      function getCurrentFeedbackMeta() {
+        var state = collectFeedbackStateFromDOM();
+        var savedDate = state.recordDate || todayStr();
+        if (feedbackSheetsState.editingId) {
+          var sheet = getFeedbackSheetById(feedbackSheetsState.editingId);
+          if (sheet && sheet.savedDate) savedDate = sheet.savedDate;
+        }
+        return {
+          workName: state.workName || '',
+          round: state.round || '',
+          user: currentUser || '',
+          savedDate: savedDate,
+          dateLabel: el.feedbackDateInput && el.feedbackDateInput.value
+            ? el.feedbackDateInput.value
+            : formatFeedbackRecordDate(savedDate),
+          rows: state.rows || []
+        };
+      }
+
+      function buildFeedbackPrintBodyRows(rows) {
+        var html = [];
+        (rows || []).forEach(function (row, index) {
+          var photoHtml = row.photo
+            ? '<img class="fb-photo-img" src="' + String(row.photo).replace(/"/g, '&quot;') + '" alt="">'
+            : '<div class="fb-photo-empty"></div>';
+          html.push(
+            '<tr class="fb-item-start">' +
+            '<td class="fb-num" rowspan="2">' + (index + 1) + '</td>' +
+            '<td class="fb-photo" rowspan="2">' + photoHtml + '</td>' +
+            '<td class="fb-label">원인</td>' +
+            '<td class="fb-text">' + formatPrintMultiline(row.cause) + '</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td class="fb-label">해결책</td>' +
+            '<td class="fb-text">' + formatPrintMultiline(row.solution) + '</td>' +
+            '</tr>'
+          );
+        });
+        return html.join('');
+      }
+
+      function buildFeedbackPrintHtml(meta) {
+        meta = meta || getCurrentFeedbackMeta();
+        var titleParts = ['자가피드백'];
+        if (meta.workName) titleParts.push(meta.workName);
+        var titleText = titleParts.join(' · ');
+        var roundLine = meta.round
+          ? '<span>차수: ' + escapeHtml(meta.round) + '</span>'
+          : '';
+        var userLine = meta.user
+          ? '<span>이름: ' + escapeHtml(meta.user) + '</span>'
+          : '';
+        var workLine = meta.workName
+          ? '<span>작품명: ' + escapeHtml(meta.workName) + '</span>'
+          : '';
+        return '<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">' +
+          '<title>' + escapeHtml(titleText) + '</title>' +
+          '<style>' +
+          '* { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }' +
+          'body { font-family: "Pretendard", "Malgun Gothic", sans-serif; color: #111; margin: 24px; background: #fff; }' +
+          'h1 { margin: 0 0 10px; font-size: 1.4rem; text-align: center; font-weight: 700; }' +
+          '.meta { margin: 0 0 16px; color: #333; font-size: 0.9rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 24px; }' +
+          'table { width: 100%; border-collapse: collapse; font-size: 0.88rem; border: 2px solid #111; table-layout: fixed; }' +
+          'th, td { border: 1px solid #111; padding: 8px 10px; vertical-align: middle; }' +
+          'thead th { background: #f3f3f3; text-align: center; font-weight: 700; }' +
+          'col.col-num { width: 6%; }' +
+          'col.col-photo { width: 34%; }' +
+          'col.col-label { width: 10%; }' +
+          'col.col-text { width: 50%; }' +
+          '.fb-num { text-align: center; font-weight: 700; font-size: 1rem; }' +
+          '.fb-photo { text-align: center; vertical-align: middle; padding: 10px; }' +
+          '.fb-photo-img { max-width: 100%; max-height: 220px; object-fit: contain; display: block; margin: 0 auto; }' +
+          '.fb-photo-empty { min-height: 160px; }' +
+          '.fb-label { text-align: center; font-weight: 700; background: #fafafa; white-space: nowrap; }' +
+          '.fb-text { text-align: left; vertical-align: top; min-height: 72px; line-height: 1.5; word-break: break-word; }' +
+          'tr.fb-item-start td { border-top-width: 2px; }' +
+          'tbody tr:first-child td { border-top-width: 1px; }' +
+          '@media print { body { margin: 12mm; } @page { margin: 12mm; } tr { page-break-inside: avoid; } }' +
+          '</style></head><body>' +
+          '<h1>자가피드백' + (meta.workName ? ' — ' + escapeHtml(meta.workName) : '') +
+          (meta.round ? ' <span style="font-size:0.92rem;">(' + escapeHtml(meta.round) + ')</span>' : '') +
+          '</h1>' +
+          '<p class="meta">' + workLine + roundLine + userLine +
+          '<span>기록일: ' + escapeHtml(meta.dateLabel) + '</span>' +
+          '<span>인쇄: ' + escapeHtml(new Date().toLocaleString('ko-KR')) + '</span>' +
+          '</p>' +
+          '<table>' +
+          '<colgroup>' +
+          '<col class="col-num"><col class="col-photo"><col class="col-label"><col class="col-text">' +
+          '</colgroup>' +
+          '<thead><tr>' +
+          '<th>구분</th><th>사진</th><th colspan="2">원인 · 해결책</th>' +
+          '</tr></thead>' +
+          '<tbody>' + buildFeedbackPrintBodyRows(meta.rows) + '</tbody>' +
+          '</table></body></html>';
+      }
+
+      function printFeedbackSheet() {
+        if (mainViewMode !== 'feedback') return;
+        var meta = getCurrentFeedbackMeta();
+        if (!meta.rows.length) {
+          showError('인쇄할 자가피드백 항목이 없습니다.');
+          return;
+        }
+        var html = buildFeedbackPrintHtml(meta);
+        var iframe = document.createElement('iframe');
+        iframe.setAttribute('aria-hidden', 'true');
+        iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
+        document.body.appendChild(iframe);
+        var printWindow = iframe.contentWindow;
+        var printDoc = printWindow.document;
+        printDoc.open();
+        printDoc.write(html);
+        printDoc.close();
+        setTimeout(function () {
+          printWindow.focus();
+          printWindow.print();
+          setTimeout(function () {
+            if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+          }, 1000);
+        }, 300);
+      }
+
+      function getCurrentScoreMeta() {
+        var data = collectScoreSheetFromDOM();
+        return {
+          workName: data.workName || '채점결과',
+          user: currentUser || '',
+          savedDate: data.savedDate || todayStr(),
+          columns: getEnabledScoreColumns(),
+          rounds: data.rounds || []
+        };
+      }
+
+      function buildScorePrintHtml(meta) {
+        meta = meta || getCurrentScoreMeta();
+        var columns = meta.columns || [];
+        var groups = getScoreColumnGroups(columns);
+        var maxTotal = calcMaxTotal(columns);
+
+        var row1 = '<tr><th class="round-col" rowspan="3">회차</th>';
+        groups.forEach(function (group) {
+          row1 += '<th class="group-header" colspan="' + group.columns.length + '">' +
+            escapeHtml(group.name) + '</th>';
+        });
+        row1 += '<th class="total-col" rowspan="2">종합</th></tr>';
+
+        var row2 = '<tr>';
+        columns.forEach(function (col) {
+          row2 += '<th class="sub-label">' + escapeHtml(col.label) + '</th>';
+        });
+        row2 += '</tr>';
+
+        var row3 = '<tr class="max-row">';
+        columns.forEach(function (col) {
+          row3 += '<td class="max-cell">' + escapeHtml(formatScoreMax(col.maxScore)) + '</td>';
+        });
+        row3 += '<td class="total-col max-total">' + escapeHtml(formatScoreDisplay(maxTotal)) + '</td></tr>';
+
+        var bodyRows = (meta.rounds || []).map(function (round, idx) {
+          var label = round.label || ((idx + 1) + '회차');
+          var cells = columns.map(function (col) {
+            var raw = round.scores && round.scores[col.id] != null ? round.scores[col.id] : '';
+            var num = parseScoreValue(raw);
+            var display = num != null ? formatScoreDisplay(num) : '';
+            return '<td class="score-cell">' + escapeHtml(display) + '</td>';
+          }).join('');
+          var total = calcRoundTotal(round, columns);
+          var totalDisplay = total != null ? formatScoreDisplay(total) : '';
+          return '<tr>' +
+            '<td class="round-col">' + escapeHtml(label) + '</td>' +
+            cells +
+            '<td class="total-col score-total">' + escapeHtml(totalDisplay) + '</td>' +
+            '</tr>';
+        }).join('');
+
+        var titleText = '채점결과' + (meta.workName ? ' · ' + meta.workName : '');
+        var userLine = meta.user
+          ? '<span>이름: ' + escapeHtml(meta.user) + '</span>'
+          : '';
+        var workLine = meta.workName
+          ? '<span>작품명: ' + escapeHtml(meta.workName) + '</span>'
+          : '';
+        var dateLine = '<span>기록일: ' + escapeHtml(meta.savedDate) + '</span>';
+        var chartSection = '';
+        if (meta.chartImage) {
+          var chartSrc = String(meta.chartImage).replace(/"/g, '&quot;');
+          chartSection =
+            '<div class="chart-section">' +
+            '<h2 class="chart-title">회차별 점수 변화</h2>' +
+            '<img class="chart-image" src="' + chartSrc + '" alt="회차별 점수 그래프">' +
+            '</div>';
+        }
+
+        return '<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">' +
+          '<title>' + escapeHtml(titleText) + '</title>' +
+          '<style>' +
+          '* { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }' +
+          'body { font-family: "Pretendard", "Malgun Gothic", sans-serif; color: #111; margin: 24px; background: #fff; }' +
+          'h1 { margin: 0 0 10px; font-size: 1.35rem; text-align: center; font-weight: 700; }' +
+          '.meta { margin: 0 0 16px; color: #333; font-size: 0.9rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 24px; }' +
+          'table { width: 100%; border-collapse: collapse; font-size: 0.84rem; border: 2px solid #333; table-layout: auto; }' +
+          'th, td { border: 1px solid #666; padding: 7px 8px; vertical-align: middle; text-align: center; }' +
+          'th.group-header { background: #e8ddd0; font-weight: 700; font-size: 0.88rem; }' +
+          'th.sub-label { background: #f3f3f3; font-weight: 600; white-space: nowrap; }' +
+          'th.round-col, td.round-col { background: #f3f3f3; font-weight: 700; white-space: nowrap; min-width: 72px; }' +
+          'tr.max-row td { background: #f7f7f7; font-weight: 600; color: #444; }' +
+          'th.total-col, td.total-col { background: #fff3e8; font-weight: 700; color: #7a3e00; min-width: 56px; }' +
+          'td.score-cell { min-width: 48px; }' +
+          'td.score-total { font-size: 0.92rem; }' +
+          '.chart-section { margin-top: 28px; page-break-inside: avoid; }' +
+          '.chart-title { font-size: 1rem; font-weight: 700; margin: 0 0 12px; text-align: center; }' +
+          '.chart-image { display: block; width: 100%; max-width: 920px; margin: 0 auto; height: auto; }' +
+          '@media print { body { margin: 12mm; } @page { margin: 12mm; } tr { page-break-inside: avoid; } }' +
+          '</style></head><body>' +
+          '<h1>채점결과' + (meta.workName ? ' — ' + escapeHtml(meta.workName) : '') + '</h1>' +
+          '<p class="meta">' + userLine + workLine + dateLine +
+          '<span>인쇄: ' + escapeHtml(new Date().toLocaleString('ko-KR')) + '</span></p>' +
+          '<table><thead>' + row1 + row2 + row3 + '</thead><tbody>' +
+          bodyRows +
+          '</tbody></table>' +
+          chartSection +
+          '</body></html>';
+      }
+
+      function captureScoreChartImage() {
+        if (!el.scoreChartCanvas || mainViewMode !== 'scoring') {
+          return Promise.resolve('');
+        }
+        var columns = getEnabledScoreColumns();
+        if (!columns.length) return Promise.resolve('');
+
+        collectScoreColumnsFromDOM();
+        collectScoreRoundsFromDOM();
+
+        return ensureChartJs().then(function () {
+          return new Promise(function (resolve) {
+            var chartData = buildScoreChartData();
+            var columnsAfter = getEnabledScoreColumns();
+            var chartOptions = {
+              responsive: true,
+              maintainAspectRatio: false,
+              animation: false,
+              plugins: {
+                legend: {
+                  position: 'bottom',
+                  labels: { boxWidth: 12, font: { size: 11 } }
+                },
+                tooltip: { mode: 'index', intersect: false }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  suggestedMax: calcMaxTotal(columnsAfter),
+                  title: { display: true, text: '점수' }
+                },
+                x: {
+                  title: { display: true, text: '회차' }
+                }
+              }
+            };
+
+            function finishCapture() {
+              setTimeout(function () {
+                requestAnimationFrame(function () {
+                  var url = '';
+                  try {
+                    if (scoreChart) url = scoreChart.toBase64Image('image/png', 1);
+                  } catch (e) { /* ignore */ }
+                  if (scoreChart && scoreChart.options) delete scoreChart.options.animation;
+                  resolve(url || '');
+                });
+              }, 120);
+            }
+
+            if (scoreChart) {
+              scoreChart.data.labels = chartData.labels;
+              scoreChart.data.datasets = chartData.datasets;
+              scoreChart.options.scales.y.suggestedMax = calcMaxTotal(columnsAfter);
+              scoreChart.options.animation = false;
+              scoreChart.update('none');
+              finishCapture();
+              return;
+            }
+
+            scoreChart = new window.Chart(el.scoreChartCanvas.getContext('2d'), {
+              type: 'line',
+              data: chartData,
+              options: chartOptions
+            });
+            finishCapture();
+          });
+        }).catch(function () {
+          return '';
+        });
+      }
+
+      function printScoreSheet() {
+        if (mainViewMode !== 'scoring') return;
+        var meta = getCurrentScoreMeta();
+        if (!meta.columns.length) {
+          showError('인쇄할 채점 항목이 없습니다. 항목 표시 설정에서 하나 이상 켜주세요.');
+          return;
+        }
+        if (!meta.rounds.length) {
+          showError('인쇄할 회차가 없습니다.');
+          return;
+        }
+        captureScoreChartImage().then(function (chartImage) {
+          meta.chartImage = chartImage;
+          openScorePrintWindow(buildScorePrintHtml(meta));
+        });
+      }
+
+      function openScorePrintWindow(html) {
+        var iframe = document.createElement('iframe');
+        iframe.setAttribute('aria-hidden', 'true');
+        iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
+        document.body.appendChild(iframe);
+        var printWindow = iframe.contentWindow;
+        var printDoc = printWindow.document;
+        printDoc.open();
+        printDoc.write(html);
+        printDoc.close();
+        setTimeout(function () {
+          printWindow.focus();
+          printWindow.print();
+          setTimeout(function () {
+            if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+          }, 1000);
+        }, 300);
+      }
+
+      function triggerContextPrint() {
+        if (!currentUser || !el.nameCard || !el.nameCard.classList.contains('name-locked')) {
+          showError('이름을 선택한 뒤 인쇄할 수 있습니다.');
+          return;
+        }
+        if (mainViewMode === 'diary') {
+          openDiaryPrintModal();
+        } else if (mainViewMode === 'process') {
+          printProcessSheet();
+        } else if (mainViewMode === 'feedback') {
+          printFeedbackSheet();
+        } else if (mainViewMode === 'scoring') {
+          printScoreSheet();
+        }
+      }
+
+      function formatMonthLabel(yearMonth) {
+        var p = String(yearMonth || '').split('-');
+        if (p.length < 2) return yearMonth;
+        return p[0] + '년 ' + parseInt(p[1], 10) + '월';
+      }
+
+      function extractRecordedMonths(dates) {
+        var map = {};
+        (dates || []).forEach(function (d) {
+          if (!d || d.length < 7) return;
+          map[d.substring(0, 7)] = true;
+        });
+        return Object.keys(map).sort(function (a, b) { return b.localeCompare(a); });
+      }
+
+      function getDaysInMonth(yearMonth) {
+        var parts = String(yearMonth || '').split('-');
+        var y = parseInt(parts[0], 10);
+        var m = parseInt(parts[1], 10);
+        if (!y || !m) return [];
+        var count = new Date(y, m, 0).getDate();
+        var dates = [];
+        var d;
+        for (d = 1; d <= count; d++) {
+          dates.push(yearMonth + '-' + String(d).padStart(2, '0'));
+        }
+        return dates;
+      }
+
+      function buildMonthChartStats(tasks, yearMonth) {
+        var dates = getDaysInMonth(yearMonth);
+        var stats = {};
+        dates.forEach(function (d) {
+          stats[d] = { date: d, total: 0, completed: 0, score: 0, percent: 0 };
+        });
+        (tasks || []).forEach(function (row) {
+          var d = String(row.task_date).substring(0, 10);
+          if (!stats[d]) return;
+          var state = row.state === 'checked' || row.state === 'triangle' || row.state === 'none'
+            ? row.state : 'none';
+          stats[d].total++;
+          if (state === 'checked') stats[d].completed++;
+          stats[d].score += progressWeightForState(state);
+        });
+        return dates.map(function (d) {
+          var s = stats[d];
+          s.percent = calcProgressPercent(s.total, s.score);
+          return s;
+        });
+      }
+
+      function formatTaskStateForPrint(state) {
+        if (state === 'checked') return '✓';
+        if (state === 'triangle') return '△';
+        return '○';
+      }
+
+      function buildDiaryPrintDaySections(tasks, yearMonth) {
+        var byDate = {};
+        (tasks || []).forEach(function (row) {
+          var d = String(row.task_date).substring(0, 10);
+          if (d.substring(0, 7) !== yearMonth) return;
+          if (!byDate[d]) byDate[d] = [];
+          byDate[d].push(row);
+        });
+        var dates = Object.keys(byDate).sort();
+        if (!dates.length) return '';
+        return dates.map(function (dateStr) {
+          var items = byDate[dateStr].map(function (row) {
+            return '<li class="diary-task-item">' +
+              '<span class="diary-task-state">' + escapeHtml(formatTaskStateForPrint(row.state)) + '</span>' +
+              '<span class="diary-task-text">' + escapeHtml(String(row.text || '')) + '</span>' +
+              '</li>';
+          }).join('');
+          return '<section class="diary-day-section">' +
+            '<h3 class="diary-day-title">' + escapeHtml(formatDateKorean(dateStr)) + '</h3>' +
+            '<ul class="diary-task-list">' + items + '</ul>' +
+            '</section>';
+        }).join('');
+      }
+
+      function renderDiaryPrintChartImage(stats) {
+        return ensureChartJs().then(function () {
+          return new Promise(function (resolve) {
+            var wrap = document.createElement('div');
+            wrap.style.cssText = 'position:fixed;left:-9999px;top:0;width:1100px;height:340px;';
+            var canvas = document.createElement('canvas');
+            canvas.width = 1100;
+            canvas.height = 340;
+            wrap.appendChild(canvas);
+            document.body.appendChild(wrap);
+
+            var labels = (stats || []).map(function (s) {
+              var p = s.date.split('-');
+              return String(parseInt(p[2], 10));
+            });
+            var data = (stats || []).map(function (s) { return s.percent; });
+            var colors = barColorsFromStats(stats);
+            var barStyle = getChartBarDatasetStyle();
+            ensureBarCountPlugin();
+
+            var printChart = new window.Chart(canvas.getContext('2d'), {
+              type: 'bar',
+              data: {
+                labels: labels,
+                datasets: [{
+                  label: '완료율 (%)',
+                  data: data,
+                  backgroundColor: colors.backgrounds,
+                  borderColor: colors.borders,
+                  borderWidth: barStyle.borderWidth,
+                  borderRadius: barStyle.borderRadius
+                }]
+              },
+              options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                animation: false,
+                layout: { padding: { top: 22 } },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: { callback: function (v) { return v + '%'; }, font: { size: 10 } }
+                  },
+                  x: {
+                    ticks: { font: { size: 9 }, maxRotation: 0, autoSkip: false }
+                  }
+                },
+                plugins: {
+                  barCountLabels: { stats: stats },
+                  legend: { display: false },
+                  tooltip: { enabled: false }
+                }
+              }
+            });
+
+            setTimeout(function () {
+              var url = '';
+              try {
+                url = printChart.toBase64Image('image/png', 1);
+              } catch (e) { /* ignore */ }
+              printChart.destroy();
+              if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
+              resolve(url || '');
+            }, 150);
+          });
+        }).catch(function () {
+          return '';
+        });
+      }
+
+      function buildDiaryPrintHtml(meta) {
+        meta = meta || {};
+        var title = '프로의 일지 — ' + formatMonthLabel(meta.yearMonth);
+        var chartSection = meta.chartImage
+          ? '<div class="chart-section">' +
+            '<h2 class="chart-title">' + escapeHtml(formatMonthLabel(meta.yearMonth)) + ' 완료율</h2>' +
+            '<img class="chart-image" src="' + String(meta.chartImage).replace(/"/g, '&quot;') + '" alt="월별 완료율 그래프">' +
+            '</div>'
+          : '';
+        var daySections = meta.daySections || '';
+        return '<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">' +
+          '<title>' + escapeHtml(title) + '</title>' +
+          '<style>' +
+          '* { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }' +
+          'body { font-family: "Pretendard", "Malgun Gothic", sans-serif; color: #111; margin: 24px; background: #fff; }' +
+          'h1 { margin: 0 0 10px; font-size: 1.4rem; text-align: center; font-weight: 700; }' +
+          '.meta { margin: 0 0 18px; color: #333; font-size: 0.9rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 24px; }' +
+          '.chart-section { margin-bottom: 24px; page-break-inside: avoid; }' +
+          '.chart-title { font-size: 1rem; font-weight: 700; margin: 0 0 10px; text-align: center; }' +
+          '.chart-image { display: block; width: 100%; max-width: 100%; height: auto; margin: 0 auto; }' +
+          '.diary-day-section { margin: 0 0 18px; page-break-inside: avoid; }' +
+          '.diary-day-title { margin: 0 0 8px; font-size: 0.95rem; font-weight: 700; padding-bottom: 6px; border-bottom: 2px solid #333; }' +
+          '.diary-task-list { list-style: none; margin: 0; padding: 0; }' +
+          '.diary-task-item { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; border-bottom: 1px solid #ddd; font-size: 0.88rem; line-height: 1.45; }' +
+          '.diary-task-state { flex: 0 0 22px; text-align: center; font-weight: 700; }' +
+          '.diary-task-text { flex: 1 1 auto; word-break: break-word; }' +
+          '.diary-empty { text-align: center; color: #666; padding: 24px 12px; }' +
+          '@media print { body { margin: 12mm; } @page { margin: 12mm; } }' +
+          '</style></head><body>' +
+          '<h1>' + escapeHtml(title) + '</h1>' +
+          '<p class="meta">' +
+          (meta.user ? '<span>이름: ' + escapeHtml(meta.user) + '</span>' : '') +
+          '<span>기간: ' + escapeHtml(formatMonthLabel(meta.yearMonth)) + '</span>' +
+          '<span>인쇄: ' + escapeHtml(new Date().toLocaleString('ko-KR')) + '</span>' +
+          '</p>' +
+          chartSection +
+          (daySections || '<p class="diary-empty">해당 월에 기록된 할 일이 없습니다.</p>') +
+          '</body></html>';
+      }
+
+      function closeDiaryPrintModal() {
+        if (!el.diaryPrintModal) return;
+        el.diaryPrintModal.classList.remove('visible');
+        el.diaryPrintModal.setAttribute('aria-hidden', 'true');
+      }
+
+      function openDiaryPrintModal() {
+        if (mainViewMode !== 'diary') return;
+        if (!currentUser) {
+          showError('이름을 선택한 뒤 인쇄할 수 있습니다.');
+          return;
+        }
+        run('getTaskDates', [currentUser], '기록된 월 불러오는 중...')
+          .then(function (dates) {
+            var months = extractRecordedMonths(dates || []);
+            if (!months.length) {
+              showError('인쇄할 일지 기록이 없습니다.');
+              return;
+            }
+            if (!el.diaryPrintMonthSelect || !el.diaryPrintModal) return;
+            el.diaryPrintMonthSelect.innerHTML = '';
+            months.forEach(function (ym) {
+              var opt = document.createElement('option');
+              opt.value = ym;
+              opt.textContent = formatMonthLabel(ym);
+              el.diaryPrintMonthSelect.appendChild(opt);
+            });
+            el.diaryPrintModal.classList.add('visible');
+            el.diaryPrintModal.setAttribute('aria-hidden', 'false');
+          })
+          .catch(function (e) {
+            showError(e.message || '일지 기록을 불러오지 못했습니다.');
+          });
+      }
+
+      function confirmDiaryPrint() {
+        if (!currentUser || !el.diaryPrintMonthSelect) return;
+        var yearMonth = el.diaryPrintMonthSelect.value;
+        if (!yearMonth) {
+          showError('인쇄할 월을 선택해주세요.');
+          return;
+        }
+        closeDiaryPrintModal();
+        run('getUserMonthTasks', [currentUser, yearMonth], '일지 인쇄 준비 중...')
+          .then(function (tasks) {
+            tasks = tasks || [];
+            if (!tasks.length) {
+              showError('선택한 월에 기록된 할 일이 없습니다.');
+              return;
+            }
+            var stats = buildMonthChartStats(tasks, yearMonth);
+            var daySections = buildDiaryPrintDaySections(tasks, yearMonth);
+            return renderDiaryPrintChartImage(stats).then(function (chartImage) {
+              openScorePrintWindow(buildDiaryPrintHtml({
+                user: currentUser,
+                yearMonth: yearMonth,
+                chartImage: chartImage,
+                daySections: daySections
+              }));
+            });
+          })
+          .catch(function (e) {
+            showError(e.message || '일지를 인쇄하지 못했습니다.');
+          });
       }
 
       function buildCategorySelectOptions(selected) {
@@ -4017,6 +5775,7 @@
         tr.setAttribute('data-process-id', row.id);
 
         var tdCat = document.createElement('td');
+        tdCat.className = 'col-category';
         var sel = document.createElement('select');
         sel.className = 'process-category';
         sel.innerHTML = buildCategorySelectOptions(row.category);
@@ -4172,26 +5931,1862 @@
         }
       }
 
+      function feedbackCacheKey() {
+        return currentUser ? CACHE_FEEDBACK + currentUser : '';
+      }
+
+      function normalizeFeedbackSheet(sheet) {
+        sheet = sheet || {};
+        return {
+          id: sheet.id || '',
+          workName: String(sheet.workName || sheet.work_name || '').trim(),
+          round: String(sheet.round || '').trim(),
+          savedDate: sheet.savedDate || sheet.saved_date || todayStr(),
+          rows: Array.isArray(sheet.rows) ? sheet.rows.map(normalizeFeedbackRow) : []
+        };
+      }
+
+      function getFeedbackSheetById(id) {
+        id = String(id || '');
+        if (!id) return null;
+        var i;
+        for (i = 0; i < feedbackSheetsState.sheets.length; i++) {
+          if (feedbackSheetsState.sheets[i].id === id) return feedbackSheetsState.sheets[i];
+        }
+        return null;
+      }
+
+      function getLatestFeedbackSheet() {
+        var sheets = feedbackSheetsState.sheets.slice().sort(function (a, b) {
+          return b.savedDate.localeCompare(a.savedDate) ||
+            String(b.workName || '').localeCompare(String(a.workName || ''));
+        });
+        return sheets[0] || null;
+      }
+
+      function saveFeedbackSheetsState() {
+        if (!currentUser) return;
+        try {
+          localStorage.setItem(CACHE_FEEDBACK_INDEX + currentUser, JSON.stringify({
+            editingId: feedbackSheetsState.editingId || ''
+          }));
+        } catch (e) { /* ignore */ }
+      }
+
+      function loadFeedbackSheetsStateLocal() {
+        if (!currentUser) {
+          feedbackSheetsState = { editingId: '', sheets: [] };
+          return;
+        }
+        try {
+          var raw = localStorage.getItem(CACHE_FEEDBACK_INDEX + currentUser);
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            feedbackSheetsState = {
+              editingId: parsed.editingId || '',
+              sheets: (parsed.sheets || []).map(normalizeFeedbackSheet)
+            };
+          } else {
+            feedbackSheetsState = { editingId: '', sheets: [] };
+            migrateLegacyFeedbackStorage();
+          }
+        } catch (e) {
+          feedbackSheetsState = { editingId: '', sheets: [] };
+        }
+        if (feedbackSheetsState.editingId &&
+          !feedbackSheetsState.sheets.some(function (s) { return s.id === feedbackSheetsState.editingId; })) {
+          feedbackSheetsState.editingId = '';
+        }
+      }
+
+      function applyLoadedFeedbackSheets(sheets, preferredEditingId) {
+        var editingId = preferredEditingId || feedbackSheetsState.editingId || '';
+        feedbackSheetsState.sheets = (sheets || []).map(normalizeFeedbackSheet);
+        if (editingId && !feedbackSheetsState.sheets.some(function (s) { return s.id === editingId; })) {
+          editingId = '';
+        }
+        feedbackSheetsState.editingId = editingId;
+        saveFeedbackSheetsState();
+      }
+
+      function migrateLegacyFeedbackStorage() {
+        if (!currentUser) return;
+        try {
+          var raw = localStorage.getItem(feedbackCacheKey());
+          if (!raw) return;
+          var data = JSON.parse(raw);
+          if (!data || !Array.isArray(data.rows) || !data.rows.length) {
+            localStorage.removeItem(feedbackCacheKey());
+            return;
+          }
+          feedbackSheetsState.sheets.push(normalizeFeedbackSheet({
+            id: 'fb-local-' + Date.now(),
+            workName: data.workName || '',
+            round: data.round || '',
+            savedDate: data.recordDate || todayStr(),
+            rows: data.rows
+          }));
+          localStorage.removeItem(feedbackCacheKey());
+        } catch (e) { /* ignore */ }
+      }
+
+      function migrateLocalOnlyFeedbackSheetsToServer(localSheets) {
+        var pending = (localSheets || []).filter(function (sheet) {
+          return sheet && !isProcessSheetServerId(sheet.id);
+        });
+        if (!pending.length) return Promise.resolve();
+        var chain = Promise.resolve();
+        pending.forEach(function (sheet) {
+          chain = chain.then(function () {
+            return runSilent('saveFeedbackSheet', [currentUser, normalizeFeedbackSheet(sheet)]);
+          });
+        });
+        return chain;
+      }
+
+      function loadFeedbackSheetsState() {
+        if (!currentUser) {
+          feedbackSheetsState = { editingId: '', sheets: [] };
+          return Promise.resolve();
+        }
+
+        migrateLegacyFeedbackStorage();
+
+        var preferredEditingId = '';
+        var localSheets = feedbackSheetsState.sheets.slice();
+        try {
+          var raw = localStorage.getItem(CACHE_FEEDBACK_INDEX + currentUser);
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            preferredEditingId = parsed.editingId || '';
+          }
+        } catch (e) { /* ignore */ }
+
+        return runSilent('getFeedbackSheets', [currentUser])
+          .then(function (sheets) {
+            return migrateLocalOnlyFeedbackSheetsToServer(localSheets).then(function () {
+              if (localSheets.some(function (sheet) { return !isProcessSheetServerId(sheet.id); })) {
+                return runSilent('getFeedbackSheets', [currentUser]);
+              }
+              return sheets;
+            });
+          })
+          .then(function (sheets) {
+            applyLoadedFeedbackSheets(sheets, preferredEditingId);
+          })
+          .catch(function (e) {
+            loadFeedbackSheetsStateLocal();
+            var msg = e && e.message ? e.message : String(e);
+            if (/feedback_sheets|schema cache|relation .* does not exist/i.test(msg)) {
+              throw new Error('서버에 자가피드백 테이블이 없습니다. Supabase SQL Editor에서 pro1G_supabase_feedback_sheets.sql을 실행해주세요.');
+            }
+            throw e;
+          });
+      }
+
+      function preloadFeedbackSheetsForUser() {
+        if (!currentUser) return Promise.resolve();
+        return loadFeedbackSheetsState()
+          .then(function () {
+            renderFeedbackSavedList();
+          })
+          .catch(function () {
+            return null;
+          });
+      }
+
+      function formatFeedbackSheetLabel(sheet) {
+        if (!sheet) return '';
+        var label = String(sheet.workName || '').trim() || '(작품명 없음)';
+        if (sheet.round) label += ' · ' + sheet.round;
+        return label;
+      }
+
+      function openFeedbackSavedListPanel() {
+        feedbackSavedListOpen = true;
+        if (el.feedbackSavedPanel) el.feedbackSavedPanel.classList.add('is-open');
+        if (el.feedbackSavedToggle) el.feedbackSavedToggle.setAttribute('aria-expanded', 'true');
+      }
+
+      function toggleFeedbackSavedList() {
+        feedbackSavedListOpen = !feedbackSavedListOpen;
+        if (el.feedbackSavedPanel) {
+          el.feedbackSavedPanel.classList.toggle('is-open', feedbackSavedListOpen);
+        }
+        if (el.feedbackSavedToggle) {
+          el.feedbackSavedToggle.setAttribute('aria-expanded', feedbackSavedListOpen ? 'true' : 'false');
+        }
+      }
+
+      function renderFeedbackSavedList() {
+        if (!el.feedbackSavedList) return;
+        el.feedbackSavedList.innerHTML = '';
+        var sheets = feedbackSheetsState.sheets.slice().sort(function (a, b) {
+          return b.savedDate.localeCompare(a.savedDate) ||
+            String(b.workName || '').localeCompare(String(a.workName || ''));
+        });
+        if (el.feedbackSavedCount) {
+          el.feedbackSavedCount.textContent = sheets.length + '개';
+        }
+        if (!sheets.length) {
+          var empty = document.createElement('li');
+          empty.className = 'process-saved-empty';
+          empty.textContent = '저장된 자가피드백이 없습니다. 작성 후 저장 버튼을 눌러주세요.';
+          el.feedbackSavedList.appendChild(empty);
+          return;
+        }
+        sheets.forEach(function (sheet) {
+          var li = document.createElement('li');
+          li.className = 'process-saved-item';
+          if (sheet.id === feedbackSheetsState.editingId) li.classList.add('active');
+
+          var openBtn = document.createElement('button');
+          openBtn.type = 'button';
+          openBtn.className = 'process-saved-item-btn';
+          openBtn.innerHTML = '<strong>' + escapeHtml(formatFeedbackSheetLabel(sheet)) + '</strong><span>' +
+            formatDateOptionLabel(sheet.savedDate) + '</span>';
+          openBtn.addEventListener('click', function () {
+            openSavedFeedbackSheet(sheet.id);
+          });
+
+          var delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'process-saved-item-del';
+          delBtn.title = '삭제';
+          delBtn.setAttribute('aria-label', '자가피드백 삭제');
+          delBtn.textContent = '×';
+          delBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            deleteSavedFeedbackSheet(sheet.id);
+          });
+
+          li.appendChild(openBtn);
+          li.appendChild(delBtn);
+          el.feedbackSavedList.appendChild(li);
+        });
+      }
+
+      function openSavedFeedbackSheet(sheetId) {
+        persistFeedbackToMemory();
+        var sheet = getFeedbackSheetById(sheetId);
+        if (!sheet) return;
+        openFeedbackSheet(sheet);
+        renderFeedbackSavedList();
+        if (mainViewMode !== 'feedback') {
+          showFeedbackView();
+        }
+      }
+
+      function deleteSavedFeedbackSheet(sheetId) {
+        if (!currentUser) return;
+        var sheet = getFeedbackSheetById(sheetId);
+        if (!sheet) return;
+        var label = formatFeedbackSheetLabel(sheet);
+        if (!window.confirm('「' + label + '」 자가피드백을 삭제할까요?')) return;
+        run('deleteFeedbackSheet', [currentUser, sheetId], '자가피드백 삭제 중...')
+          .then(function (sheets) {
+            applyLoadedFeedbackSheets(sheets, '');
+            renderFeedbackSavedList();
+            if (feedbackSheetsState.editingId === sheetId) {
+              var latest = getLatestFeedbackSheet();
+              if (latest) {
+                openFeedbackSheet(latest);
+              } else {
+                newFeedbackDraft();
+              }
+            }
+            showError('자가피드백이 삭제되었습니다.');
+            el.errorBox.style.background = 'rgba(34, 197, 94, 0.15)';
+            el.errorBox.style.color = '#86efac';
+          })
+          .catch(function (e) {
+            showError(e.message || '자가피드백을 삭제하지 못했습니다.');
+          });
+      }
+
+      function syncFeedbackRowsToEditingTarget(rows, meta) {
+        meta = meta || {};
+        if (!feedbackSheetsState.editingId) return;
+        var sheet = getFeedbackSheetById(feedbackSheetsState.editingId);
+        if (!sheet) return;
+        sheet.workName = meta.workName != null ? meta.workName : sheet.workName;
+        sheet.round = meta.round != null ? meta.round : sheet.round;
+        sheet.savedDate = meta.recordDate || sheet.savedDate || todayStr();
+        sheet.rows = (rows || []).map(normalizeFeedbackRow);
+      }
+
+      function createFeedbackRow() {
+        feedbackRowIdCounter += 1;
+        return {
+          id: 'fb_' + Date.now() + '_' + feedbackRowIdCounter,
+          photo: '',
+          cause: '',
+          solution: ''
+        };
+      }
+
+      function formatFeedbackRecordDate(dateStr) {
+        dateStr = dateStr || todayStr();
+        var parts = String(dateStr).split('-');
+        if (parts.length === 3) {
+          return parts[0].slice(-2) + '.' + parts[1] + '.' + parts[2] + '.';
+        }
+        return dateStr;
+      }
+
+      function defaultFeedbackRows() {
+        var rows = [];
+        var i;
+        for (i = 0; i < DEFAULT_FEEDBACK_ROW_COUNT; i++) {
+          rows.push(createFeedbackRow());
+        }
+        return rows;
+      }
+
+      function normalizeFeedbackRow(row) {
+        row = row || {};
+        if (!row.id) {
+          feedbackRowIdCounter += 1;
+          row.id = 'fb_' + Date.now() + '_' + feedbackRowIdCounter;
+        }
+        return {
+          id: row.id,
+          photo: String(row.photo || ''),
+          cause: String(row.cause || ''),
+          solution: String(row.solution || '')
+        };
+      }
+
+      function applyFeedbackMetaToDOM(sheet) {
+        sheet = sheet || {};
+        if (el.feedbackWorkNameInput) el.feedbackWorkNameInput.value = sheet.workName || '';
+        if (el.feedbackRoundInput) el.feedbackRoundInput.value = sheet.round || '';
+        if (el.feedbackDateInput) {
+          el.feedbackDateInput.value = formatFeedbackRecordDate(sheet.savedDate || todayStr());
+        }
+      }
+
+      function openFeedbackSheet(sheetOrId) {
+        var sheet = typeof sheetOrId === 'string' ? getFeedbackSheetById(sheetOrId) : sheetOrId;
+        if (!sheet) return;
+        feedbackSheetsState.editingId = sheet.id;
+        saveFeedbackSheetsState();
+        applyFeedbackMetaToDOM(sheet);
+        feedbackRows = (sheet.rows || []).map(normalizeFeedbackRow);
+        if (!feedbackRows.length) feedbackRows = defaultFeedbackRows();
+        renderFeedbackTable(true);
+        renderFeedbackSavedList();
+      }
+
+      function newFeedbackDraft() {
+        feedbackSheetsState.editingId = '';
+        saveFeedbackSheetsState();
+        applyFeedbackMetaToDOM({ workName: '', round: '', savedDate: todayStr() });
+        feedbackRows = defaultFeedbackRows();
+        renderFeedbackTable(true);
+        renderFeedbackSavedList();
+      }
+
+      function collectFeedbackRowsFromDOM() {
+        if (!el.feedbackTableBody) return feedbackRows.slice();
+        var next = [];
+        var seen = {};
+        el.feedbackTableBody.querySelectorAll('tr[data-feedback-id]').forEach(function (tr) {
+          var id = tr.getAttribute('data-feedback-id');
+          if (!id || seen[id]) return;
+          seen[id] = true;
+          var existing = null;
+          var i;
+          for (i = 0; i < feedbackRows.length; i++) {
+            if (feedbackRows[i].id === id) {
+              existing = feedbackRows[i];
+              break;
+            }
+          }
+          var causeEl = el.feedbackTableBody.querySelector(
+            'tr[data-feedback-id="' + id + '"] [data-fb-field="cause"]'
+          );
+          var solutionEl = el.feedbackTableBody.querySelector(
+            'tr[data-feedback-id="' + id + '"] [data-fb-field="solution"]'
+          );
+          var img = el.feedbackTableBody.querySelector(
+            'tr[data-feedback-id="' + id + '"] .feedback-photo-preview'
+          );
+          var photo = existing ? existing.photo : '';
+          if (img && img.src && img.src.indexOf('data:') === 0) {
+            photo = img.src;
+          }
+          next.push({
+            id: id,
+            photo: photo,
+            cause: causeEl ? causeEl.value : (existing ? existing.cause : ''),
+            solution: solutionEl ? solutionEl.value : (existing ? existing.solution : '')
+          });
+        });
+        if (next.length) feedbackRows = next;
+        return feedbackRows.slice();
+      }
+
+      function collectFeedbackStateFromDOM() {
+        collectFeedbackRowsFromDOM();
+        return {
+          workName: el.feedbackWorkNameInput ? el.feedbackWorkNameInput.value.trim() : '',
+          round: el.feedbackRoundInput ? el.feedbackRoundInput.value.trim() : '',
+          recordDate: todayStr(),
+          rows: feedbackRows.map(function (row) {
+            return {
+              id: row.id,
+              photo: row.photo,
+              cause: row.cause,
+              solution: row.solution
+            };
+          })
+        };
+      }
+
+      function persistFeedbackToMemory() {
+        if (!el.feedbackTableBody) return;
+        var state = collectFeedbackStateFromDOM();
+        syncFeedbackRowsToEditingTarget(state.rows, state);
+      }
+
+      function saveFeedbackSheet() {
+        if (!currentUser) {
+          showError('이름을 선택한 뒤 저장할 수 있습니다.');
+          return;
+        }
+        var workName = el.feedbackWorkNameInput ? el.feedbackWorkNameInput.value.trim() : '';
+        if (!workName) {
+          showError('작품명을 입력해주세요.');
+          return;
+        }
+        var state = collectFeedbackStateFromDOM();
+        var round = state.round;
+        var rows = state.rows.map(normalizeFeedbackRow);
+        var existing = feedbackSheetsState.editingId
+          ? getFeedbackSheetById(feedbackSheetsState.editingId)
+          : null;
+        var sameAsLoaded = existing &&
+          existing.workName === workName &&
+          existing.round === round;
+        var savedDate;
+        var sheetPayload;
+
+        if (existing && sameAsLoaded) {
+          savedDate = existing.savedDate || todayStr();
+          sheetPayload = normalizeFeedbackSheet({
+            id: existing.id,
+            workName: workName,
+            round: round,
+            savedDate: savedDate,
+            rows: rows
+          });
+        } else {
+          savedDate = todayStr();
+          sheetPayload = normalizeFeedbackSheet({
+            workName: workName,
+            round: round,
+            savedDate: savedDate,
+            rows: rows
+          });
+        }
+
+        run('saveFeedbackSheet', [currentUser, sheetPayload], '자가피드백 저장 중...')
+          .then(function (saved) {
+            saved = normalizeFeedbackSheet(saved);
+            return runSilent('getFeedbackSheets', [currentUser]).then(function (sheets) {
+              applyLoadedFeedbackSheets(sheets, saved.id);
+              var refreshed = getFeedbackSheetById(saved.id) || saved;
+              openFeedbackSheet(refreshed);
+              renderFeedbackSavedList();
+              openFeedbackSavedListPanel();
+              showError('자가피드백이 서버에 저장되었습니다: ' +
+                refreshed.workName +
+                (refreshed.round ? ' (' + refreshed.round + ')' : '') +
+                ' · ' + formatDateOptionLabel(refreshed.savedDate));
+              el.errorBox.style.background = 'rgba(34, 197, 94, 0.15)';
+              el.errorBox.style.color = '#86efac';
+            });
+          })
+          .catch(function (e) {
+            showError(e.message || '자가피드백을 서버에 저장하지 못했습니다.');
+          });
+      }
+
+      function ensureCropperJs() {
+        if (window.Cropper) return Promise.resolve();
+        if (cropperJsPromise) return cropperJsPromise;
+        cropperJsPromise = new Promise(function (resolve, reject) {
+          var s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js';
+          s.onload = resolve;
+          s.onerror = function () { reject(new Error('사진 편집 라이브러리 로드 실패')); };
+          document.head.appendChild(s);
+        });
+        return cropperJsPromise;
+      }
+
+      function readFileAsDataUrl(file) {
+        return new Promise(function (resolve, reject) {
+          var reader = new FileReader();
+          reader.onload = function (ev) { resolve(ev.target.result || ''); };
+          reader.onerror = function () { reject(new Error('사진을 불러오지 못했습니다.')); };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      function loadFeedbackImage(dataUrl) {
+        return new Promise(function (resolve, reject) {
+          var img = new Image();
+          img.onload = function () { resolve(img); };
+          img.onerror = function () { reject(new Error('사진을 표시하지 못했습니다.')); };
+          img.src = dataUrl;
+        });
+      }
+
+      function canvasToJpegBlob(canvas, quality) {
+        return new Promise(function (resolve) {
+          canvas.toBlob(function (blob) { resolve(blob); }, 'image/jpeg', quality);
+        });
+      }
+
+      function blobToDataUrl(blob) {
+        return new Promise(function (resolve, reject) {
+          var reader = new FileReader();
+          reader.onload = function () { resolve(reader.result || ''); };
+          reader.onerror = function () { reject(new Error('사진 변환에 실패했습니다.')); };
+          reader.readAsDataURL(blob);
+        });
+      }
+
+      function drawFeedbackImageToCanvas(img, maxDim) {
+        var w = img.naturalWidth || img.width;
+        var h = img.naturalHeight || img.height;
+        if (!w || !h) throw new Error('사진 크기를 확인할 수 없습니다.');
+        if (maxDim && (w > maxDim || h > maxDim)) {
+          if (w >= h) {
+            h = Math.max(1, Math.round(h * maxDim / w));
+            w = maxDim;
+          } else {
+            w = Math.max(1, Math.round(w * maxDim / h));
+            h = maxDim;
+          }
+        }
+        var canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        var ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        return canvas;
+      }
+
+      function compressFeedbackImage(dataUrl, maxBytes) {
+        maxBytes = maxBytes || MAX_FEEDBACK_PHOTO_BYTES;
+        return loadFeedbackImage(dataUrl).then(function (img) {
+          var canvas = drawFeedbackImageToCanvas(img, 1920);
+          var w = canvas.width;
+          var h = canvas.height;
+          var quality = 0.9;
+
+          function attempt() {
+            return canvasToJpegBlob(canvas, quality).then(function (blob) {
+              if (!blob) throw new Error('사진 압축에 실패했습니다.');
+              if (blob.size <= maxBytes || (quality <= 0.4 && w <= 480)) {
+                return blobToDataUrl(blob);
+              }
+              if (quality > 0.4) {
+                quality -= 0.08;
+                return attempt();
+              }
+              w = Math.max(320, Math.round(w * 0.85));
+              h = Math.max(240, Math.round(h * 0.85));
+              canvas.width = w;
+              canvas.height = h;
+              var ctx = canvas.getContext('2d');
+              ctx.fillStyle = '#ffffff';
+              ctx.fillRect(0, 0, w, h);
+              ctx.drawImage(img, 0, 0, w, h);
+              quality = 0.82;
+              return attempt();
+            });
+          }
+
+          return attempt();
+        });
+      }
+
+      function processFeedbackPhotoFile(file, photoBox, row) {
+        if (!file) return Promise.reject(new Error('선택한 파일이 없습니다.'));
+        if (!/^image\//i.test(file.type || '')) {
+          return Promise.reject(new Error('이미지 파일만 업로드할 수 있습니다.'));
+        }
+        if (file.size > MAX_FEEDBACK_PHOTO_INPUT_BYTES) {
+          return Promise.reject(new Error('원본 사진은 15MB 이하만 업로드할 수 있습니다.'));
+        }
+        return readFileAsDataUrl(file).then(function (dataUrl) {
+          return compressFeedbackImage(dataUrl);
+        }).then(function (compressed) {
+          row.photo = compressed;
+          updateFeedbackPhotoPreview(photoBox, compressed, row);
+          return compressed;
+        });
+      }
+
+      function destroyFeedbackImageEditorCropper(clearImage) {
+        if (feedbackImageEditorState.cropper) {
+          feedbackImageEditorState.cropper.destroy();
+          feedbackImageEditorState.cropper = null;
+        }
+        if (clearImage && el.feedbackEditorImage) {
+          el.feedbackEditorImage.onload = null;
+          el.feedbackEditorImage.src = '';
+          el.feedbackEditorImage.removeAttribute('src');
+        }
+      }
+
+      function closeFeedbackImageEditor() {
+        destroyFeedbackImageEditorCropper(true);
+        feedbackImageEditorState.photoBox = null;
+        feedbackImageEditorState.row = null;
+        if (el.feedbackImageEditorModal) {
+          el.feedbackImageEditorModal.classList.remove('visible');
+          el.feedbackImageEditorModal.setAttribute('aria-hidden', 'true');
+        }
+      }
+
+      function applyFeedbackImageEditor() {
+        var cropper = feedbackImageEditorState.cropper;
+        var photoBox = feedbackImageEditorState.photoBox;
+        var row = feedbackImageEditorState.row;
+        if (!cropper || !photoBox || !row) {
+          closeFeedbackImageEditor();
+          return;
+        }
+        var canvas = cropper.getCroppedCanvas({
+          maxWidth: 1920,
+          maxHeight: 1920,
+          fillColor: '#ffffff',
+          imageSmoothingEnabled: true,
+          imageSmoothingQuality: 'high'
+        });
+        if (!canvas) {
+          showError('선택한 영역을 적용하지 못했습니다.');
+          return;
+        }
+        var dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+        compressFeedbackImage(dataUrl).then(function (compressed) {
+          row.photo = compressed;
+          closeFeedbackImageEditor();
+          updateFeedbackPhotoPreview(photoBox, compressed, row);
+        }).catch(function (e) {
+          showError(e.message || '사진 편집 결과를 저장하지 못했습니다.');
+        });
+      }
+
+      function openFeedbackImageEditor(photoData, photoBox, row) {
+        photoData = row && row.photo ? row.photo : photoData;
+        if (!photoData || !el.feedbackImageEditorModal || !el.feedbackEditorImage) return;
+        ensureCropperJs().then(function () {
+          destroyFeedbackImageEditorCropper(true);
+          feedbackImageEditorState.photoBox = photoBox;
+          feedbackImageEditorState.row = row;
+          el.feedbackImageEditorModal.classList.add('visible');
+          el.feedbackImageEditorModal.setAttribute('aria-hidden', 'false');
+
+          return loadFeedbackImage(photoData).then(function () {
+            var editorImg = el.feedbackEditorImage;
+            var startCropper = function () {
+              if (!editorImg.naturalWidth || !editorImg.src) return;
+              if (feedbackImageEditorState.cropper) {
+                feedbackImageEditorState.cropper.destroy();
+                feedbackImageEditorState.cropper = null;
+              }
+              feedbackImageEditorState.cropper = new window.Cropper(editorImg, {
+                viewMode: 1,
+                dragMode: 'crop',
+                autoCropArea: 1,
+                responsive: true,
+                background: false,
+                movable: true,
+                zoomable: true,
+                scalable: false,
+                rotatable: true
+              });
+            };
+            editorImg.onload = startCropper;
+            editorImg.src = photoData;
+            if (editorImg.complete && editorImg.naturalWidth) {
+              startCropper();
+            }
+          });
+        }).catch(function (e) {
+          closeFeedbackImageEditor();
+          showError(e.message || '사진 편집 화면을 열지 못했습니다.');
+        });
+      }
+
+      function updateFeedbackPhotoPreview(photoBox, photoData, row) {
+        if (!photoBox) return;
+        photoBox.innerHTML = '';
+
+        var fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.className = 'feedback-photo-input is-hidden';
+        fileInput.onchange = function (evt) {
+          var file = evt.target.files && evt.target.files[0];
+          fileInput.value = '';
+          if (!file) return;
+          processFeedbackPhotoFile(file, photoBox, row).catch(function (e) {
+            showError(e.message || '사진을 처리하지 못했습니다.');
+          });
+        };
+
+        if (photoData) {
+          var img = document.createElement('img');
+          img.className = 'feedback-photo-preview';
+          img.src = photoData;
+          img.alt = '피드백 사진';
+          img.title = '클릭하여 사진 편집 (회전·영역 선택)';
+          img.addEventListener('click', function (e) {
+            e.preventDefault();
+            openFeedbackImageEditor(row.photo || photoData, photoBox, row);
+          });
+          photoBox.appendChild(img);
+
+          var actions = document.createElement('div');
+          actions.className = 'feedback-photo-actions';
+
+          var changeBtn = document.createElement('button');
+          changeBtn.type = 'button';
+          changeBtn.className = 'feedback-row-delete';
+          changeBtn.textContent = '사진 변경';
+          changeBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            fileInput.click();
+          });
+
+          var clearBtn = document.createElement('button');
+          clearBtn.type = 'button';
+          clearBtn.className = 'feedback-row-delete';
+          clearBtn.textContent = '사진 제거';
+          clearBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            row.photo = '';
+            updateFeedbackPhotoPreview(photoBox, '', row);
+          });
+
+          actions.appendChild(changeBtn);
+          actions.appendChild(clearBtn);
+          photoBox.appendChild(actions);
+          photoBox.appendChild(fileInput);
+        } else {
+          var ph = document.createElement('div');
+          ph.className = 'feedback-photo-placeholder';
+          ph.textContent = '사진을 선택하세요 (500KB 이하 자동 압축)';
+          ph.addEventListener('click', function () {
+            fileInput.click();
+          });
+          photoBox.appendChild(ph);
+          photoBox.appendChild(fileInput);
+        }
+      }
+
+      function renderFeedbackTable(skipMetaLoad) {
+        if (!el.feedbackTableBody) return;
+        if (!skipMetaLoad && feedbackSheetsState.editingId) {
+          var editingSheet = getFeedbackSheetById(feedbackSheetsState.editingId);
+          if (editingSheet) applyFeedbackMetaToDOM(editingSheet);
+        }
+        el.feedbackTableBody.innerHTML = '';
+        feedbackRows.forEach(function (row, index) {
+          var trCause = document.createElement('tr');
+          trCause.setAttribute('data-feedback-id', row.id);
+          var trSolution = document.createElement('tr');
+          trSolution.setAttribute('data-feedback-id', row.id);
+
+          var tdNum = document.createElement('td');
+          tdNum.className = 'fb-num';
+          tdNum.rowSpan = 2;
+          tdNum.textContent = String(index + 1);
+
+          var tdPhoto = document.createElement('td');
+          tdPhoto.className = 'fb-photo';
+          tdPhoto.rowSpan = 2;
+          var photoBox = document.createElement('div');
+          photoBox.className = 'feedback-photo-box';
+          updateFeedbackPhotoPreview(photoBox, row.photo, row);
+          tdPhoto.appendChild(photoBox);
+
+          var tdLabelCause = document.createElement('td');
+          tdLabelCause.className = 'fb-label';
+          tdLabelCause.textContent = '원인';
+          var tdCause = document.createElement('td');
+          var causeTa = document.createElement('textarea');
+          causeTa.className = 'feedback-text-input';
+          causeTa.setAttribute('data-fb-field', 'cause');
+          causeTa.value = row.cause || '';
+          causeTa.placeholder = '원인을 작성하세요';
+          tdCause.appendChild(causeTa);
+
+          trCause.appendChild(tdNum);
+          trCause.appendChild(tdPhoto);
+          trCause.appendChild(tdLabelCause);
+          trCause.appendChild(tdCause);
+
+          var tdLabelSol = document.createElement('td');
+          tdLabelSol.className = 'fb-label';
+          tdLabelSol.textContent = '해결책';
+          var tdSol = document.createElement('td');
+          var solTa = document.createElement('textarea');
+          solTa.className = 'feedback-text-input';
+          solTa.setAttribute('data-fb-field', 'solution');
+          solTa.value = row.solution || '';
+          solTa.placeholder = '해결책을 작성하세요';
+          tdSol.appendChild(solTa);
+          var delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'feedback-row-delete';
+          delBtn.textContent = '이 항목 삭제';
+          delBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            collectFeedbackRowsFromDOM();
+            feedbackRows = feedbackRows.filter(function (r) { return r.id !== row.id; });
+            if (!feedbackRows.length) feedbackRows.push(createFeedbackRow());
+            renderFeedbackTable(true);
+          });
+          tdSol.appendChild(delBtn);
+
+          trSolution.appendChild(tdLabelSol);
+          trSolution.appendChild(tdSol);
+
+          el.feedbackTableBody.appendChild(trCause);
+          el.feedbackTableBody.appendChild(trSolution);
+        });
+      }
+
+      function restoreFeedbackViewFromState() {
+        if (feedbackSheetsState.editingId) {
+          var editingSheet = getFeedbackSheetById(feedbackSheetsState.editingId);
+          if (editingSheet) {
+            openFeedbackSheet(editingSheet);
+            return;
+          }
+          feedbackSheetsState.editingId = '';
+          saveFeedbackSheetsState();
+        }
+        var latest = getLatestFeedbackSheet();
+        if (latest) {
+          openFeedbackSavedListPanel();
+          openFeedbackSheet(latest);
+          return;
+        }
+        newFeedbackDraft();
+      }
+
+      function addFeedbackRow() {
+        collectFeedbackRowsFromDOM();
+        feedbackRows.push(createFeedbackRow());
+        renderFeedbackTable(true);
+      }
+
+      function defaultScoreColumnEntry(col) {
+        return {
+          enabled: true,
+          group: col.group,
+          label: col.label,
+          maxScore: col.maxScore
+        };
+      }
+
+      function defaultScoreColumnSettings() {
+        var settings = {};
+        DEFAULT_SCORE_COLUMNS.forEach(function (col) {
+          settings[col.id] = defaultScoreColumnEntry(col);
+        });
+        return settings;
+      }
+
+      function normalizeScoreColumnEntry(entry, col) {
+        if (entry === false) {
+          return { enabled: false, group: col.group, label: col.label, maxScore: col.maxScore };
+        }
+        if (entry === true || entry == null) {
+          return defaultScoreColumnEntry(col);
+        }
+        entry = entry || {};
+        var maxScore = parseScoreValue(entry.maxScore != null ? entry.maxScore : col.maxScore);
+        if (maxScore == null || maxScore < 0) maxScore = col.maxScore;
+        return {
+          enabled: entry.enabled !== false,
+          group: String(entry.group != null ? entry.group : col.group).trim() || col.group,
+          label: String(entry.label != null ? entry.label : col.label).trim() || col.label,
+          maxScore: maxScore
+        };
+      }
+
+      function normalizeScoreColumnSettings(settings) {
+        settings = settings || {};
+        var next = {};
+        DEFAULT_SCORE_COLUMNS.forEach(function (col) {
+          next[col.id] = normalizeScoreColumnEntry(settings[col.id], col);
+        });
+        return next;
+      }
+
+      function getScoreColumnById(id) {
+        var i;
+        for (i = 0; i < DEFAULT_SCORE_COLUMNS.length; i++) {
+          if (DEFAULT_SCORE_COLUMNS[i].id === id) return DEFAULT_SCORE_COLUMNS[i];
+        }
+        return null;
+      }
+
+      function getAllScoreColumns() {
+        return DEFAULT_SCORE_COLUMNS.map(function (col) {
+          var meta = normalizeScoreColumnEntry(scoreSheetState.columnSettings[col.id], col);
+          return {
+            id: col.id,
+            group: meta.group,
+            label: meta.label,
+            maxScore: meta.maxScore,
+            enabled: meta.enabled
+          };
+        });
+      }
+
+      function getEnabledScoreColumns() {
+        return getAllScoreColumns().filter(function (col) {
+          return col.enabled !== false;
+        });
+      }
+
+      function getScoreColumnGroups(columns) {
+        var groups = [];
+        var current = null;
+        columns.forEach(function (col) {
+          if (!current || current.name !== col.group) {
+            current = { name: col.group, columns: [] };
+            groups.push(current);
+          }
+          current.columns.push(col);
+        });
+        return groups;
+      }
+
+      function createScoreRound(label) {
+        scoreRoundIdCounter += 1;
+        return {
+          id: 'sr_' + Date.now() + '_' + scoreRoundIdCounter,
+          label: label || '',
+          scores: {}
+        };
+      }
+
+      function defaultScoreRounds() {
+        var rounds = [];
+        var i;
+        for (i = 1; i <= DEFAULT_SCORE_ROUND_COUNT; i++) {
+          rounds.push(createScoreRound(i + '회차'));
+        }
+        return rounds;
+      }
+
+      function normalizeScoreRound(round) {
+        round = round || {};
+        if (!round.id) {
+          scoreRoundIdCounter += 1;
+          round.id = 'sr_' + Date.now() + '_' + scoreRoundIdCounter;
+        }
+        return {
+          id: round.id,
+          label: String(round.label || '').trim(),
+          scores: round.scores && typeof round.scores === 'object' ? round.scores : {}
+        };
+      }
+
+      function normalizeScoreSheet(sheet) {
+        sheet = sheet || {};
+        return {
+          id: sheet.id || '',
+          workName: String(sheet.workName || sheet.work_name || '채점결과').trim() || '채점결과',
+          savedDate: sheet.savedDate || sheet.saved_date || todayStr(),
+          columnSettings: normalizeScoreColumnSettings(sheet.columnSettings || sheet.column_settings),
+          rounds: (sheet.rounds && sheet.rounds.length)
+            ? sheet.rounds.map(normalizeScoreRound)
+            : defaultScoreRounds()
+        };
+      }
+
+      function applyScoreSheet(sheet) {
+        sheet = normalizeScoreSheet(sheet);
+        scoreSheetState.id = sheet.id || '';
+        scoreSheetState.workName = sheet.workName;
+        scoreSheetState.savedDate = sheet.savedDate || todayStr();
+        scoreSheetState.columnSettings = sheet.columnSettings;
+        scoreSheetState.rounds = sheet.rounds;
+        scoreSheetsState.editingId = sheet.id || '';
+        if (el.scoreWorkNameInput) el.scoreWorkNameInput.value = scoreSheetState.workName;
+      }
+
+      function getScoreSheetById(id) {
+        id = String(id || '');
+        if (!id) return null;
+        var i;
+        for (i = 0; i < scoreSheetsState.sheets.length; i++) {
+          if (scoreSheetsState.sheets[i].id === id) return scoreSheetsState.sheets[i];
+        }
+        return null;
+      }
+
+      function getLatestScoreSheet() {
+        var sheets = scoreSheetsState.sheets.slice().sort(function (a, b) {
+          return b.savedDate.localeCompare(a.savedDate) ||
+            String(b.workName || '').localeCompare(String(a.workName || ''));
+        });
+        return sheets[0] || null;
+      }
+
+      function applyLoadedScoreSheets(sheets, preferredEditingId) {
+        var editingId = preferredEditingId || scoreSheetsState.editingId || '';
+        scoreSheetsState.sheets = (sheets || []).map(normalizeScoreSheet);
+        if (editingId && !scoreSheetsState.sheets.some(function (s) { return s.id === editingId; })) {
+          editingId = '';
+        }
+        scoreSheetsState.editingId = editingId;
+        saveScoreSheetStateLocal();
+      }
+
+      function syncScoreSheetToEditingTarget(data) {
+        if (!scoreSheetsState.editingId) return;
+        var sheet = getScoreSheetById(scoreSheetsState.editingId);
+        if (!sheet) return;
+        sheet.workName = data.workName;
+        sheet.savedDate = data.savedDate || sheet.savedDate;
+        sheet.columnSettings = data.columnSettings;
+        sheet.rounds = data.rounds;
+      }
+
+      function initDefaultScoreSheet() {
+        scoreSheetsState.editingId = '';
+        applyScoreSheet({
+          workName: '채점결과',
+          savedDate: todayStr(),
+          columnSettings: defaultScoreColumnSettings(),
+          rounds: defaultScoreRounds()
+        });
+      }
+
+      function newScoreDraft() {
+        scoreSheetsState.editingId = '';
+        saveScoreSheetStateLocal();
+        applyScoreSheet({
+          workName: '',
+          savedDate: todayStr(),
+          columnSettings: defaultScoreColumnSettings(),
+          rounds: defaultScoreRounds()
+        });
+        renderScoreColumnSettings();
+        renderScoringTable();
+        renderScoreChart();
+        renderScoreSavedList();
+      }
+
+      function saveScoreSheetStateLocal() {
+        if (!currentUser) return;
+        try {
+          localStorage.setItem(CACHE_SCORE_INDEX + currentUser, JSON.stringify({
+            id: scoreSheetsState.editingId || ''
+          }));
+        } catch (e) { /* ignore */ }
+      }
+
+      function loadScoreSheetsState() {
+        if (!currentUser) {
+          scoreSheetsState = { editingId: '', sheets: [] };
+          initDefaultScoreSheet();
+          return Promise.resolve();
+        }
+        var preferredEditingId = '';
+        try {
+          var raw = localStorage.getItem(CACHE_SCORE_INDEX + currentUser);
+          if (raw) preferredEditingId = JSON.parse(raw).id || '';
+        } catch (e) { /* ignore */ }
+
+        return runSilent('getScoreSheets', [currentUser])
+          .then(function (sheets) {
+            applyLoadedScoreSheets(sheets, preferredEditingId);
+            if (scoreSheetsState.editingId) {
+              var editingSheet = getScoreSheetById(scoreSheetsState.editingId);
+              if (editingSheet) {
+                applyScoreSheet(editingSheet);
+                return;
+              }
+              scoreSheetsState.editingId = '';
+            }
+            var latest = getLatestScoreSheet();
+            if (latest) applyScoreSheet(latest);
+            else initDefaultScoreSheet();
+            saveScoreSheetStateLocal();
+          })
+          .catch(function (e) {
+            scoreSheetsState = { editingId: '', sheets: [] };
+            initDefaultScoreSheet();
+            var msg = e && e.message ? e.message : String(e);
+            if (/score_sheets|schema cache|relation .* does not exist/i.test(msg)) {
+              throw new Error('서버에 채점결과 테이블이 없습니다. Supabase SQL Editor에서 pro1G_supabase_score_sheets.sql을 실행해주세요.');
+            }
+            throw e;
+          });
+      }
+
+      function preloadScoreSheetsForUser() {
+        if (!currentUser) return Promise.resolve();
+        return loadScoreSheetsState()
+          .then(function () {
+            renderScoreSavedList();
+          })
+          .catch(function () {
+            return null;
+          });
+      }
+
+      function formatScoreSheetLabel(sheet) {
+        if (!sheet) return '';
+        return String(sheet.workName || '').trim() || '(작품명 없음)';
+      }
+
+      function openScoreSavedListPanel() {
+        scoreSavedListOpen = true;
+        if (el.scoreSavedPanel) el.scoreSavedPanel.classList.add('is-open');
+        if (el.scoreSavedToggle) el.scoreSavedToggle.setAttribute('aria-expanded', 'true');
+      }
+
+      function toggleScoreSavedList() {
+        scoreSavedListOpen = !scoreSavedListOpen;
+        if (el.scoreSavedPanel) {
+          el.scoreSavedPanel.classList.toggle('is-open', scoreSavedListOpen);
+        }
+        if (el.scoreSavedToggle) {
+          el.scoreSavedToggle.setAttribute('aria-expanded', scoreSavedListOpen ? 'true' : 'false');
+        }
+      }
+
+      function renderScoreSavedList() {
+        if (!el.scoreSavedList) return;
+        el.scoreSavedList.innerHTML = '';
+        var sheets = scoreSheetsState.sheets.slice().sort(function (a, b) {
+          return b.savedDate.localeCompare(a.savedDate) ||
+            String(b.workName || '').localeCompare(String(a.workName || ''));
+        });
+        if (el.scoreSavedCount) {
+          el.scoreSavedCount.textContent = sheets.length + '개';
+        }
+        if (!sheets.length) {
+          var empty = document.createElement('li');
+          empty.className = 'process-saved-empty';
+          empty.textContent = '저장된 채점결과가 없습니다. 작성 후 저장 버튼을 눌러주세요.';
+          el.scoreSavedList.appendChild(empty);
+          return;
+        }
+        sheets.forEach(function (sheet) {
+          var li = document.createElement('li');
+          li.className = 'process-saved-item';
+          if (sheet.id === scoreSheetsState.editingId) li.classList.add('active');
+
+          var openBtn = document.createElement('button');
+          openBtn.type = 'button';
+          openBtn.className = 'process-saved-item-btn';
+          openBtn.innerHTML = '<strong>' + escapeHtml(formatScoreSheetLabel(sheet)) + '</strong><span>' +
+            formatDateOptionLabel(sheet.savedDate) + '</span>';
+          openBtn.addEventListener('click', function () {
+            openSavedScoreSheet(sheet.id);
+          });
+
+          var delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'process-saved-item-del';
+          delBtn.title = '삭제';
+          delBtn.setAttribute('aria-label', '채점결과 삭제');
+          delBtn.textContent = '×';
+          delBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            deleteSavedScoreSheet(sheet.id);
+          });
+
+          li.appendChild(openBtn);
+          li.appendChild(delBtn);
+          el.scoreSavedList.appendChild(li);
+        });
+      }
+
+      function openSavedScoreSheet(sheetId) {
+        persistScoreToMemory();
+        var sheet = getScoreSheetById(sheetId);
+        if (!sheet) return;
+        scoreSheetsState.editingId = sheet.id;
+        applyScoreSheet(sheet);
+        saveScoreSheetStateLocal();
+        renderScoreColumnSettings();
+        renderScoringTable();
+        renderScoreChart();
+        renderScoreSavedList();
+        if (mainViewMode !== 'scoring') {
+          showScoringView();
+        }
+      }
+
+      function deleteSavedScoreSheet(sheetId) {
+        if (!currentUser) return;
+        var sheet = getScoreSheetById(sheetId);
+        if (!sheet) return;
+        var label = formatScoreSheetLabel(sheet);
+        if (!window.confirm('「' + label + '」 채점결과를 삭제할까요?')) return;
+        run('deleteScoreSheet', [currentUser, sheetId], '채점결과 삭제 중...')
+          .then(function (sheets) {
+            applyLoadedScoreSheets(sheets, '');
+            renderScoreSavedList();
+            if (scoreSheetsState.editingId === sheetId) {
+              var latest = getLatestScoreSheet();
+              if (latest) {
+                openSavedScoreSheet(latest.id);
+              } else {
+                newScoreDraft();
+              }
+            }
+            showError('채점결과가 삭제되었습니다.');
+            el.errorBox.style.background = 'rgba(34, 197, 94, 0.15)';
+            el.errorBox.style.color = '#86efac';
+          })
+          .catch(function (e) {
+            showError(e.message || '채점결과를 삭제하지 못했습니다.');
+          });
+      }
+
+      function parseScoreValue(val) {
+        if (val === '' || val == null) return null;
+        var num = parseFloat(String(val).replace(/,/g, ''));
+        return isNaN(num) ? null : num;
+      }
+
+      function formatScoreDisplay(num) {
+        if (num == null || isNaN(num)) return '';
+        if (Math.abs(num - Math.round(num)) < 0.0001) return String(Math.round(num));
+        return String(Math.round(num * 1000) / 1000);
+      }
+
+      function formatScoreMax(num) {
+        if (Math.abs(num - Math.round(num)) < 0.0001) return String(num) + '.0';
+        return String(num);
+      }
+
+      function calcRoundTotal(round, columns) {
+        var sum = 0;
+        var hasValue = false;
+        (columns || getEnabledScoreColumns()).forEach(function (col) {
+          var val = parseScoreValue(round.scores[col.id]);
+          if (val != null) {
+            sum += val;
+            hasValue = true;
+          }
+        });
+        return hasValue ? sum : null;
+      }
+
+      function calcMaxTotal(columns) {
+        var sum = 0;
+        (columns || getEnabledScoreColumns()).forEach(function (col) {
+          sum += col.maxScore;
+        });
+        return sum;
+      }
+
+      function collectScoreColumnsFromDOM() {
+        if (!el.scoringTableHead) return;
+        el.scoringTableHead.querySelectorAll('.score-group-input').forEach(function (input) {
+          var ids = (input.getAttribute('data-score-group-ids') || '').split(',').filter(Boolean);
+          var groupName = input.value.trim();
+          ids.forEach(function (id) {
+            var col = getScoreColumnById(id);
+            if (!col) return;
+            var meta = normalizeScoreColumnEntry(scoreSheetState.columnSettings[id], col);
+            meta.group = groupName || col.group;
+            scoreSheetState.columnSettings[id] = meta;
+          });
+        });
+        el.scoringTableHead.querySelectorAll('.score-label-input').forEach(function (input) {
+          var id = input.getAttribute('data-score-col-id');
+          var col = getScoreColumnById(id);
+          if (!col) return;
+          var meta = normalizeScoreColumnEntry(scoreSheetState.columnSettings[id], col);
+          meta.label = input.value.trim() || col.label;
+          scoreSheetState.columnSettings[id] = meta;
+        });
+        el.scoringTableHead.querySelectorAll('.score-max-input').forEach(function (input) {
+          var id = input.getAttribute('data-score-col-id');
+          var col = getScoreColumnById(id);
+          if (!col) return;
+          var meta = normalizeScoreColumnEntry(scoreSheetState.columnSettings[id], col);
+          var val = parseScoreValue(input.value);
+          meta.maxScore = val != null && val >= 0 ? val : col.maxScore;
+          scoreSheetState.columnSettings[id] = meta;
+        });
+      }
+
+      function updateScoreMaxTotalCell() {
+        if (!el.scoringTableHead) return;
+        var cell = el.scoringTableHead.querySelector('[data-score-max-total]');
+        if (cell) cell.textContent = formatScoreDisplay(calcMaxTotal(getEnabledScoreColumns()));
+      }
+
+      function updateScoreBodyMaxLimits() {
+        if (!el.scoringTableBody) return;
+        var colMap = {};
+        getEnabledScoreColumns().forEach(function (col) {
+          colMap[col.id] = col;
+        });
+        el.scoringTableBody.querySelectorAll('[data-score-col]').forEach(function (input) {
+          var id = input.getAttribute('data-score-col');
+          var col = colMap[id];
+          if (!col) return;
+          var val = parseScoreValue(input.value);
+          if (val != null && val > col.maxScore) input.value = String(col.maxScore);
+        });
+        el.scoringTableBody.querySelectorAll('tr[data-score-round-id]').forEach(function (tr) {
+          updateScoreRowTotal(tr, getEnabledScoreColumns());
+        });
+      }
+
+      function onScoreHeaderMetaChange() {
+        collectScoreColumnsFromDOM();
+        updateScoreMaxTotalCell();
+        updateScoreBodyMaxLimits();
+        renderScoreColumnSettings();
+        scheduleScoreChartRender();
+      }
+
+      function collectScoreRoundsFromDOM() {
+        if (!el.scoringTableBody) return;
+        var next = [];
+        el.scoringTableBody.querySelectorAll('tr[data-score-round-id]').forEach(function (tr) {
+          var id = tr.getAttribute('data-score-round-id');
+          var labelEl = tr.querySelector('.score-round-label');
+          var scores = {};
+          tr.querySelectorAll('[data-score-col]').forEach(function (input) {
+            scores[input.getAttribute('data-score-col')] = input.value;
+          });
+          next.push(normalizeScoreRound({
+            id: id,
+            label: labelEl ? labelEl.value : '',
+            scores: scores
+          }));
+        });
+        if (next.length) scoreSheetState.rounds = next;
+      }
+
+      function collectScoreSheetFromDOM() {
+        collectScoreColumnsFromDOM();
+        collectScoreRoundsFromDOM();
+        if (el.scoreWorkNameInput) {
+          scoreSheetState.workName = el.scoreWorkNameInput.value.trim() || '채점결과';
+        }
+        var data = {
+          id: scoreSheetState.id || '',
+          workName: scoreSheetState.workName,
+          savedDate: scoreSheetState.savedDate || todayStr(),
+          columnSettings: normalizeScoreColumnSettings(scoreSheetState.columnSettings),
+          rounds: scoreSheetState.rounds.map(function (round) {
+            return {
+              id: round.id,
+              label: round.label,
+              scores: round.scores || {}
+            };
+          })
+        };
+        syncScoreSheetToEditingTarget(data);
+        return data;
+      }
+
+      function renderScoreColumnSettings() {
+        if (!el.scoreColumnGrid) return;
+        el.scoreColumnGrid.innerHTML = '';
+        getAllScoreColumns().forEach(function (col) {
+          var label = document.createElement('label');
+          label.className = 'score-column-toggle';
+          if (!col.enabled) {
+            label.classList.add('is-off');
+          }
+          var cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.checked = col.enabled !== false;
+          cb.addEventListener('change', function () {
+            collectScoreSheetFromDOM();
+            var baseCol = getScoreColumnById(col.id);
+            var meta = normalizeScoreColumnEntry(scoreSheetState.columnSettings[col.id], baseCol);
+            meta.enabled = cb.checked;
+            scoreSheetState.columnSettings[col.id] = meta;
+            renderScoreColumnSettings();
+            renderScoringTable();
+            renderScoreChart();
+          });
+          var text = document.createElement('span');
+          text.textContent = col.group + ' · ' + col.label + ' (만점 ' + col.maxScore + ')';
+          label.appendChild(cb);
+          label.appendChild(text);
+          el.scoreColumnGrid.appendChild(label);
+        });
+      }
+
+      function renderScoringTableHead(columns, groups) {
+        if (!el.scoringTableHead) return;
+        el.scoringTableHead.innerHTML = '';
+
+        var tr1 = document.createElement('tr');
+        var thRound = document.createElement('th');
+        thRound.className = 'score-round-col';
+        thRound.rowSpan = 3;
+        thRound.textContent = '회차';
+        tr1.appendChild(thRound);
+
+        groups.forEach(function (group, gi) {
+          var th = document.createElement('th');
+          var cls = 'score-group-header';
+          if (gi === 0) cls += ' score-group-start';
+          if (gi === groups.length - 1) cls += ' score-group-end';
+          th.className = cls;
+          th.colSpan = group.columns.length;
+          var groupInput = document.createElement('input');
+          groupInput.type = 'text';
+          groupInput.className = 'score-input score-group-input';
+          groupInput.value = group.name;
+          groupInput.maxLength = 30;
+          groupInput.setAttribute('data-score-group-ids', group.columns.map(function (c) { return c.id; }).join(','));
+          groupInput.title = '과제명';
+          groupInput.addEventListener('input', onScoreHeaderMetaChange);
+          th.appendChild(groupInput);
+          tr1.appendChild(th);
+        });
+
+        var thTotal = document.createElement('th');
+        thTotal.className = 'score-total-col';
+        thTotal.rowSpan = 2;
+        thTotal.textContent = '종합';
+        tr1.appendChild(thTotal);
+        el.scoringTableHead.appendChild(tr1);
+
+        var tr2 = document.createElement('tr');
+        columns.forEach(function (col, idx) {
+          var th = document.createElement('th');
+          var cls2 = 'score-sub-label';
+          if (idx === 0) cls2 += ' score-group-start';
+          if (idx === columns.length - 1) cls2 += ' score-group-end';
+          th.className = cls2;
+          var labelInput = document.createElement('input');
+          labelInput.type = 'text';
+          labelInput.className = 'score-input score-label-input';
+          labelInput.value = col.label;
+          labelInput.maxLength = 40;
+          labelInput.setAttribute('data-score-col-id', col.id);
+          labelInput.title = '채점 항목명';
+          labelInput.addEventListener('input', onScoreHeaderMetaChange);
+          th.appendChild(labelInput);
+          tr2.appendChild(th);
+        });
+        el.scoringTableHead.appendChild(tr2);
+
+        var tr3 = document.createElement('tr');
+        tr3.className = 'score-max-row';
+        columns.forEach(function (col, idx) {
+          var td = document.createElement('td');
+          var cls3 = '';
+          if (idx === 0) cls3 += ' score-group-start';
+          if (idx === columns.length - 1) cls3 += ' score-group-end';
+          if (cls3) td.className = cls3;
+          var maxInput = document.createElement('input');
+          maxInput.type = 'text';
+          maxInput.inputMode = 'decimal';
+          maxInput.className = 'score-input score-max-input';
+          maxInput.value = formatScoreMax(col.maxScore);
+          maxInput.setAttribute('data-score-col-id', col.id);
+          maxInput.title = '만점';
+          maxInput.addEventListener('input', onScoreHeaderMetaChange);
+          td.appendChild(maxInput);
+          tr3.appendChild(td);
+        });
+        var tdMaxTotal = document.createElement('td');
+        tdMaxTotal.className = 'score-total-col';
+        tdMaxTotal.setAttribute('data-score-max-total', '1');
+        tdMaxTotal.textContent = formatScoreDisplay(calcMaxTotal(columns));
+        tr3.appendChild(tdMaxTotal);
+        el.scoringTableHead.appendChild(tr3);
+      }
+
+      function renderScoringTable() {
+        if (!el.scoringTableBody) return;
+        var columns = getEnabledScoreColumns();
+        if (!columns.length) {
+          el.scoringTableHead.innerHTML = '';
+          el.scoringTableBody.innerHTML = '<tr><td colspan="2" style="padding:16px;">표시할 채점 항목을 하나 이상 켜주세요.</td></tr>';
+          return;
+        }
+        var groups = getScoreColumnGroups(columns);
+        renderScoringTableHead(columns, groups);
+
+        el.scoringTableBody.innerHTML = '';
+        scoreSheetState.rounds.forEach(function (round, index) {
+          var tr = document.createElement('tr');
+          tr.setAttribute('data-score-round-id', round.id);
+
+          var tdRound = document.createElement('td');
+          tdRound.className = 'score-round-col';
+          var roundCell = document.createElement('div');
+          roundCell.className = 'score-round-cell';
+          var roundInput = document.createElement('input');
+          roundInput.type = 'text';
+          roundInput.className = 'score-input score-round-label';
+          roundInput.value = round.label || ((index + 1) + '회차');
+          roundInput.maxLength = 20;
+          roundInput.addEventListener('input', function () {
+            scheduleScoreChartRender();
+          });
+          roundCell.appendChild(roundInput);
+
+          var delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'score-round-del';
+          delBtn.textContent = '×';
+          delBtn.title = '회차 삭제';
+          delBtn.setAttribute('aria-label', '회차 삭제');
+          delBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            collectScoreSheetFromDOM();
+            if (scoreSheetState.rounds.length <= 1) {
+              showError('최소 1개 회차는 남겨야 합니다.');
+              return;
+            }
+            var roundId = round.id;
+            scoreSheetState.rounds = scoreSheetState.rounds.filter(function (r) { return r.id !== roundId; });
+            renderScoringTable();
+            renderScoreChart();
+          });
+          roundCell.appendChild(delBtn);
+          tdRound.appendChild(roundCell);
+          tr.appendChild(tdRound);
+
+          columns.forEach(function (col, idx) {
+            var td = document.createElement('td');
+            if (idx === 0) td.className = 'score-group-start';
+            if (idx === columns.length - 1) td.className = 'score-group-end';
+            var input = document.createElement('input');
+            input.type = 'text';
+            input.inputMode = 'decimal';
+            input.className = 'score-input';
+            input.setAttribute('data-score-col', col.id);
+            input.value = round.scores[col.id] != null ? String(round.scores[col.id]) : '';
+            input.placeholder = '0';
+            input.addEventListener('input', function () {
+              collectScoreColumnsFromDOM();
+              var maxScore = col.maxScore;
+              getEnabledScoreColumns().forEach(function (c) {
+                if (c.id === col.id) maxScore = c.maxScore;
+              });
+              var val = parseScoreValue(input.value);
+              if (val != null && val > maxScore) {
+                input.value = String(maxScore);
+              }
+              updateScoreRowTotal(tr, getEnabledScoreColumns());
+              scheduleScoreChartRender();
+            });
+            td.appendChild(input);
+            tr.appendChild(td);
+          });
+
+          var tdTotal = document.createElement('td');
+          tdTotal.className = 'score-total-col score-total-cell';
+          var total = calcRoundTotal(round, columns);
+          tdTotal.textContent = total != null ? formatScoreDisplay(total) : '';
+          tr.appendChild(tdTotal);
+
+          el.scoringTableBody.appendChild(tr);
+        });
+      }
+
+      function updateScoreRowTotal(tr, columns) {
+        if (!tr) return;
+        var scores = {};
+        tr.querySelectorAll('[data-score-col]').forEach(function (input) {
+          scores[input.getAttribute('data-score-col')] = input.value;
+        });
+        var total = calcRoundTotal({ scores: scores }, columns);
+        var totalCell = tr.querySelector('.score-total-cell');
+        if (totalCell) totalCell.textContent = total != null ? formatScoreDisplay(total) : '';
+      }
+
+      function getScoreChartColors() {
+        return ['#ff5722', '#3b82f6', '#22c55e', '#a855f7', '#f59e0b', '#06b6d4', '#ec4899', '#84cc16', '#111827'];
+      }
+
+      function buildScoreChartData() {
+        collectScoreColumnsFromDOM();
+        collectScoreRoundsFromDOM();
+        var columns = getEnabledScoreColumns();
+        var labels = scoreSheetState.rounds.map(function (round, idx) {
+          return round.label || ((idx + 1) + '회차');
+        });
+        var datasets = [];
+        var colors = getScoreChartColors();
+        var totals = scoreSheetState.rounds.map(function (round) {
+          var total = calcRoundTotal(round, columns);
+          return total != null ? total : null;
+        });
+        datasets.push({
+          label: '종합',
+          data: totals,
+          borderColor: colors[0],
+          backgroundColor: 'rgba(255, 87, 34, 0.12)',
+          borderWidth: 3,
+          pointRadius: 4,
+          tension: 0.2,
+          spanGaps: true
+        });
+        columns.forEach(function (col, idx) {
+          datasets.push({
+            label: col.label,
+            data: scoreSheetState.rounds.map(function (round) {
+              return parseScoreValue(round.scores[col.id]);
+            }),
+            borderColor: colors[(idx + 1) % colors.length],
+            backgroundColor: 'transparent',
+            borderWidth: 1.5,
+            pointRadius: 2,
+            tension: 0.2,
+            spanGaps: true
+          });
+        });
+        return { labels: labels, datasets: datasets };
+      }
+
+      var scoreChartTimer = null;
+      function scheduleScoreChartRender() {
+        clearTimeout(scoreChartTimer);
+        scoreChartTimer = setTimeout(renderScoreChart, 120);
+      }
+
+      function renderScoreChart() {
+        if (!el.scoreChartCanvas || mainViewMode !== 'scoring') return;
+        var columns = getEnabledScoreColumns();
+        if (!columns.length) {
+          if (scoreChart) {
+            scoreChart.destroy();
+            scoreChart = null;
+          }
+          return;
+        }
+        var token = ++scoreChartRenderToken;
+        ensureChartJs().then(function () {
+          if (token !== scoreChartRenderToken || mainViewMode !== 'scoring') return;
+          var chartData = buildScoreChartData();
+          var columnsAfter = getEnabledScoreColumns();
+          var options = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { boxWidth: 12, font: { size: 11 } }
+              },
+              tooltip: { mode: 'index', intersect: false }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                suggestedMax: calcMaxTotal(columnsAfter),
+                title: { display: true, text: '점수' }
+              },
+              x: {
+                title: { display: true, text: '회차' }
+              }
+            }
+          };
+          if (scoreChart) {
+            scoreChart.data.labels = chartData.labels;
+            scoreChart.data.datasets = chartData.datasets;
+            scoreChart.options.scales.y.suggestedMax = calcMaxTotal(columns);
+            scoreChart.update();
+            return;
+          }
+          scoreChart = new window.Chart(el.scoreChartCanvas.getContext('2d'), {
+            type: 'line',
+            data: chartData,
+            options: options
+          });
+        }).catch(function () { /* ignore */ });
+      }
+
+      function restoreScoringViewFromState() {
+        if (scoreSheetsState.editingId) {
+          var editingSheet = getScoreSheetById(scoreSheetsState.editingId);
+          if (editingSheet) {
+            applyScoreSheet(editingSheet);
+            renderScoreColumnSettings();
+            renderScoringTable();
+            renderScoreChart();
+            return;
+          }
+          scoreSheetsState.editingId = '';
+          saveScoreSheetStateLocal();
+        }
+        var latest = getLatestScoreSheet();
+        if (latest) {
+          openScoreSavedListPanel();
+          scoreSheetsState.editingId = latest.id;
+          applyScoreSheet(latest);
+          saveScoreSheetStateLocal();
+          renderScoreColumnSettings();
+          renderScoringTable();
+          renderScoreChart();
+          renderScoreSavedList();
+          return;
+        }
+        initDefaultScoreSheet();
+        renderScoreColumnSettings();
+        renderScoringTable();
+        renderScoreChart();
+      }
+
+      function addScoreRound() {
+        collectScoreSheetFromDOM();
+        var n = scoreSheetState.rounds.length + 1;
+        scoreSheetState.rounds.push(createScoreRound(n + '회차'));
+        renderScoringTable();
+        renderScoreChart();
+      }
+
+      function persistScoreToMemory() {
+        if (mainViewMode !== 'scoring') return;
+        collectScoreSheetFromDOM();
+      }
+
+      function saveScoreSheet() {
+        if (!currentUser) {
+          showError('이름을 선택한 뒤 저장할 수 있습니다.');
+          return;
+        }
+        var payload = collectScoreSheetFromDOM();
+        if (!getEnabledScoreColumns().length) {
+          showError('채점 항목을 하나 이상 켜주세요.');
+          return;
+        }
+        var existing = scoreSheetsState.editingId
+          ? getScoreSheetById(scoreSheetsState.editingId)
+          : null;
+        var sameAsLoaded = existing && existing.workName === payload.workName;
+        var sheetPayload;
+
+        if (existing && sameAsLoaded) {
+          sheetPayload = normalizeScoreSheet({
+            id: existing.id,
+            workName: payload.workName,
+            savedDate: existing.savedDate || todayStr(),
+            columnSettings: payload.columnSettings,
+            rounds: payload.rounds
+          });
+        } else {
+          sheetPayload = normalizeScoreSheet({
+            workName: payload.workName,
+            savedDate: todayStr(),
+            columnSettings: payload.columnSettings,
+            rounds: payload.rounds
+          });
+        }
+
+        run('saveScoreSheet', [currentUser, sheetPayload], '채점결과 저장 중...')
+          .then(function (saved) {
+            saved = normalizeScoreSheet(saved);
+            return runSilent('getScoreSheets', [currentUser]).then(function (sheets) {
+              applyLoadedScoreSheets(sheets, saved.id);
+              var refreshed = getScoreSheetById(saved.id) || saved;
+              scoreSheetsState.editingId = refreshed.id;
+              applyScoreSheet(refreshed);
+              saveScoreSheetStateLocal();
+              restoreScoringViewFromState();
+              renderScoreSavedList();
+              openScoreSavedListPanel();
+              showError('채점결과가 서버에 저장되었습니다: ' +
+                refreshed.workName + ' · ' + formatDateOptionLabel(refreshed.savedDate));
+              el.errorBox.style.background = 'rgba(34, 197, 94, 0.15)';
+              el.errorBox.style.color = '#86efac';
+            });
+          })
+          .catch(function (e) {
+            showError(e.message || '채점결과를 서버에 저장하지 못했습니다.');
+          });
+      }
+
+      function showScoringView() {
+        if (!currentUser) {
+          showError('채점결과를 보려면 먼저 이름을 선택해주세요.');
+          return;
+        }
+        if (!el.taskCard || el.taskCard.style.display === 'none') {
+          showError('일지 화면에서 이름을 선택한 뒤 채점결과를 이용할 수 있습니다.');
+          return;
+        }
+        if (mainViewMode === 'process') {
+          persistProcessRowsToMemory();
+        } else if (mainViewMode === 'feedback') {
+          persistFeedbackToMemory();
+        } else if (mainViewMode === 'scoring') {
+          return;
+        }
+        mainViewMode = 'scoring';
+        applyMainViewMode();
+      }
+
       function applyMainViewMode() {
         var isProcess = mainViewMode === 'process';
+        var isFeedback = mainViewMode === 'feedback';
+        var isScoring = mainViewMode === 'scoring';
+        var isDiary = mainViewMode === 'diary';
         document.body.classList.toggle('main-view-process', isProcess);
+        document.body.classList.toggle('main-view-feedback', isFeedback);
+        document.body.classList.toggle('main-view-scoring', isScoring);
         if (el.processCard) {
           el.processCard.classList.toggle('visible', isProcess);
+        }
+        if (el.feedbackCard) {
+          el.feedbackCard.classList.toggle('visible', isFeedback);
+        }
+        if (el.scoringCard) {
+          el.scoringCard.classList.toggle('visible', isScoring);
         }
         if (el.ganttTabBtn) {
           el.ganttTabBtn.classList.toggle('active', isProcess);
           el.ganttTabBtn.setAttribute('aria-pressed', isProcess ? 'true' : 'false');
         }
-        if (el.diaryTabBtn) {
-          el.diaryTabBtn.classList.toggle('active', !isProcess);
-          el.diaryTabBtn.setAttribute('aria-pressed', !isProcess ? 'true' : 'false');
+        if (el.feedbackTabBtn) {
+          el.feedbackTabBtn.classList.toggle('active', isFeedback);
+          el.feedbackTabBtn.setAttribute('aria-pressed', isFeedback ? 'true' : 'false');
         }
-        if (!isProcess) {
+        if (el.scoringTabBtn) {
+          el.scoringTabBtn.classList.toggle('active', isScoring);
+          el.scoringTabBtn.setAttribute('aria-pressed', isScoring ? 'true' : 'false');
+        }
+        if (el.diaryTabBtn) {
+          el.diaryTabBtn.classList.toggle('active', isDiary);
+          el.diaryTabBtn.setAttribute('aria-pressed', isDiary ? 'true' : 'false');
+        }
+        if (isDiary) {
           if (el.taskCard && el.taskCard.style.display !== 'none') {
             if (el.taskDiaryRow) el.taskDiaryRow.style.display = 'flex';
             if (el.chartCard) el.chartCard.style.display = 'block';
           }
-        } else {
+        } else if (isProcess) {
           loadProcessSheetsState()
             .then(function () {
               restoreProcessViewFromState();
@@ -4200,13 +7795,39 @@
               showError(e.message || '공정표를 불러오지 못했습니다.');
               restoreProcessViewFromState();
             });
+        } else if (isFeedback) {
+          loadFeedbackSheetsState()
+            .then(function () {
+              restoreFeedbackViewFromState();
+              renderFeedbackSavedList();
+            })
+            .catch(function (e) {
+              showError(e.message || '자가피드백을 불러오지 못했습니다.');
+              restoreFeedbackViewFromState();
+            });
+        } else if (isScoring) {
+          loadScoreSheetsState()
+            .then(function () {
+              restoreScoringViewFromState();
+              renderScoreSavedList();
+            })
+            .catch(function (e) {
+              showError(e.message || '채점결과를 불러오지 못했습니다.');
+              restoreScoringViewFromState();
+            });
         }
         updateProcessSavedPanelVisibility();
       }
 
       function showDiaryView() {
         if (mainViewMode === 'diary') return;
-        persistProcessRowsToMemory();
+        if (mainViewMode === 'process') {
+          persistProcessRowsToMemory();
+        } else if (mainViewMode === 'feedback') {
+          persistFeedbackToMemory();
+        } else if (mainViewMode === 'scoring') {
+          persistScoreToMemory();
+        }
         mainViewMode = 'diary';
         applyMainViewMode();
       }
@@ -4220,7 +7841,32 @@
           showError('일지 화면에서 이름을 선택한 뒤 공정표를 이용할 수 있습니다.');
           return;
         }
+        if (mainViewMode === 'feedback') {
+          persistFeedbackToMemory();
+        } else if (mainViewMode === 'scoring') {
+          persistScoreToMemory();
+        }
         mainViewMode = 'process';
+        applyMainViewMode();
+      }
+
+      function showFeedbackView() {
+        if (!currentUser) {
+          showError('자가피드백을 보려면 먼저 이름을 선택해주세요.');
+          return;
+        }
+        if (!el.taskCard || el.taskCard.style.display === 'none') {
+          showError('일지 화면에서 이름을 선택한 뒤 자가피드백을 이용할 수 있습니다.');
+          return;
+        }
+        if (mainViewMode === 'process') {
+          persistProcessRowsToMemory();
+        } else if (mainViewMode === 'scoring') {
+          persistScoreToMemory();
+        } else if (mainViewMode === 'feedback') {
+          return;
+        }
+        mainViewMode = 'feedback';
         applyMainViewMode();
       }
 
@@ -5333,6 +8979,13 @@
         activeSidebarSection = section;
         var sameUser = namesMatch(name, currentUser);
 
+        if (!sameUser && mainViewMode === 'feedback') {
+          persistFeedbackToMemory();
+        }
+        if (!sameUser && mainViewMode === 'scoring') {
+          persistScoreToMemory();
+        }
+
         saveUserName(name);
         currentUser = name;
         saveViewDate(targetDate);
@@ -5346,6 +8999,12 @@
           scheduleChartLoad();
           if (mainViewMode === 'process') {
             loadAndRenderProcessTable();
+          } else if (mainViewMode === 'feedback') {
+            restoreFeedbackViewFromState();
+          } else if (mainViewMode === 'scoring') {
+            loadScoreSheetsState().then(function () {
+              restoreScoringViewFromState();
+            });
           }
         }
         updateSidebarActiveState();
@@ -5886,6 +9545,8 @@
             if (viewDate === todayStr()) return loadTomorrowTasks();
           })
           .then(function () { return preloadProcessSheetsForUser(); })
+          .then(function () { return preloadFeedbackSheetsForUser(); })
+          .then(function () { return preloadScoreSheetsForUser(); })
           .then(scheduleChartLoad);
         el.taskInput.focus();
       }
@@ -6015,16 +9676,12 @@
           confirmUser();
         }
       });
-      el.changeNameBtn.addEventListener('click', function () {
-        showDiaryView();
-        setNameLocked(false);
-        applySavedNameToSelect();
-        if (users.length === 0) el.userName.value = currentUser;
-        if (el.taskDiaryRow) el.taskDiaryRow.style.display = 'none';
-        el.taskCard.style.display = 'none';
-        el.chartCard.style.display = 'none';
-        el.nameHint.textContent = '이름을 선택하면 이 기기에 저장되어 다음 접속 시 자동으로 선택됩니다.';
-      });
+      if (el.contextPrintBtn) {
+        el.contextPrintBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          triggerContextPrint();
+        });
+      }
 
       el.taskInput.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {
@@ -6067,22 +9724,126 @@
           showDiaryView();
         });
       }
+      if (el.diaryPrintCancelBtn) {
+        el.diaryPrintCancelBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          closeDiaryPrintModal();
+        });
+      }
+      if (el.diaryPrintBackdrop) {
+        el.diaryPrintBackdrop.addEventListener('click', function (e) {
+          e.preventDefault();
+          closeDiaryPrintModal();
+        });
+      }
+      if (el.diaryPrintConfirmBtn) {
+        el.diaryPrintConfirmBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          confirmDiaryPrint();
+        });
+      }
       if (el.ganttTabBtn) {
         el.ganttTabBtn.addEventListener('click', function (e) {
           e.preventDefault();
           showProcessView();
         });
       }
+      if (el.feedbackTabBtn) {
+        el.feedbackTabBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          showFeedbackView();
+        });
+      }
+      if (el.scoringTabBtn) {
+        el.scoringTabBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          showScoringView();
+        });
+      }
+      if (el.saveScoreSheetBtn) {
+        el.saveScoreSheetBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          saveScoreSheet();
+        });
+      }
+      if (el.newScoreDraftBtn) {
+        el.newScoreDraftBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          persistScoreToMemory();
+          newScoreDraft();
+        });
+      }
+      if (el.scoreSavedToggle) {
+        el.scoreSavedToggle.addEventListener('click', function (e) {
+          e.preventDefault();
+          toggleScoreSavedList();
+        });
+      }
+      if (el.addScoreRoundBtn) {
+        el.addScoreRoundBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          addScoreRound();
+        });
+      }
+      if (el.feedbackSavedToggle) {
+        el.feedbackSavedToggle.addEventListener('click', function (e) {
+          e.preventDefault();
+          toggleFeedbackSavedList();
+        });
+      }
+      if (el.newFeedbackDraftBtn) {
+        el.newFeedbackDraftBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          persistFeedbackToMemory();
+          newFeedbackDraft();
+          renderFeedbackSavedList();
+        });
+      }
+      if (el.addFeedbackRowBtn) {
+        el.addFeedbackRowBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          addFeedbackRow();
+        });
+      }
+      if (el.saveFeedbackBtn) {
+        el.saveFeedbackBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          saveFeedbackSheet();
+        });
+      }
+      if (el.feedbackEditorRotateLeft) {
+        el.feedbackEditorRotateLeft.addEventListener('click', function (e) {
+          e.preventDefault();
+          if (feedbackImageEditorState.cropper) feedbackImageEditorState.cropper.rotate(-90);
+        });
+      }
+      if (el.feedbackEditorRotateRight) {
+        el.feedbackEditorRotateRight.addEventListener('click', function (e) {
+          e.preventDefault();
+          if (feedbackImageEditorState.cropper) feedbackImageEditorState.cropper.rotate(90);
+        });
+      }
+      if (el.feedbackEditorCancel) {
+        el.feedbackEditorCancel.addEventListener('click', function (e) {
+          e.preventDefault();
+          closeFeedbackImageEditor();
+        });
+      }
+      if (el.feedbackEditorApply) {
+        el.feedbackEditorApply.addEventListener('click', function (e) {
+          e.preventDefault();
+          applyFeedbackImageEditor();
+        });
+      }
+      if (el.feedbackImageEditorBackdrop) {
+        el.feedbackImageEditorBackdrop.addEventListener('click', function () {
+          closeFeedbackImageEditor();
+        });
+      }
       if (el.addProcessRowBtn) {
         el.addProcessRowBtn.addEventListener('click', function (e) {
           e.preventDefault();
           addProcessRow();
-        });
-      }
-      if (el.printProcessSheetBtn) {
-        el.printProcessSheetBtn.addEventListener('click', function (e) {
-          e.preventDefault();
-          printProcessSheet();
         });
       }
       if (el.processSavedToggle) {
@@ -6143,6 +9904,14 @@
         .then(function () {
           if (!savedOnBoot) return;
           return preloadProcessSheetsForUser();
+        })
+        .then(function () {
+          if (!savedOnBoot) return;
+          return preloadFeedbackSheetsForUser();
+        })
+        .then(function () {
+          if (!savedOnBoot) return;
+          return preloadScoreSheetsForUser();
         })
         .then(function () {
           if (!savedOnBoot) prefetchChartJs();
