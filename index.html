@@ -532,6 +532,7 @@
     .process-actions {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 12px;
       margin-top: 14px;
     }
@@ -1992,7 +1993,7 @@
                 <th>작업 내용</th>
                 <th class="col-time">목표 시간</th>
                 <th class="col-time">실제 시간</th>
-                <th class="col-total">전체 시간</th>
+                <th class="col-total">동일 작업 연계 시간</th>
                 <th class="col-move" aria-label="행 이동"></th>
                 <th class="col-delete" aria-label="행 삭제"></th>
               </tr>
@@ -2013,6 +2014,7 @@
         <p class="process-empty" id="processEmpty" style="display:none;">행이 없습니다. 아래 <strong>추가</strong> 버튼으로 작업을 등록하세요.</p>
         <div class="process-actions">
           <button type="button" class="btn btn-primary" id="addProcessRowBtn">추가</button>
+          <button type="button" class="btn btn-outline" id="printProcessSheetBtn">인쇄</button>
         </div>
       </div>
     </div>
@@ -2452,6 +2454,121 @@
     return { badges: badges };
   }
 
+  function isUuid(value) {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ''));
+  }
+
+  function normalizeProcessRowPayload(row) {
+    var category = String(row.category || '');
+    if (category === '락카') category = '도색';
+    return {
+      id: String(row.id || ''),
+      category: category,
+      content: String(row.content || ''),
+      targetMin: row.targetMin === '' || row.targetMin == null ? '' : String(row.targetMin),
+      actualMin: row.actualMin === '' || row.actualMin == null ? '' : String(row.actualMin)
+    };
+  }
+
+  function mapProcessSheetRow(row) {
+    var savedDate = String(row.saved_date || row.savedDate || formatDate(new Date())).substring(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(savedDate)) savedDate = formatDate(new Date());
+    var rows = [];
+    if (Array.isArray(row.rows)) {
+      rows = row.rows.map(normalizeProcessRowPayload);
+    }
+    return {
+      id: row.id,
+      name: String(row.name || '공정표').trim() || '공정표',
+      savedDate: savedDate,
+      rows: rows
+    };
+  }
+
+  async function getProcessSheets(userName) {
+    userName = String(userName || '').trim();
+    if (!userName) return [];
+    var user = await getUserByName(userName);
+    if (!user) return [];
+
+    var db = requireConfig();
+    var res = await db.from('process_sheets')
+      .select('id, name, saved_date, rows, created_at, updated_at')
+      .eq('user_id', user.id)
+      .order('saved_date', { ascending: false })
+      .order('updated_at', { ascending: false });
+    if (res.error) throw new Error(res.error.message);
+    return (res.data || []).map(mapProcessSheetRow);
+  }
+
+  async function saveProcessSheet(userName, sheet) {
+    userName = String(userName || '').trim();
+    if (!userName) throw new Error('이름을 선택해주세요.');
+    if (!sheet || !String(sheet.name || '').trim()) {
+      throw new Error('공정표 이름을 입력해주세요.');
+    }
+
+    var user = await getUserByName(userName);
+    if (!user) throw new Error('등록되지 않은 사용자입니다.');
+
+    var savedDate = sheet.savedDate || formatDate(new Date());
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(savedDate)) savedDate = formatDate(new Date());
+
+    var payload = {
+      user_id: user.id,
+      name: String(sheet.name || '공정표').trim() || '공정표',
+      saved_date: savedDate,
+      rows: (sheet.rows || []).map(normalizeProcessRowPayload),
+      updated_at: new Date().toISOString()
+    };
+
+    var db = requireConfig();
+    var sheetId = sheet.id;
+    if (isUuid(sheetId)) {
+      var upd = await db.from('process_sheets')
+        .update({
+          name: payload.name,
+          saved_date: payload.saved_date,
+          rows: payload.rows,
+          updated_at: payload.updated_at
+        })
+        .eq('id', sheetId)
+        .eq('user_id', user.id)
+        .select('id, name, saved_date, rows')
+        .maybeSingle();
+      if (upd.error) throw new Error(upd.error.message);
+      if (!upd.data) throw new Error('저장할 공정표를 찾을 수 없습니다.');
+      return mapProcessSheetRow(upd.data);
+    }
+
+    var ins = await db.from('process_sheets')
+      .insert(payload)
+      .select('id, name, saved_date, rows')
+      .single();
+    if (ins.error) throw new Error(ins.error.message);
+    return mapProcessSheetRow(ins.data);
+  }
+
+  async function deleteProcessSheet(userName, sheetId) {
+    userName = String(userName || '').trim();
+    sheetId = String(sheetId || '').trim();
+    if (!userName) throw new Error('이름을 선택해주세요.');
+    if (!sheetId) throw new Error('삭제할 공정표를 찾을 수 없습니다.');
+
+    var user = await getUserByName(userName);
+    if (!user) throw new Error('등록되지 않은 사용자입니다.');
+
+    var db = requireConfig();
+    var del = await db.from('process_sheets')
+      .delete()
+      .eq('id', sheetId)
+      .eq('user_id', user.id)
+      .select('id');
+    if (del.error) throw new Error(del.error.message);
+    if (!del.data || !del.data.length) throw new Error('삭제할 공정표를 찾을 수 없습니다.');
+    return getProcessSheets(userName);
+  }
+
   global.ProDiaryApi = {
     isReady: function () {
       return Boolean(global.SUPABASE_URL && global.SUPABASE_ANON_KEY &&
@@ -2469,7 +2586,10 @@
     getDayProgress: getDayProgress,
     getBootstrapData: getBootstrapData,
     getTaskDates: getTaskDates,
-    getProBadges: getProBadges
+    getProBadges: getProBadges,
+    getProcessSheets: getProcessSheets,
+    saveProcessSheet: saveProcessSheet,
+    deleteProcessSheet: deleteProcessSheet
   };
 })(window);
 
@@ -2626,6 +2746,7 @@
         processTableFoot: document.getElementById('processTableFoot'),
         processEmpty: document.getElementById('processEmpty'),
         addProcessRowBtn: document.getElementById('addProcessRowBtn'),
+        printProcessSheetBtn: document.getElementById('printProcessSheetBtn'),
         processTotalTarget: document.getElementById('processTotalTarget'),
         processTotalActual: document.getElementById('processTotalActual'),
         processTotalAll: document.getElementById('processTotalAll'),
@@ -2905,7 +3026,7 @@
         };
       }
 
-      function loadProcessSheetsState() {
+      function loadProcessSheetsStateLocal() {
         if (!currentUser) {
           processSheetsState = { editingId: '', draftRows: [], sheets: [] };
           return;
@@ -2932,14 +3053,140 @@
         }
       }
 
+      function isProcessSheetServerId(id) {
+        return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(id || ''));
+      }
+
+      function applyLoadedProcessSheets(sheets, preferredEditingId) {
+        var editingId = preferredEditingId || processSheetsState.editingId || '';
+        processSheetsState.sheets = (sheets || []).map(normalizeProcessSheet);
+        if (editingId && !processSheetsState.sheets.some(function (s) { return s.id === editingId; })) {
+          editingId = '';
+        }
+        processSheetsState.editingId = editingId;
+        processSheetsState.draftRows = [];
+        saveProcessSheetsState();
+      }
+
+      function migrateLocalOnlyProcessSheetsToServer(localSheets) {
+        var pending = (localSheets || []).filter(function (sheet) {
+          return sheet && !isProcessSheetServerId(sheet.id);
+        });
+        if (!pending.length) return Promise.resolve();
+        var chain = Promise.resolve();
+        pending.forEach(function (sheet) {
+          chain = chain.then(function () {
+            return runSilent('saveProcessSheet', [currentUser, normalizeProcessSheet(sheet)]);
+          });
+        });
+        return chain;
+      }
+
+      function loadProcessSheetsState() {
+        if (!currentUser) {
+          processSheetsState = { editingId: '', draftRows: [], sheets: [] };
+          return Promise.resolve();
+        }
+
+        var preferredEditingId = '';
+        var localSheets = [];
+        try {
+          var raw = localStorage.getItem(CACHE_PROCESS_INDEX + currentUser);
+          if (!raw) {
+            migrateLegacyProcessStorage();
+            raw = localStorage.getItem(CACHE_PROCESS_INDEX + currentUser);
+          }
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            preferredEditingId = parsed.editingId || parsed.activeId || '';
+            if (Array.isArray(parsed.sheets)) {
+              localSheets = parsed.sheets.map(normalizeProcessSheet);
+            }
+          }
+        } catch (e) { /* ignore */ }
+
+        return runSilent('getProcessSheets', [currentUser])
+          .then(function (sheets) {
+            return migrateLocalOnlyProcessSheetsToServer(localSheets).then(function () {
+              if (localSheets.some(function (sheet) { return !isProcessSheetServerId(sheet.id); })) {
+                return runSilent('getProcessSheets', [currentUser]);
+              }
+              return sheets;
+            });
+          })
+          .then(function (sheets) {
+            applyLoadedProcessSheets(sheets, preferredEditingId);
+          })
+          .catch(function (e) {
+            loadProcessSheetsStateLocal();
+            var msg = e && e.message ? e.message : String(e);
+            if (/process_sheets|schema cache|relation .* does not exist/i.test(msg)) {
+              throw new Error('서버에 공정표 테이블이 없습니다. Supabase SQL Editor에서 pro1G_supabase_process_sheets.sql을 실행해주세요.');
+            }
+            throw e;
+          });
+      }
+
       function saveProcessSheetsState() {
         if (!currentUser) return;
         try {
           localStorage.setItem(CACHE_PROCESS_INDEX + currentUser, JSON.stringify({
-            editingId: processSheetsState.editingId,
-            sheets: processSheetsState.sheets
+            editingId: processSheetsState.editingId || ''
           }));
         } catch (e) { /* ignore */ }
+      }
+
+      function getLatestProcessSheet() {
+        var sheets = processSheetsState.sheets.slice().sort(function (a, b) {
+          return b.savedDate.localeCompare(a.savedDate) ||
+            String(b.name || '').localeCompare(String(a.name || ''));
+        });
+        return sheets[0] || null;
+      }
+
+      function openProcessSavedListPanel() {
+        processSavedListOpen = true;
+        if (el.processSavedPanel) el.processSavedPanel.classList.add('is-open');
+        if (el.processSavedToggle) el.processSavedToggle.setAttribute('aria-expanded', 'true');
+      }
+
+      function restoreProcessViewFromState() {
+        renderProcessSavedList();
+        if (processSheetsState.editingId) {
+          var editingSheet = getProcessSheetById(processSheetsState.editingId);
+          if (editingSheet) {
+            setProcessEditorFields(editingSheet.name, editingSheet.savedDate);
+            processRows = (editingSheet.rows || []).map(normalizeProcessRow);
+            renderProcessTable(processRows);
+            return;
+          }
+          processSheetsState.editingId = '';
+        }
+        var draftRows = getProcessRowsForEditing();
+        if (draftRows.length) {
+          setProcessEditorFields('공정표', todayStr());
+          processRows = draftRows;
+          renderProcessTable(processRows);
+          return;
+        }
+        var latest = getLatestProcessSheet();
+        if (latest) {
+          openProcessSavedListPanel();
+          openSavedProcessSheet(latest.id);
+          return;
+        }
+        newProcessDraft(false);
+      }
+
+      function preloadProcessSheetsForUser() {
+        if (!currentUser) return Promise.resolve();
+        return loadProcessSheetsState()
+          .then(function () {
+            renderProcessSavedList();
+          })
+          .catch(function () {
+            return null;
+          });
       }
 
       function migrateLegacyProcessStorage() {
@@ -3129,6 +3376,7 @@
         processRows = (sheet.rows || []).map(normalizeProcessRow);
         renderProcessTable(processRows);
         renderProcessSavedList();
+        saveProcessSheetsState();
         if (mainViewMode !== 'process') {
           showProcessView();
         }
@@ -3140,14 +3388,29 @@
         if (!confirm('"' + sheet.name + '" (' + formatDateOptionLabel(sheet.savedDate) + ') 공정표를 삭제할까요?')) {
           return;
         }
-        processSheetsState.sheets = processSheetsState.sheets.filter(function (s) {
-          return s.id !== sheetId;
-        });
-        if (processSheetsState.editingId === sheetId) {
-          newProcessDraft(false);
+        if (!isProcessSheetServerId(sheetId)) {
+          processSheetsState.sheets = processSheetsState.sheets.filter(function (s) {
+            return s.id !== sheetId;
+          });
+          if (processSheetsState.editingId === sheetId) {
+            newProcessDraft(false);
+          }
+          saveProcessSheetsState();
+          renderProcessSavedList();
+          return;
         }
-        saveProcessSheetsState();
-        renderProcessSavedList();
+        run('deleteProcessSheet', [currentUser, sheetId], '공정표 삭제 중...')
+          .then(function (sheets) {
+            var wasEditing = processSheetsState.editingId === sheetId;
+            applyLoadedProcessSheets(sheets, wasEditing ? '' : processSheetsState.editingId);
+            if (wasEditing) {
+              newProcessDraft(false);
+            }
+            renderProcessSavedList();
+          })
+          .catch(function (e) {
+            showError(e.message || '공정표를 삭제하지 못했습니다.');
+          });
       }
 
       function newProcessDraft(confirmReset) {
@@ -3164,6 +3427,7 @@
         setProcessEditorFields('공정표', todayStr());
         renderProcessTable([]);
         renderProcessSavedList();
+        saveProcessSheetsState();
       }
 
       function persistProcessRowsToMemory() {
@@ -3184,43 +3448,53 @@
         }
         processRows = collectProcessRowsFromDOM();
         var rows = processRows.map(normalizeProcessRow);
-        var sheet = null;
         var savedDate;
         var existing = processSheetsState.editingId
           ? getProcessSheetById(processSheetsState.editingId)
           : null;
         var sameNameAsLoaded = existing && existing.name === name;
+        var sheetPayload;
 
         if (existing && sameNameAsLoaded) {
           savedDate = existing.savedDate || todayStr();
-          existing.name = name;
-          existing.rows = rows;
-          sheet = existing;
-          setProcessEditSnapshot(sheet);
+          sheetPayload = normalizeProcessSheet({
+            id: existing.id,
+            name: name,
+            savedDate: savedDate,
+            rows: rows
+          });
         } else {
           if (existing) {
             restoreSheetFromSnapshot(existing.id);
           }
           savedDate = todayStr();
-          sheet = normalizeProcessSheet({
-            id: 'ps-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+          sheetPayload = normalizeProcessSheet({
             name: name,
             savedDate: savedDate,
             rows: rows
           });
-          processSheetsState.sheets.push(sheet);
-          processSheetsState.editingId = sheet.id;
-          setProcessEditSnapshot(sheet);
         }
-        saveProcessSheetsState();
-        setProcessEditorFields(name, savedDate);
-        renderProcessSavedList();
-        processSavedListOpen = true;
-        if (el.processSavedPanel) el.processSavedPanel.classList.add('is-open');
-        if (el.processSavedToggle) el.processSavedToggle.setAttribute('aria-expanded', 'true');
-        showError('공정표가 저장되었습니다: ' + name + ' (' + formatDateOptionLabel(savedDate) + ')');
-        el.errorBox.style.background = 'rgba(34, 197, 94, 0.15)';
-        el.errorBox.style.color = '#86efac';
+
+        run('saveProcessSheet', [currentUser, sheetPayload], '공정표 저장 중...')
+          .then(function (saved) {
+            saved = normalizeProcessSheet(saved);
+            return runSilent('getProcessSheets', [currentUser]).then(function (sheets) {
+              applyLoadedProcessSheets(sheets, saved.id);
+              var refreshed = getProcessSheetById(saved.id) || saved;
+              setProcessEditSnapshot(refreshed);
+              setProcessEditorFields(refreshed.name, refreshed.savedDate);
+              processRows = (refreshed.rows || []).map(normalizeProcessRow);
+              renderProcessTable(processRows);
+              renderProcessSavedList();
+              openProcessSavedListPanel();
+              showError('공정표가 서버에 저장되었습니다: ' + refreshed.name + ' (' + formatDateOptionLabel(refreshed.savedDate) + ')');
+              el.errorBox.style.background = 'rgba(34, 197, 94, 0.15)';
+              el.errorBox.style.color = '#86efac';
+            });
+          })
+          .catch(function (e) {
+            showError(e.message || '공정표를 서버에 저장하지 못했습니다.');
+          });
       }
 
       function normalizeProcessRow(row) {
@@ -3410,7 +3684,7 @@
             return;
           }
 
-          if (idx === block.start) {
+          if (idx === block.end) {
             td.textContent = formatProcessMinutes(block.targetSum);
             td.classList.remove('is-dash');
             if (block.category) {
@@ -3434,6 +3708,132 @@
         if (el.processTotalAll) el.processTotalAll.textContent = '—';
         applyProcessGroupTotalsToDOM(rows);
         renderProcessCategoryTotals(rows);
+      }
+
+      function getCurrentProcessSheetMeta() {
+        var title = el.processTitleInput ? el.processTitleInput.value.trim() : '공정표';
+        if (!title) title = '공정표';
+        var savedDate = todayStr();
+        if (processSheetsState.editingId) {
+          var sheet = getProcessSheetById(processSheetsState.editingId);
+          if (sheet) savedDate = sheet.savedDate;
+        }
+        return {
+          title: title,
+          user: currentUser || '',
+          savedDate: savedDate,
+          dateLabel: el.processWrittenDate
+            ? el.processWrittenDate.textContent
+            : formatProcessWrittenDate(savedDate)
+        };
+      }
+
+      function formatProcessCellMinutes(val) {
+        if (val === '' || val == null) return '';
+        return formatProcessMinutes(val);
+      }
+
+      function getProcessRowLinkedTimeDisplay(idx, blocks) {
+        for (var b = 0; b < blocks.length; b++) {
+          var block = blocks[b];
+          if (idx >= block.start && idx <= block.end) {
+            if (idx === block.end) {
+              return formatProcessMinutes(block.targetSum);
+            }
+            return '—';
+          }
+        }
+        return '—';
+      }
+
+      function buildProcessPrintHtml(rows) {
+        var meta = getCurrentProcessSheetMeta();
+        var blocks = computeProcessBlocks(rows);
+        var totals = calcProcessTotals(rows);
+        var categories = calcProcessCategoryTotals(rows);
+        var bodyRows = rows.map(function (row, idx) {
+          return '<tr>' +
+            '<td>' + escapeHtml(row.category || '') + '</td>' +
+            '<td>' + escapeHtml(row.content) + '</td>' +
+            '<td class="num">' + escapeHtml(formatProcessCellMinutes(row.targetMin)) + '</td>' +
+            '<td class="num">' + escapeHtml(formatProcessCellMinutes(row.actualMin)) + '</td>' +
+            '<td class="num linked">' + escapeHtml(getProcessRowLinkedTimeDisplay(idx, blocks)) + '</td>' +
+            '</tr>';
+        }).join('');
+        var categoryRows = categories.map(function (item) {
+          return '<tr class="subtotal">' +
+            '<td colspan="2">' + escapeHtml(item.category) + '</td>' +
+            '<td class="num">' + escapeHtml(formatProcessMinutes(item.targetSum)) + '</td>' +
+            '<td class="num">' + escapeHtml(formatProcessMinutes(item.actualSum)) + '</td>' +
+            '<td class="num">—</td>' +
+            '</tr>';
+        }).join('');
+        var userLine = meta.user
+          ? '<span>작성자: ' + escapeHtml(meta.user) + '</span>'
+          : '';
+        return '<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">' +
+          '<title>' + escapeHtml(meta.title) + ' - 공정표</title>' +
+          '<style>' +
+          '* { box-sizing: border-box; }' +
+          'body { font-family: "Pretendard", "Malgun Gothic", sans-serif; color: #111; margin: 24px; }' +
+          'h1 { margin: 0 0 8px; font-size: 1.35rem; }' +
+          '.meta { margin: 0 0 18px; color: #555; font-size: 0.9rem; display: flex; flex-wrap: wrap; gap: 12px 20px; }' +
+          'table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }' +
+          'th, td { border: 1px solid #333; padding: 8px 10px; vertical-align: top; }' +
+          'th { background: #f0f0f0; text-align: center; font-weight: 700; }' +
+          'td.num { text-align: center; white-space: nowrap; }' +
+          'td.linked { font-weight: 700; }' +
+          'tr.subtotal td { background: #fafafa; font-weight: 600; }' +
+          'tr.grand-total td { background: #eee; font-weight: 700; }' +
+          'tr.grand-total .label { color: #222; }' +
+          '@media print { body { margin: 12mm; } @page { margin: 12mm; } }' +
+          '</style></head><body>' +
+          '<h1>' + escapeHtml(meta.title) + '</h1>' +
+          '<p class="meta">' +
+          userLine +
+          '<span>일자: ' + escapeHtml(meta.dateLabel) + '</span>' +
+          '<span>인쇄: ' + escapeHtml(new Date().toLocaleString('ko-KR')) + '</span>' +
+          '</p>' +
+          '<table>' +
+          '<thead><tr>' +
+          '<th>작업 구분</th><th>작업 내용</th><th>목표 시간</th><th>실제 시간</th><th>동일 작업 연계 시간</th>' +
+          '</tr></thead>' +
+          '<tbody>' + bodyRows + '</tbody>' +
+          '<tfoot>' +
+          categoryRows +
+          '<tr class="grand-total">' +
+          '<td colspan="2" class="label">전체 시간</td>' +
+          '<td class="num">' + escapeHtml(formatProcessMinutes(totals.targetSum)) + '</td>' +
+          '<td class="num">' + escapeHtml(formatProcessMinutes(totals.actualSum)) + '</td>' +
+          '<td class="num">—</td>' +
+          '</tr></tfoot>' +
+          '</table></body></html>';
+      }
+
+      function printProcessSheet() {
+        if (mainViewMode !== 'process') return;
+        var rows = collectProcessRowsFromDOM();
+        if (!rows.length) {
+          showError('인쇄할 공정표 행이 없습니다.');
+          return;
+        }
+        var html = buildProcessPrintHtml(rows);
+        var iframe = document.createElement('iframe');
+        iframe.setAttribute('aria-hidden', 'true');
+        iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
+        document.body.appendChild(iframe);
+        var printWindow = iframe.contentWindow;
+        var printDoc = printWindow.document;
+        printDoc.open();
+        printDoc.write(html);
+        printDoc.close();
+        setTimeout(function () {
+          printWindow.focus();
+          printWindow.print();
+          setTimeout(function () {
+            if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+          }, 1000);
+        }, 300);
       }
 
       function buildCategorySelectOptions(selected) {
@@ -3719,29 +4119,27 @@
         }
       }
 
-      function loadAndRenderProcessTable() {
+      function loadAndRenderProcessTable(skipLoad) {
         if (!currentUser) {
           processRows = [];
           renderProcessTable([]);
-          return;
+          return Promise.resolve();
         }
-        loadProcessSheetsState();
-        if (processSheetsState.editingId) {
-          var sheet = getProcessSheetById(processSheetsState.editingId);
-          if (sheet) {
-            setProcessEditorFields(sheet.name, sheet.savedDate);
-            processRows = (sheet.rows || []).map(normalizeProcessRow);
-          } else {
-            newProcessDraft(false);
-            return;
-          }
-        } else {
-          setProcessEditorFields('공정표', todayStr());
-          processRows = getProcessRowsForEditing();
+        if (skipLoad) {
+          restoreProcessViewFromState();
+          updateProcessSavedPanelVisibility();
+          return Promise.resolve();
         }
-        renderProcessTable(processRows);
-        renderProcessSavedList();
-        updateProcessSavedPanelVisibility();
+        return loadProcessSheetsState()
+          .then(function () {
+            restoreProcessViewFromState();
+            updateProcessSavedPanelVisibility();
+          })
+          .catch(function (e) {
+            showError(e.message || '공정표를 불러오지 못했습니다.');
+            restoreProcessViewFromState();
+            updateProcessSavedPanelVisibility();
+          });
       }
 
       function addProcessRow() {
@@ -3794,12 +4192,14 @@
             if (el.chartCard) el.chartCard.style.display = 'block';
           }
         } else {
-          loadProcessSheetsState();
-          if (!processSheetsState.editingId && !getProcessRowsForEditing().length) {
-            newProcessDraft(false);
-          } else {
-            loadAndRenderProcessTable();
-          }
+          loadProcessSheetsState()
+            .then(function () {
+              restoreProcessViewFromState();
+            })
+            .catch(function (e) {
+              showError(e.message || '공정표를 불러오지 못했습니다.');
+              restoreProcessViewFromState();
+            });
         }
         updateProcessSavedPanelVisibility();
       }
@@ -4080,8 +4480,14 @@
           el.displayName.textContent = currentUser;
           renderUserProBadges();
           if (mainViewMode === 'process') {
-            loadProcessSheetsState();
-            renderProcessSavedList();
+            loadProcessSheetsState()
+              .then(function () {
+                renderProcessSavedList();
+              })
+              .catch(function (e) {
+                showError(e.message || '저장된 공정표를 불러오지 못했습니다.');
+                renderProcessSavedList();
+              });
           }
         } else {
           el.nameCard.classList.remove('name-locked');
@@ -5479,6 +5885,7 @@
           .then(function () {
             if (viewDate === todayStr()) return loadTomorrowTasks();
           })
+          .then(function () { return preloadProcessSheetsForUser(); })
           .then(scheduleChartLoad);
         el.taskInput.focus();
       }
@@ -5672,6 +6079,12 @@
           addProcessRow();
         });
       }
+      if (el.printProcessSheetBtn) {
+        el.printProcessSheetBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          printProcessSheet();
+        });
+      }
       if (el.processSavedToggle) {
         el.processSavedToggle.addEventListener('click', function (e) {
           e.preventDefault();
@@ -5726,6 +6139,10 @@
           return refreshDiaryDates().then(function () {
             if (viewDate === todayStr()) return loadTomorrowTasks();
           });
+        })
+        .then(function () {
+          if (!savedOnBoot) return;
+          return preloadProcessSheetsForUser();
         })
         .then(function () {
           if (!savedOnBoot) prefetchChartJs();
