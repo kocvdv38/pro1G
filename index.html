@@ -5802,6 +5802,11 @@
         textarea.style.height = textarea.scrollHeight + 'px';
       }
 
+      function resizeAllProcessContentTextareas() {
+        if (!el.processTableBody) return;
+        el.processTableBody.querySelectorAll('textarea.process-content').forEach(autoResizeProcessContent);
+      }
+
       function buildProcessRowElement(row, rowIndex, rowCount) {
         row = normalizeProcessRow(row);
         rowIndex = typeof rowIndex === 'number' ? rowIndex : 0;
@@ -5824,7 +5829,6 @@
         inpContent.rows = 1;
         inpContent.value = row.content;
         tdContent.appendChild(inpContent);
-        autoResizeProcessContent(inpContent);
 
         var tdTarget = document.createElement('td');
         tdTarget.className = 'col-time';
@@ -5909,6 +5913,10 @@
         processRows.forEach(function (row, idx) {
           el.processTableBody.appendChild(buildProcessRowElement(row, idx, processRows.length));
         });
+        resizeAllProcessContentTextareas();
+        requestAnimationFrame(function () {
+          resizeAllProcessContentTextareas();
+        });
         updateProcessTotals(processRows);
         if (el.processEmpty) {
           el.processEmpty.style.display = processRows.length ? 'none' : '';
@@ -5952,7 +5960,13 @@
         var row = normalizeProcessRow(newRowData);
         processRows.push(row);
         if (el.processTableBody) {
-          el.processTableBody.appendChild(buildProcessRowElement(row, processRows.length - 1, processRows.length));
+          var newTr = buildProcessRowElement(row, processRows.length - 1, processRows.length);
+          el.processTableBody.appendChild(newTr);
+          var newContent = newTr.querySelector('.process-content');
+          autoResizeProcessContent(newContent);
+          requestAnimationFrame(function () {
+            autoResizeProcessContent(newContent);
+          });
         }
         updateProcessTotals(processRows);
         saveProcessRowsCache(processRows);
