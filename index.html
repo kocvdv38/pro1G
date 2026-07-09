@@ -4935,6 +4935,7 @@
           'h1 { margin: 0 0 8px; font-size: 1.35rem; color: #111; }' +
           '.meta { margin: 0 0 18px; color: #555; font-size: 0.9rem; display: flex; flex-wrap: wrap; gap: 12px 20px; }' +
           'table { width: 100%; border-collapse: collapse; font-size: 0.88rem; border-top: 2px solid #3d3d3d; border-bottom: 2px solid #3d3d3d; border-left: none; border-right: none; table-layout: fixed; }' +
+          'table.process-print-data { border-bottom: none; }' +
           'th, td { border: 1px solid #8a8a8a; padding: 9px 10px; vertical-align: middle; }' +
           'th:first-child, td:first-child { border-left: none; }' +
           'th:last-child, td:last-child { border-right: none; }' +
@@ -4952,14 +4953,17 @@
           'tbody td.linked { font-weight: 700; }' +
           'td.cat, th.cat { text-align: center; }' +
           'td.num { text-align: center; white-space: nowrap; }' +
-          'tfoot td { border-top: 1px solid #8a8a8a; }' +
+          '.process-print-summary { width: 100%; border-collapse: collapse; font-size: 0.88rem; border-top: none; border-bottom: 2px solid #3d3d3d; border-left: none; border-right: none; table-layout: fixed; page-break-inside: avoid; }' +
+          '.process-print-summary td { border: 1px solid #8a8a8a; padding: 9px 10px; vertical-align: middle; }' +
+          '.process-print-summary td:first-child { border-left: none; }' +
+          '.process-print-summary td:last-child { border-right: none; }' +
           'tr.grand-total td { background: #ffe8cc; font-weight: 700; text-align: center; border-top: 2px solid #3d3d3d; border-bottom: 2px solid #3d3d3d; }' +
           'tr.grand-total .label { color: #7a3e00; }' +
           'tr.section-header td { background: #ffffff; color: #1a2a44; font-weight: 700; border-top: 2px solid #3d3d3d; text-align: center; font-size: 0.92rem; }' +
           'tr.subtotal td { font-weight: 600; text-align: center; }' +
           'tr.subtotal.even td { background: #ffffff; }' +
           'tr.subtotal.odd td { background: #eef2f7; }' +
-          '@media print { body { margin: 12mm; } @page { margin: 12mm; } table { page-break-inside: auto; } tr { page-break-inside: avoid; } }' +
+          '@media print { body { margin: 12mm; } @page { margin: 12mm; } table { page-break-inside: auto; } tr { page-break-inside: avoid; } .process-print-summary { page-break-inside: avoid; } }' +
           '</style></head><body>' +
           '<h1>' + escapeHtml(meta.title) + '</h1>' +
           '<p class="meta">' +
@@ -4967,7 +4971,7 @@
           '<span>일자: ' + escapeHtml(meta.dateLabel) + '</span>' +
           '<span>인쇄: ' + escapeHtml(new Date().toLocaleString('ko-KR')) + '</span>' +
           '</p>' +
-          '<table>' +
+          '<table class="process-print-data">' +
           '<colgroup>' +
           '<col class="col-cat">' +
           '<col class="col-content">' +
@@ -4979,7 +4983,16 @@
           '<th class="cat">작업 구분</th><th class="content">작업 내용</th><th class="num">목표 시간</th><th class="num">실제 작업 시간</th><th class="num">동일 작업 연계 시간</th>' +
           '</tr></thead>' +
           '<tbody>' + bodyRows + '</tbody>' +
-          '<tfoot>' +
+          '</table>' +
+          '<table class="process-print-summary">' +
+          '<colgroup>' +
+          '<col class="col-cat">' +
+          '<col class="col-content">' +
+          '<col class="col-target">' +
+          '<col class="col-actual">' +
+          '<col class="col-linked">' +
+          '</colgroup>' +
+          '<tbody>' +
           '<tr class="grand-total">' +
           '<td colspan="2" class="cat label">전체 시간</td>' +
           '<td class="num">' + escapeHtml(formatProcessMinutes(totals.targetSum)) + '</td>' +
@@ -4987,7 +5000,7 @@
           '<td class="num">—</td>' +
           '</tr>' +
           categoryRows +
-          '</tfoot>' +
+          '</tbody>' +
           '</table></body></html>';
       }
 
