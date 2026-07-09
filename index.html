@@ -380,6 +380,7 @@
       border-collapse: collapse;
       font-size: 0.86rem;
       min-width: 640px;
+      table-layout: fixed;
     }
     .process-table th,
     .process-table td {
@@ -460,14 +461,21 @@
     tr.process-row-drag-over-after td {
       box-shadow: inset 0 -2px 0 var(--accent-hover);
     }
-    .process-table tbody tr[data-process-id] td {
-      cursor: grab;
-    }
     .process-table tbody tr[data-process-id] select,
     .process-table tbody tr[data-process-id] input,
+    .process-table tbody tr[data-process-id] textarea,
     .process-table tbody tr[data-process-id] button {
       cursor: auto;
     }
+    .process-table .col-content {
+      vertical-align: top;
+      min-width: 0;
+    }
+    .process-table col.col-category { width: 11%; }
+    .process-table col.col-time { width: 96px; }
+    .process-table col.col-total { width: 88px; }
+    .process-table col.col-move { width: 58px; }
+    .process-table col.col-delete { width: 44px; }
     tr.process-row-dragging td {
       cursor: grabbing;
     }
@@ -505,7 +513,8 @@
     }
     .process-table select,
     .process-table input[type="text"],
-    .process-table input[type="number"] {
+    .process-table input[type="number"],
+    .process-table textarea {
       width: 100%;
       padding: 8px 10px;
       border: 1px solid var(--border);
@@ -515,10 +524,25 @@
       font-size: 0.85rem;
       font-family: inherit;
     }
+    .process-table textarea.process-content {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      min-height: 36px;
+      line-height: 1.45;
+      resize: none;
+      overflow: hidden;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
     .process-table input[type="number"] {
       text-align: right;
     }
-    .process-table input::placeholder {
+    .process-table input::placeholder,
+    .process-table textarea::placeholder {
       color: var(--muted);
       opacity: 0.7;
     }
@@ -2254,7 +2278,8 @@
     html[data-theme="sketch"] select,
     html[data-theme="sketch"] textarea,
     html[data-theme="sketch"] .process-table select,
-    html[data-theme="sketch"] .process-table input {
+    html[data-theme="sketch"] .process-table input,
+    html[data-theme="sketch"] .process-table textarea {
       border: 1.5px solid #111111;
       color: #111111;
       box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
@@ -2583,10 +2608,19 @@
         <p class="hint" style="margin-top:0;">목표·실제 시간은 분 단위입니다. 전체 시간은 <strong>연속된 같은 작업 구분</strong>의 목표 시간 합입니다. <strong>저장</strong>하면 이름·일자로 보관되며, 왼쪽 일지 날짜와는 별도입니다.</p>
         <div class="process-table-wrap">
           <table class="process-table" id="processTable">
+            <colgroup>
+              <col class="col-category">
+              <col class="col-content">
+              <col class="col-time">
+              <col class="col-time">
+              <col class="col-total">
+              <col class="col-move">
+              <col class="col-delete">
+            </colgroup>
             <thead>
               <tr>
                 <th class="col-category">작업 구분</th>
-                <th>작업 내용</th>
+                <th class="col-content">작업 내용</th>
                 <th class="col-time">목표 시간</th>
                 <th class="col-time">실제 작업 시간</th>
                 <th class="col-total">동일 작업 연계 시간</th>
@@ -5654,30 +5688,20 @@
         applyProcessRowReorder(idx, newIdx);
       }
 
-      function canStartProcessRowDrag(target, tr) {
-        if (!target || !tr) return false;
-        if (target.closest('.process-row-drag-handle')) return true;
-        if (target.closest('select, input, button, textarea, a, label')) return false;
-        return tr.contains(target);
-      }
-
       function bindProcessRowDragEvents(tr) {
-        tr.draggable = true;
-
-        tr.addEventListener('dragstart', function (e) {
-          if (!canStartProcessRowDrag(e.target, tr)) {
-            e.preventDefault();
-            return;
-          }
-          processRowDragId = tr.getAttribute('data-process-id');
-          e.dataTransfer.effectAllowed = 'move';
-          e.dataTransfer.setData('text/plain', processRowDragId);
-          tr.classList.add('process-row-dragging');
-        });
-
-        tr.addEventListener('dragend', function () {
-          clearProcessRowDragState();
-        });
+        var dragHandle = tr.querySelector('.process-row-drag-handle');
+        if (dragHandle) {
+          dragHandle.draggable = true;
+          dragHandle.addEventListener('dragstart', function (e) {
+            processRowDragId = tr.getAttribute('data-process-id');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', processRowDragId);
+            tr.classList.add('process-row-dragging');
+          });
+          dragHandle.addEventListener('dragend', function () {
+            clearProcessRowDragState();
+          });
+        }
 
         tr.addEventListener('dragover', function (e) {
           if (!processRowDragId || processRowDragId === tr.getAttribute('data-process-id')) return;
@@ -5731,10 +5755,15 @@
       }
 
       function bindProcessRowEvents(tr) {
-        var inputs = tr.querySelectorAll('select, input');
+        var inputs = tr.querySelectorAll('select, input, textarea');
         inputs.forEach(function (inp) {
           inp.addEventListener('change', onProcessRowChange);
-          inp.addEventListener('input', onProcessRowChange);
+          inp.addEventListener('input', function () {
+            if (inp.classList.contains('process-content')) {
+              autoResizeProcessContent(inp);
+            }
+            onProcessRowChange();
+          });
         });
         var upBtn = tr.querySelector('.process-row-move-up');
         if (upBtn) {
@@ -5767,6 +5796,12 @@
         }
       }
 
+      function autoResizeProcessContent(textarea) {
+        if (!textarea) return;
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+      }
+
       function buildProcessRowElement(row, rowIndex, rowCount) {
         row = normalizeProcessRow(row);
         rowIndex = typeof rowIndex === 'number' ? rowIndex : 0;
@@ -5782,12 +5817,14 @@
         tdCat.appendChild(sel);
 
         var tdContent = document.createElement('td');
-        var inpContent = document.createElement('input');
-        inpContent.type = 'text';
+        tdContent.className = 'col-content';
+        var inpContent = document.createElement('textarea');
         inpContent.className = 'process-content';
         inpContent.placeholder = '작업 내용 입력';
+        inpContent.rows = 1;
         inpContent.value = row.content;
         tdContent.appendChild(inpContent);
+        autoResizeProcessContent(inpContent);
 
         var tdTarget = document.createElement('td');
         tdTarget.className = 'col-time';
@@ -5907,7 +5944,12 @@
           return;
         }
         persistProcessRows();
-        var row = normalizeProcessRow({ id: 'pr' + (++processRowIdCounter) });
+        var newRowData = { id: 'pr' + (++processRowIdCounter) };
+        if (processRows.length > 0) {
+          var prevCategory = processRows[processRows.length - 1].category;
+          if (prevCategory) newRowData.category = prevCategory;
+        }
+        var row = normalizeProcessRow(newRowData);
         processRows.push(row);
         if (el.processTableBody) {
           el.processTableBody.appendChild(buildProcessRowElement(row, processRows.length - 1, processRows.length));
