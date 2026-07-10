@@ -652,6 +652,124 @@
       font-size: 0.86rem;
       min-width: 120px;
     }
+    .score-work-name-field {
+      flex: 1 1 220px;
+      min-width: 180px;
+      max-width: 360px;
+    }
+    .score-work-name-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .score-work-name-row input {
+      flex: 1;
+      min-width: 0;
+    }
+    .score-drawing-link-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .score-drawing-link-btn {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--input-bg);
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+    .score-drawing-link-btn:hover {
+      color: var(--accent);
+      border-color: var(--border-strong);
+      background: var(--accent-soft);
+    }
+    .score-drawing-link-btn:focus-visible {
+      outline: none;
+      border-color: var(--border-strong);
+      box-shadow: 0 0 0 2px var(--accent-soft);
+    }
+    .score-drawing-link-btn svg {
+      width: 16px;
+      height: 16px;
+      display: block;
+    }
+    .score-drawing-view-btn {
+      flex-shrink: 0;
+      height: 34px;
+      padding: 0 10px;
+      border: 1px solid rgba(255, 214, 102, 0.55);
+      border-radius: var(--radius-sm);
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+    .score-drawing-view-btn:hover {
+      border-color: var(--border-strong);
+      background: rgba(255, 214, 102, 0.28);
+    }
+    .score-drawing-view-btn:focus-visible {
+      outline: none;
+      border-color: var(--border-strong);
+      box-shadow: 0 0 0 2px var(--accent-soft);
+    }
+    .score-drawing-link-clear {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--input-bg);
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+    .score-drawing-link-clear:hover {
+      color: var(--danger);
+      border-color: rgba(255, 92, 122, 0.45);
+      background: rgba(255, 92, 122, 0.12);
+    }
+    .score-drawing-link-clear:focus-visible {
+      outline: none;
+      border-color: var(--border-strong);
+      box-shadow: 0 0 0 2px var(--accent-soft);
+    }
+    .score-drawing-link-panel input[type="url"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--input-bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+    }
+    .score-drawing-link-panel input[type="url"]:focus {
+      outline: none;
+      border-color: var(--border-strong);
+      box-shadow: 0 0 0 2px var(--accent-soft);
+    }
     .feedback-card-actions {
       margin-left: auto;
       display: flex;
@@ -1066,6 +1184,99 @@
       border-color: var(--border-strong);
       box-shadow: 0 0 0 2px var(--accent-soft);
     }
+    .score-max-cell-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .score-max-cell-inner .score-input {
+      flex: 1;
+      min-width: 0;
+      width: auto;
+    }
+    .score-max-cell-inner .score-paste-btn {
+      width: 24px;
+      height: 24px;
+    }
+    .score-max-cell-inner .score-paste-btn svg {
+      width: 12px;
+      height: 12px;
+    }
+    .score-cell-inner {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 72px;
+    }
+    .score-cell-inner .score-input {
+      flex: 1;
+      min-width: 0;
+      width: auto;
+    }
+    .score-paste-btn {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--input-bg);
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+    .score-paste-btn:hover {
+      color: var(--accent);
+      border-color: var(--border-strong);
+      background: var(--accent-soft);
+    }
+    .score-paste-btn:focus-visible {
+      outline: none;
+      border-color: var(--border-strong);
+      box-shadow: 0 0 0 2px var(--accent-soft);
+    }
+    .score-paste-btn svg {
+      width: 14px;
+      height: 14px;
+      display: block;
+      pointer-events: none;
+    }
+    .score-dim-paste-panel textarea {
+      width: 100%;
+      min-height: 200px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 0.82rem;
+      font-family: ui-monospace, 'Cascadia Code', 'Consolas', monospace;
+      line-height: 1.45;
+      resize: vertical;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+    .score-dim-paste-panel textarea:focus {
+      outline: none;
+      border-color: var(--border-strong);
+      box-shadow: 0 0 0 2px var(--accent-soft);
+    }
+    .score-dim-paste-preview {
+      margin: 0 0 14px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      min-height: 1.2em;
+    }
+    .score-dim-paste-preview.is-ok {
+      color: var(--success);
+    }
+    .score-dim-paste-preview.is-error {
+      color: var(--danger);
+    }
     .scoring-table .score-total-cell {
       font-weight: 700;
       color: var(--accent-hover);
@@ -1095,6 +1306,263 @@
       position: relative;
       height: 280px;
     }
+    .score-dim-detail-wrap {
+      margin-top: 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card-solid, var(--card));
+      padding: 14px 12px 12px;
+    }
+    .score-dim-detail-hint {
+      margin: 0 0 12px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .score-dim-detail-empty {
+      margin: 0;
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+    #scoreDimDetailPanel {
+      display: block;
+      overflow: visible;
+    }
+    #scoreDimDetailPanel:has(.score-dim-detail-empty) {
+      display: block;
+    }
+    #scoreDimDetailPanel:has(.score-dim-detail-round-block) {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 12px;
+      overflow-x: auto;
+      align-items: flex-start;
+      padding-bottom: 2px;
+    }
+    #scoreDimDetailPanel .score-dim-detail-master-table,
+    #scoreDimDetailPanel .score-dim-detail-table {
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 0.72rem;
+    }
+    #scoreDimDetailPanel .score-dim-detail-master-table th,
+    #scoreDimDetailPanel .score-dim-detail-master-table td,
+    #scoreDimDetailPanel .score-dim-detail-table th,
+    #scoreDimDetailPanel .score-dim-detail-table td {
+      padding: 4px 3px;
+      text-align: center;
+      vertical-align: middle;
+      line-height: 1.25;
+      word-break: break-all;
+      box-sizing: border-box;
+    }
+    #scoreDimDetailPanel thead tr:first-child th {
+      height: 36px;
+      min-height: 36px;
+      max-height: 36px;
+      overflow: hidden;
+    }
+    #scoreDimDetailPanel thead tr:nth-child(2) th {
+      height: 30px;
+      min-height: 30px;
+      max-height: 30px;
+      overflow: hidden;
+    }
+    #scoreDimDetailPanel tbody tr {
+      height: 28px;
+    }
+    #scoreDimDetailPanel tbody td {
+      height: 28px;
+      min-height: 28px;
+      max-height: 28px;
+      overflow: hidden;
+    }
+    .score-dim-detail-round-block {
+      flex: 0 0 auto;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--input-bg, rgba(255, 255, 255, 0.03));
+    }
+    .score-dim-detail-round-block:not(.score-dim-detail-eval-block) {
+      flex: 0 0 150px;
+      width: 150px;
+      max-width: 150px;
+    }
+    .score-dim-detail-round-block:not(.score-dim-detail-eval-block) .score-dim-detail-table {
+      width: 100%;
+      min-width: 0;
+    }
+    .score-dim-detail-eval-block {
+      align-self: flex-start;
+      flex: 0 0 auto;
+    }
+    .score-dim-detail-eval-block .score-dim-detail-master-table {
+      width: 200px;
+      min-width: 0;
+    }
+    .score-dim-detail-eval-block .score-dim-detail-master-table col.col-eval-no { width: 50px; }
+    .score-dim-detail-eval-block .score-dim-detail-master-table col.col-eval-type { width: 50px; }
+    .score-dim-detail-eval-block .score-dim-detail-master-table col.col-eval-score { width: 50px; }
+    .score-dim-detail-eval-block .score-dim-detail-master-table col.col-eval-target { width: 50px; }
+    .score-dim-detail-master-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--input-bg, rgba(255, 255, 255, 0.03));
+    }
+    .score-dim-detail-master-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.72rem;
+      table-layout: fixed;
+      min-width: 420px;
+    }
+    .score-dim-detail-master-table th,
+    .score-dim-detail-master-table td {
+      border: 1px solid var(--border);
+      padding: 4px 3px;
+      text-align: center;
+      vertical-align: middle;
+      line-height: 1.25;
+      word-break: break-all;
+    }
+    .score-dim-detail-master-table .score-dim-eval-group {
+      background: rgba(255, 214, 102, 0.35);
+      font-weight: 700;
+      font-size: 0.7rem;
+    }
+    .score-dim-detail-master-table .score-dim-round-group {
+      background: var(--accent-soft);
+      font-weight: 700;
+      font-size: 0.7rem;
+    }
+    .score-dim-detail-master-table .score-dim-round-group-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .score-dim-detail-master-table .score-dim-round-group-sum {
+      font-size: 0.68rem;
+      font-weight: 500;
+      color: var(--muted);
+    }
+    .score-dim-detail-master-table .score-dim-col-head {
+      background: rgba(255, 214, 102, 0.28);
+      font-weight: 700;
+      font-size: 0.68rem;
+    }
+    .score-dim-detail-master-table .score-dim-col-head.is-round {
+      background: var(--input-bg);
+      font-size: 0.68rem;
+    }
+    .score-dim-detail-master-table .score-dim-eval-cell {
+      background: rgba(255, 250, 235, 0.55);
+    }
+    html[data-theme="ember"] .score-dim-detail-master-table .score-dim-eval-cell,
+    html:not([data-theme]) .score-dim-detail-master-table .score-dim-eval-cell {
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .score-dim-detail-master-table tr.band-plain td:not(.score-dim-eval-cell):not(.is-low) {
+      background: var(--input-bg, rgba(255, 255, 255, 0.03));
+    }
+    .score-dim-detail-master-table tr.band-shade td:not(.score-dim-eval-cell):not(.is-low) {
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .score-dim-detail-master-table td.is-low {
+      background: rgba(248, 113, 113, 0.22);
+    }
+    .score-dim-detail-master-table col.col-eval-no { width: 34px; }
+    .score-dim-detail-master-table col.col-eval-type { width: 34px; }
+    .score-dim-detail-master-table col.col-eval-score { width: 34px; }
+    .score-dim-detail-master-table col.col-eval-target { width: 44px; }
+    .score-dim-detail-master-table col.col-measure { width: 52px; }
+    .score-dim-detail-master-table col.col-error { width: 40px; }
+    .score-dim-detail-master-table col.col-score { width: 40px; }
+    .score-dim-detail-clear {
+      flex: 0 0 22px;
+      width: 22px;
+      height: 22px;
+      min-height: 22px;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      background: var(--card-solid, var(--card));
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1;
+      cursor: pointer;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+    .score-dim-detail-clear:hover {
+      color: var(--danger);
+      border-color: rgba(255, 92, 122, 0.45);
+      background: rgba(255, 92, 122, 0.12);
+    }
+    .score-dim-detail-table-wrap {
+      overflow: visible;
+    }
+    .score-dim-detail-table {
+      width: 150px;
+      min-width: 150px;
+      border-collapse: collapse;
+      font-size: 0.72rem;
+      table-layout: fixed;
+    }
+    .score-dim-detail-table th,
+    .score-dim-detail-table td {
+      border: 1px solid var(--border);
+      padding: 4px 3px;
+      text-align: center;
+      vertical-align: middle;
+      line-height: 1.25;
+      word-break: break-all;
+    }
+    .score-dim-detail-table th {
+      background: rgba(255, 214, 102, 0.35);
+      font-weight: 700;
+      font-size: 0.7rem;
+      color: var(--text);
+    }
+    .score-dim-detail-table .score-dim-round-group {
+      background: var(--accent-soft);
+      font-weight: 700;
+      font-size: 0.7rem;
+    }
+    .score-dim-detail-table .score-dim-round-group-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
+    .score-dim-detail-table .score-dim-round-group-sum {
+      font-size: 0.68rem;
+      font-weight: 500;
+      color: var(--muted);
+    }
+    .score-dim-detail-table .score-dim-col-head.is-round {
+      background: var(--input-bg);
+      font-size: 0.68rem;
+    }
+    .score-dim-detail-table tr.band-plain td {
+      background: var(--input-bg, rgba(255, 255, 255, 0.03));
+    }
+    .score-dim-detail-table tr.band-shade td {
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .score-dim-detail-table tr.is-low td {
+      background: rgba(248, 113, 113, 0.22);
+    }
+    .score-dim-detail-table col.col-measure { width: 50px; }
+    .score-dim-detail-table col.col-error { width: 50px; }
+    .score-dim-detail-table col.col-score { width: 50px; }
     .sidebar-title {
       font-size: 0.82rem;
       font-weight: 700;
@@ -2686,9 +3154,18 @@
 
       <div class="card" id="scoringCard">
         <div class="scoring-card-header">
-          <label class="feedback-meta-field">
+          <label class="feedback-meta-field score-work-name-field">
             <span>작품명</span>
-            <input type="text" id="scoreWorkNameInput" placeholder="작품 이름" maxlength="80">
+            <div class="score-work-name-row">
+              <input type="text" id="scoreWorkNameInput" placeholder="작품 이름" maxlength="80">
+              <div class="score-drawing-link-actions" id="scoreDrawingLinkActions">
+                <button type="button" class="score-drawing-link-btn" id="scoreDrawingLinkBtn" title="도면 링크 입력" aria-label="도면 링크 입력">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                </button>
+                <button type="button" class="score-drawing-view-btn" id="scoreDrawingViewBtn" hidden title="도면 보기">도면 보기</button>
+                <button type="button" class="score-drawing-link-clear" id="scoreDrawingLinkClearIconBtn" hidden title="도면 링크 삭제" aria-label="도면 링크 삭제">×</button>
+              </div>
+            </div>
           </label>
           <div class="scoring-card-actions">
             <button type="button" class="btn btn-outline" id="newScoreDraftBtn">새로 만들기</button>
@@ -2714,6 +3191,11 @@
           <div class="score-chart-canvas-wrap">
             <canvas id="scoreChart" aria-label="회차별 점수 그래프"></canvas>
           </div>
+        </div>
+        <div class="score-dim-detail-wrap" id="scoreDimDetailWrap">
+          <p class="score-chart-title">치수정밀도 상세 기록</p>
+          <p class="score-dim-detail-hint">표 상단 <strong>치수정밀도 만점</strong> 오른쪽 버튼으로 <strong>No · Type · 점수 · 측정항목</strong> 평가 항목을 붙여넣고, 각 회차 <strong>치수정밀도</strong> 칸 오른쪽 버튼으로 <strong>측정치수 · 오차 · 점수</strong>를 붙여넣으세요.</p>
+          <div id="scoreDimDetailPanel"></div>
         </div>
       </div>
     </div>
@@ -2775,6 +3257,49 @@
       <div class="diary-print-modal-actions">
         <button type="button" class="btn btn-outline" id="diaryPrintCancelBtn">취소</button>
         <button type="button" class="btn btn-primary" id="diaryPrintConfirmBtn">인쇄</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="scoreDimPasteModal" class="diary-print-modal score-dim-paste-modal" aria-hidden="true" role="dialog" aria-labelledby="scoreDimPasteTitle">
+    <div class="diary-print-backdrop" id="scoreDimPasteBackdrop"></div>
+    <div class="diary-print-panel score-dim-paste-panel">
+      <h2 id="scoreDimPasteTitle">치수정밀도 점수 붙여넣기</h2>
+      <p class="hint" id="scoreDimPasteHint">스프레드시트에서 <strong>측정치수 · 오차 · 점수</strong> 열을 복사한 뒤 아래 칸에 붙여넣으세요.</p>
+      <textarea id="scoreDimPasteTextarea" rows="12" spellcheck="false" aria-label="측정치수·오차·점수 붙여넣기" placeholder="측정치수	오차	점수&#10;6.86	0.14	0.80&#10;44.93	0.07	1.00"></textarea>
+      <p class="score-dim-paste-preview" id="scoreDimPastePreview" aria-live="polite"></p>
+      <div class="diary-print-modal-actions">
+        <button type="button" class="btn btn-outline" id="scoreDimPasteCancelBtn">취소</button>
+        <button type="button" class="btn btn-primary" id="scoreDimPasteConfirmBtn">적용</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="scoreDimEvalPasteModal" class="diary-print-modal score-dim-paste-modal" aria-hidden="true" role="dialog" aria-labelledby="scoreDimEvalPasteTitle">
+    <div class="diary-print-backdrop" id="scoreDimEvalPasteBackdrop"></div>
+    <div class="diary-print-panel score-dim-paste-panel">
+      <h2 id="scoreDimEvalPasteTitle">치수정밀도 평가 항목 붙여넣기</h2>
+      <p class="hint" id="scoreDimEvalPasteHint">스프레드시트에서 <strong>No · Type · 점수 · 측정항목</strong> 열을 복사한 뒤 아래 칸에 붙여넣으세요.</p>
+      <textarea id="scoreDimEvalPasteTextarea" rows="12" spellcheck="false" aria-label="평가 항목 붙여넣기" placeholder="No	Type	점수	측정항목&#10;10	D	1	7&#10;11	D	1	45"></textarea>
+      <p class="score-dim-paste-preview" id="scoreDimEvalPastePreview" aria-live="polite"></p>
+      <div class="diary-print-modal-actions">
+        <button type="button" class="btn btn-outline" id="scoreDimEvalPasteCancelBtn">취소</button>
+        <button type="button" class="btn btn-primary" id="scoreDimEvalPasteConfirmBtn">적용</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="scoreDrawingLinkModal" class="diary-print-modal" aria-hidden="true" role="dialog" aria-labelledby="scoreDrawingLinkTitle">
+    <div class="diary-print-backdrop" id="scoreDrawingLinkBackdrop"></div>
+    <div class="diary-print-panel score-drawing-link-panel">
+      <h2 id="scoreDrawingLinkTitle">도면 링크</h2>
+      <p class="hint">Google Drive, Notion 등 도면이 있는 주소를 입력하세요.</p>
+      <input type="url" id="scoreDrawingLinkInput" placeholder="https://..." spellcheck="false" aria-label="도면 링크 주소">
+      <div class="diary-print-modal-actions">
+        <button type="button" class="btn btn-outline" id="scoreDrawingLinkClearBtn">지우기</button>
+        <button type="button" class="btn btn-outline" id="scoreDrawingLinkOpenBtn">열기</button>
+        <button type="button" class="btn btn-outline" id="scoreDrawingLinkCancelBtn">취소</button>
+        <button type="button" class="btn btn-primary" id="scoreDrawingLinkConfirmBtn">저장</button>
       </div>
     </div>
   </div>
@@ -3446,12 +3971,26 @@
     return getFeedbackSheets(userName);
   }
 
+  function normalizeScoreDimDetailRow(row) {
+    row = row || {};
+    return {
+      measure: String(row.measure != null ? row.measure : '').trim(),
+      error: String(row.error != null ? row.error : '').trim(),
+      score: String(row.score != null ? row.score : '').trim()
+    };
+  }
+
   function normalizeScoreRoundPayload(round) {
     round = round || {};
     return {
       id: String(round.id || ''),
       label: String(round.label || ''),
-      scores: round.scores && typeof round.scores === 'object' ? round.scores : {}
+      scores: round.scores && typeof round.scores === 'object' ? round.scores : {},
+      dimDetail: Array.isArray(round.dimDetail)
+        ? round.dimDetail.map(normalizeScoreDimDetailRow).filter(function (r) {
+          return r.measure || r.error || r.score;
+        })
+        : []
     };
   }
 
@@ -3492,11 +4031,25 @@
     var savedDate = sheet.savedDate || formatDate(new Date());
     if (!/^\d{4}-\d{2}-\d{2}$/.test(savedDate)) savedDate = formatDate(new Date());
 
+    var columnSettings = Object.assign({}, sheet.columnSettings || {});
+    var dimEvalItems = sheet.dimEvalItems || columnSettings.__dimEvalItems;
+    var drawingLink = sheet.drawingLink || columnSettings.__drawingLink;
+    if (Array.isArray(dimEvalItems) && dimEvalItems.length) {
+      columnSettings.__dimEvalItems = dimEvalItems;
+    } else {
+      delete columnSettings.__dimEvalItems;
+    }
+    if (drawingLink) {
+      columnSettings.__drawingLink = drawingLink;
+    } else {
+      delete columnSettings.__drawingLink;
+    }
+
     var payload = {
       user_id: user.id,
       work_name: String(sheet.workName || '채점결과').trim() || '채점결과',
       saved_date: savedDate,
-      column_settings: sheet.columnSettings || {},
+      column_settings: columnSettings,
       rounds: (sheet.rounds || []).map(normalizeScoreRoundPayload),
       updated_at: new Date().toISOString()
     };
@@ -3648,10 +4201,13 @@
       var processSheetsState = { editingId: '', draftRows: [], sheets: [], editSnapshot: null };
       var feedbackSheetsState = { editingId: '', sheets: [] };
       var scoreSheetsState = { editingId: '', sheets: [] };
-      var scoreSheetState = { id: '', workName: '채점결과', savedDate: '', columnSettings: {}, rounds: [] };
+      var scoreSheetState = { id: '', workName: '채점결과', savedDate: '', drawingLink: '', columnSettings: {}, dimEvalItems: [], rounds: [] };
       var scoreRoundIdCounter = 0;
       var scoreChart = null;
       var scoreChartRenderToken = 0;
+      var scoreDimPasteState = { roundId: '', tr: null };
+      var DIM_EVAL_SETTINGS_KEY = '__dimEvalItems';
+      var DRAWING_LINK_SETTINGS_KEY = '__drawingLink';
       var DEFAULT_SCORE_COLUMNS = [
         { id: 't1_3d', group: '1과제', label: '3D 채점', maxScore: 3 },
         { id: 't1_2d', group: '1과제', label: '2D 채점', maxScore: 7 },
@@ -3663,6 +4219,7 @@
         { id: 't2_safe', group: '2과제', label: '안전', maxScore: 3 }
       ];
       var DEFAULT_SCORE_ROUND_COUNT = 3;
+      var SCORE_DIM_COL_ID = 't2_dim';
       var processSavedListOpen = false;
       var feedbackSavedListOpen = false;
       var scoreSavedListOpen = false;
@@ -3808,13 +4365,39 @@
         feedbackEditorCancel: document.getElementById('feedbackEditorCancel'),
         feedbackEditorApply: document.getElementById('feedbackEditorApply'),
         scoreWorkNameInput: document.getElementById('scoreWorkNameInput'),
+        scoreDrawingLinkBtn: document.getElementById('scoreDrawingLinkBtn'),
+        scoreDrawingViewBtn: document.getElementById('scoreDrawingViewBtn'),
+        scoreDrawingLinkClearIconBtn: document.getElementById('scoreDrawingLinkClearIconBtn'),
+        scoreDrawingLinkModal: document.getElementById('scoreDrawingLinkModal'),
+        scoreDrawingLinkBackdrop: document.getElementById('scoreDrawingLinkBackdrop'),
+        scoreDrawingLinkInput: document.getElementById('scoreDrawingLinkInput'),
+        scoreDrawingLinkClearBtn: document.getElementById('scoreDrawingLinkClearBtn'),
+        scoreDrawingLinkOpenBtn: document.getElementById('scoreDrawingLinkOpenBtn'),
+        scoreDrawingLinkCancelBtn: document.getElementById('scoreDrawingLinkCancelBtn'),
+        scoreDrawingLinkConfirmBtn: document.getElementById('scoreDrawingLinkConfirmBtn'),
         saveScoreSheetBtn: document.getElementById('saveScoreSheetBtn'),
         newScoreDraftBtn: document.getElementById('newScoreDraftBtn'),
         scoreColumnGrid: document.getElementById('scoreColumnGrid'),
         scoringTableHead: document.getElementById('scoringTableHead'),
         scoringTableBody: document.getElementById('scoringTableBody'),
         addScoreRoundBtn: document.getElementById('addScoreRoundBtn'),
-        scoreChartCanvas: document.getElementById('scoreChart')
+        scoreChartCanvas: document.getElementById('scoreChart'),
+        scoreDimDetailWrap: document.getElementById('scoreDimDetailWrap'),
+        scoreDimDetailPanel: document.getElementById('scoreDimDetailPanel'),
+        scoreDimPasteModal: document.getElementById('scoreDimPasteModal'),
+        scoreDimPasteBackdrop: document.getElementById('scoreDimPasteBackdrop'),
+        scoreDimPasteHint: document.getElementById('scoreDimPasteHint'),
+        scoreDimPasteTextarea: document.getElementById('scoreDimPasteTextarea'),
+        scoreDimPastePreview: document.getElementById('scoreDimPastePreview'),
+        scoreDimPasteCancelBtn: document.getElementById('scoreDimPasteCancelBtn'),
+        scoreDimPasteConfirmBtn: document.getElementById('scoreDimPasteConfirmBtn'),
+        scoreDimEvalPasteModal: document.getElementById('scoreDimEvalPasteModal'),
+        scoreDimEvalPasteBackdrop: document.getElementById('scoreDimEvalPasteBackdrop'),
+        scoreDimEvalPasteHint: document.getElementById('scoreDimEvalPasteHint'),
+        scoreDimEvalPasteTextarea: document.getElementById('scoreDimEvalPasteTextarea'),
+        scoreDimEvalPastePreview: document.getElementById('scoreDimEvalPastePreview'),
+        scoreDimEvalPasteCancelBtn: document.getElementById('scoreDimEvalPasteCancelBtn'),
+        scoreDimEvalPasteConfirmBtn: document.getElementById('scoreDimEvalPasteConfirmBtn')
       };
 
       function setBusy(active, message) {
@@ -5164,8 +5747,78 @@
           user: currentUser || '',
           savedDate: data.savedDate || todayStr(),
           columns: getEnabledScoreColumns(),
-          rounds: data.rounds || []
+          rounds: data.rounds || [],
+          dimEvalItems: data.dimEvalItems || [],
+          dimEnabled: isScoreDimColumnEnabled()
         };
+      }
+
+      function buildScoreDimDetailPrintSection(meta) {
+        meta = meta || {};
+        if (!meta.dimEnabled) return '';
+        var evalItems = meta.dimEvalItems || [];
+        var rounds = meta.rounds || [];
+        var roundsWithData = (rounds || []).filter(function (round) {
+          return round.dimDetail && round.dimDetail.length;
+        });
+        var hasEval = evalItems.length > 0;
+        var hasRoundData = roundsWithData.length > 0;
+        if (!hasEval && !hasRoundData) return '';
+
+        var rowCount = getScoreDimDetailRowCount(evalItems, roundsWithData);
+        if (!rowCount && hasEval) rowCount = evalItems.length;
+
+        var rowIdx;
+        var bandClass;
+        var html = '<div class="dim-detail-section">' +
+          '<h2 class="dim-detail-title">치수정밀도 상세 기록</h2>' +
+          '<div class="dim-detail-wrap">';
+
+        if (hasEval) {
+          html += '<div class="dim-detail-block dim-detail-eval"><table>' +
+            '<thead>' +
+            '<tr><th class="dim-group" colspan="4">평가 항목</th></tr>' +
+            '<tr><th>No</th><th>Type</th><th>점수</th><th>측정항목</th></tr>' +
+            '</thead><tbody>';
+          for (rowIdx = 0; rowIdx < rowCount; rowIdx++) {
+            var evalItem = evalItems[rowIdx] || { no: '', type: '', itemScore: '', target: '' };
+            bandClass = rowIdx % 2 === 0 ? 'band-plain' : 'band-shade';
+            html += '<tr class="' + bandClass + '">' +
+              '<td>' + escapeHtml(evalItem.no) + '</td>' +
+              '<td>' + escapeHtml(evalItem.type) + '</td>' +
+              '<td>' + escapeHtml(evalItem.itemScore) + '</td>' +
+              '<td>' + escapeHtml(evalItem.target) + '</td>' +
+              '</tr>';
+          }
+          html += '</tbody></table></div>';
+        }
+
+        rounds.forEach(function (round, index) {
+          if (!round.dimDetail || !round.dimDetail.length) return;
+          var label = round.label || ((index + 1) + '회차');
+          var total = sumDimDetailScores(round.dimDetail);
+          var groupText = label;
+          if (total != null) groupText += ' · 합계 ' + formatScoreDisplay(total);
+          html += '<div class="dim-detail-block dim-detail-round"><table>' +
+            '<thead>' +
+            '<tr><th class="dim-group dim-round-group" colspan="3">' + escapeHtml(groupText) + '</th></tr>' +
+            '<tr><th>측정치수</th><th>오차</th><th>점수</th></tr>' +
+            '</thead><tbody>';
+          for (rowIdx = 0; rowIdx < rowCount; rowIdx++) {
+            var detailRow = round.dimDetail[rowIdx] || { measure: '', error: '', score: '' };
+            var low = isDimDetailRowLowScore(detailRow);
+            bandClass = rowIdx % 2 === 0 ? 'band-plain' : 'band-shade';
+            html += '<tr class="' + bandClass + (low ? ' is-low' : '') + '">' +
+              '<td>' + escapeHtml(detailRow.measure) + '</td>' +
+              '<td>' + escapeHtml(detailRow.error) + '</td>' +
+              '<td>' + escapeHtml(detailRow.score) + '</td>' +
+              '</tr>';
+          }
+          html += '</tbody></table></div>';
+        });
+
+        html += '</div></div>';
+        return html;
       }
 
       function buildScorePrintHtml(meta) {
@@ -5247,6 +5900,17 @@
           '.chart-section { margin-top: 28px; page-break-inside: avoid; }' +
           '.chart-title { font-size: 1rem; font-weight: 700; margin: 0 0 12px; text-align: center; }' +
           '.chart-image { display: block; width: 100%; max-width: 920px; margin: 0 auto; height: auto; }' +
+          '.dim-detail-section { margin-top: 28px; page-break-inside: avoid; }' +
+          '.dim-detail-title { font-size: 1rem; font-weight: 700; margin: 0 0 12px; text-align: center; }' +
+          '.dim-detail-wrap { display: flex; flex-wrap: nowrap; gap: 10px; align-items: flex-start; }' +
+          '.dim-detail-block table { border-collapse: collapse; font-size: 0.68rem; table-layout: fixed; border: 1px solid #666; }' +
+          '.dim-detail-eval table { width: 200px; }' +
+          '.dim-detail-round table { width: 150px; }' +
+          '.dim-detail-block th, .dim-detail-block td { border: 1px solid #666; padding: 4px 3px; text-align: center; vertical-align: middle; word-break: break-all; }' +
+          '.dim-detail-block th.dim-group { background: #fff3cc; font-weight: 700; }' +
+          '.dim-detail-block th.dim-round-group { background: #e8f4ff; }' +
+          '.dim-detail-block tr.band-shade td { background: #f7f7f7; }' +
+          '.dim-detail-block tr.is-low td { background: #fde8e8; }' +
           '@media print { body { margin: 12mm; } @page { margin: 12mm; } tr { page-break-inside: avoid; } }' +
           '</style></head><body>' +
           '<h1>채점결과' + (meta.workName ? ' — ' + escapeHtml(meta.workName) : '') + '</h1>' +
@@ -5256,6 +5920,7 @@
           bodyRows +
           '</tbody></table>' +
           chartSection +
+          buildScoreDimDetailPrintSection(meta) +
           '</body></html>';
       }
 
@@ -5286,8 +5951,6 @@
               },
               scales: {
                 y: {
-                  beginAtZero: true,
-                  suggestedMax: calcMaxTotal(columnsAfter),
                   title: { display: true, text: '점수' }
                 },
                 x: {
@@ -5295,6 +5958,7 @@
                 }
               }
             };
+            applyScoreChartYRange(chartOptions.scales.y, chartData);
 
             function finishCapture() {
               setTimeout(function () {
@@ -5312,7 +5976,7 @@
             if (scoreChart) {
               scoreChart.data.labels = chartData.labels;
               scoreChart.data.datasets = chartData.datasets;
-              scoreChart.options.scales.y.suggestedMax = calcMaxTotal(columnsAfter);
+              applyScoreChartYRange(scoreChart.options.scales.y, chartData);
               scoreChart.options.animation = false;
               scoreChart.update('none');
               finishCapture();
@@ -6907,6 +7571,63 @@
         return next;
       }
 
+      function normalizeDimEvalItem(row) {
+        row = row || {};
+        return {
+          no: String(row.no != null ? row.no : '').trim(),
+          type: String(row.type != null ? row.type : '').trim(),
+          itemScore: String(row.itemScore != null ? row.itemScore : '').trim(),
+          target: String(row.target != null ? row.target : '').trim()
+        };
+      }
+
+      function normalizeDimEvalItems(rows) {
+        if (!Array.isArray(rows)) return [];
+        return rows.map(normalizeDimEvalItem).filter(function (r) {
+          return r.no || r.type || r.itemScore || r.target;
+        });
+      }
+
+      function extractDimEvalItemsFromSettings(settings) {
+        settings = settings || {};
+        return normalizeDimEvalItems(settings[DIM_EVAL_SETTINGS_KEY]);
+      }
+
+      function normalizeDrawingLink(url) {
+        url = String(url || '').trim();
+        if (!url) return '';
+        if (!/^[a-z][a-z0-9+.-]*:/i.test(url)) {
+          url = 'https://' + url;
+        }
+        return url;
+      }
+
+      function isValidDrawingLink(url) {
+        url = normalizeDrawingLink(url);
+        if (!url) return false;
+        try {
+          var parsed = new URL(url);
+          return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+        } catch (e) {
+          return false;
+        }
+      }
+
+      function buildScoreSheetColumnSettingsPayload() {
+        var settings = normalizeScoreColumnSettings(scoreSheetState.columnSettings);
+        if (scoreSheetState.dimEvalItems && scoreSheetState.dimEvalItems.length) {
+          settings[DIM_EVAL_SETTINGS_KEY] = scoreSheetState.dimEvalItems;
+        } else {
+          delete settings[DIM_EVAL_SETTINGS_KEY];
+        }
+        if (scoreSheetState.drawingLink) {
+          settings[DRAWING_LINK_SETTINGS_KEY] = scoreSheetState.drawingLink;
+        } else {
+          delete settings[DRAWING_LINK_SETTINGS_KEY];
+        }
+        return settings;
+      }
+
       function getScoreColumnById(id) {
         var i;
         for (i = 0; i < DEFAULT_SCORE_COLUMNS.length; i++) {
@@ -6952,7 +7673,8 @@
         return {
           id: 'sr_' + Date.now() + '_' + scoreRoundIdCounter,
           label: label || '',
-          scores: {}
+          scores: {},
+          dimDetail: []
         };
       }
 
@@ -6965,6 +7687,22 @@
         return rounds;
       }
 
+      function normalizeScoreDimDetailRow(row) {
+        row = row || {};
+        return {
+          measure: String(row.measure != null ? row.measure : '').trim(),
+          error: String(row.error != null ? row.error : '').trim(),
+          score: String(row.score != null ? row.score : '').trim()
+        };
+      }
+
+      function normalizeScoreDimDetail(rows) {
+        if (!Array.isArray(rows)) return [];
+        return rows.map(normalizeScoreDimDetailRow).filter(function (r) {
+          return r.measure || r.error || r.score;
+        });
+      }
+
       function normalizeScoreRound(round) {
         round = round || {};
         if (!round.id) {
@@ -6974,17 +7712,25 @@
         return {
           id: round.id,
           label: String(round.label || '').trim(),
-          scores: round.scores && typeof round.scores === 'object' ? round.scores : {}
+          scores: round.scores && typeof round.scores === 'object' ? round.scores : {},
+          dimDetail: normalizeScoreDimDetail(round.dimDetail)
         };
       }
 
       function normalizeScoreSheet(sheet) {
         sheet = sheet || {};
+        var rawSettings = sheet.columnSettings || sheet.column_settings || {};
         return {
           id: sheet.id || '',
           workName: String(sheet.workName || sheet.work_name || '채점결과').trim() || '채점결과',
           savedDate: sheet.savedDate || sheet.saved_date || todayStr(),
-          columnSettings: normalizeScoreColumnSettings(sheet.columnSettings || sheet.column_settings),
+          columnSettings: normalizeScoreColumnSettings(rawSettings),
+          drawingLink: normalizeDrawingLink(
+            sheet.drawingLink || sheet.drawing_link || rawSettings[DRAWING_LINK_SETTINGS_KEY]
+          ),
+          dimEvalItems: normalizeDimEvalItems(
+            sheet.dimEvalItems || rawSettings[DIM_EVAL_SETTINGS_KEY]
+          ),
           rounds: (sheet.rounds && sheet.rounds.length)
             ? sheet.rounds.map(normalizeScoreRound)
             : defaultScoreRounds()
@@ -6996,10 +7742,13 @@
         scoreSheetState.id = sheet.id || '';
         scoreSheetState.workName = sheet.workName;
         scoreSheetState.savedDate = sheet.savedDate || todayStr();
+        scoreSheetState.drawingLink = sheet.drawingLink || '';
         scoreSheetState.columnSettings = sheet.columnSettings;
+        scoreSheetState.dimEvalItems = sheet.dimEvalItems || [];
         scoreSheetState.rounds = sheet.rounds;
         scoreSheetsState.editingId = sheet.id || '';
         if (el.scoreWorkNameInput) el.scoreWorkNameInput.value = scoreSheetState.workName;
+        updateScoreDrawingLinkBtn();
       }
 
       function getScoreSheetById(id) {
@@ -7036,7 +7785,9 @@
         if (!sheet) return;
         sheet.workName = data.workName;
         sheet.savedDate = data.savedDate || sheet.savedDate;
+        sheet.drawingLink = data.drawingLink || '';
         sheet.columnSettings = data.columnSettings;
+        sheet.dimEvalItems = normalizeDimEvalItems(data.dimEvalItems);
         sheet.rounds = data.rounds;
       }
 
@@ -7253,6 +8004,683 @@
         return String(num);
       }
 
+      function getScoreRoundById(id) {
+        id = String(id || '');
+        var i;
+        for (i = 0; i < scoreSheetState.rounds.length; i++) {
+          if (scoreSheetState.rounds[i].id === id) return scoreSheetState.rounds[i];
+        }
+        return null;
+      }
+
+      function isScoreDimColumnEnabled() {
+        return getEnabledScoreColumns().some(function (col) {
+          return col.id === SCORE_DIM_COL_ID;
+        });
+      }
+
+      function splitDimPasteLine(line) {
+        if (line.indexOf('\t') !== -1) return line.split('\t');
+        if (line.indexOf(';') !== -1) return line.split(';');
+        return line.split(',');
+      }
+
+      function isDimDetailScoreCell(val) {
+        var num = parseScoreValue(val);
+        if (num == null) return false;
+        if (num === 0 || num === 1 || num === 2) return true;
+        if (num === 0.5 || num === 1.5 || num === 0.8) return true;
+        return false;
+      }
+
+      function mapDimDetailPasteCells(cells) {
+        cells = (cells || []).map(function (cell) {
+          return String(cell || '').trim();
+        });
+        while (cells.length && !cells[cells.length - 1]) {
+          cells.pop();
+        }
+        if (!cells.length) {
+          return { measure: '', error: '', score: '' };
+        }
+        if (cells.length === 2 && isDimDetailScoreCell(cells[1])) {
+          return {
+            measure: '',
+            error: cells[0],
+            score: cells[1]
+          };
+        }
+        while (cells.length < 3) cells.push('');
+        if (!cells[0] && (cells[1] || cells[2])) {
+          return {
+            measure: '',
+            error: cells[1],
+            score: cells[2]
+          };
+        }
+        if (cells.length > 3) cells = cells.slice(0, 3);
+        return {
+          measure: cells[0],
+          error: cells[1],
+          score: cells[2]
+        };
+      }
+
+      function isDimDetailHeaderCells(cells) {
+        var joined = cells.join(' ');
+        return /측정|오차|점수/i.test(joined);
+      }
+
+      function looksLikeDimDetailPaste(text) {
+        if (!text) return false;
+        var trimmed = String(text).trim();
+        if (!trimmed) return false;
+        return trimmed.indexOf('\n') !== -1 || trimmed.indexOf('\t') !== -1;
+      }
+
+      function parseDimDetailPaste(text) {
+        var lines = String(text || '').replace(/\r/g, '').split('\n');
+        var rows = [];
+        var i;
+        for (i = 0; i < lines.length; i++) {
+          var line = lines[i].trim();
+          if (!line) continue;
+          var cells = splitDimPasteLine(line).map(function (cell) {
+            return String(cell || '').trim();
+          });
+          if (!rows.length && isDimDetailHeaderCells(cells)) continue;
+          var mapped = mapDimDetailPasteCells(cells);
+          if (!mapped.measure && !mapped.error && !mapped.score) continue;
+          rows.push(mapped);
+        }
+        return normalizeScoreDimDetail(rows);
+      }
+
+      function sumDimDetailScores(rows) {
+        var sum = 0;
+        var hasValue = false;
+        (rows || []).forEach(function (row) {
+          var val = parseScoreValue(row.score);
+          if (val != null) {
+            sum += val;
+            hasValue = true;
+          }
+        });
+        return hasValue ? sum : null;
+      }
+
+      function isDimDetailRowLowScore(row) {
+        var val = parseScoreValue(row.score);
+        if (val == null) return false;
+        return val !== 1 && val !== 2;
+      }
+
+      function isDimEvalHeaderCells(cells) {
+        var joined = cells.join(' ');
+        return /No|번호|Type|유형|길이|각도|라운드|점수|측정/i.test(joined);
+      }
+
+      function looksLikeDimEvalPaste(text) {
+        if (!text) return false;
+        var trimmed = String(text).trim();
+        if (!trimmed) return false;
+        return trimmed.indexOf('\n') !== -1 || trimmed.indexOf('\t') !== -1;
+      }
+
+      function parseDimEvalPaste(text) {
+        var lines = String(text || '').replace(/\r/g, '').split('\n');
+        var rows = [];
+        var i;
+        for (i = 0; i < lines.length; i++) {
+          var line = lines[i].trim();
+          if (!line) continue;
+          var cells = splitDimPasteLine(line).map(function (cell) {
+            return String(cell || '').trim();
+          });
+          while (cells.length < 4) cells.push('');
+          if (cells.length > 4) cells = cells.slice(0, 4);
+          if (!rows.length && isDimEvalHeaderCells(cells)) continue;
+          if (!cells[0] && !cells[1] && !cells[2] && !cells[3]) continue;
+          var typeVal = cells[1];
+          if (typeVal.length > 2) {
+            var typeMatch = typeVal.match(/^([DAR])/i);
+            if (typeMatch) typeVal = typeMatch[1].toUpperCase();
+          }
+          rows.push({
+            no: cells[0],
+            type: typeVal,
+            itemScore: cells[2],
+            target: cells[3]
+          });
+        }
+        return normalizeDimEvalItems(rows);
+      }
+
+      function sumDimEvalItemScores(items) {
+        var sum = 0;
+        var hasValue = false;
+        (items || []).forEach(function (item) {
+          var val = parseScoreValue(item.itemScore);
+          if (val != null) {
+            sum += val;
+            hasValue = true;
+          }
+        });
+        return hasValue ? sum : null;
+      }
+
+      function applyDimEvalItems(items) {
+        collectScoreSheetFromDOM();
+        scoreSheetState.dimEvalItems = normalizeDimEvalItems(items);
+        var totalMax = sumDimEvalItemScores(scoreSheetState.dimEvalItems);
+        if (totalMax != null) {
+          var col = getScoreColumnById(SCORE_DIM_COL_ID);
+          if (col) {
+            var meta = normalizeScoreColumnEntry(scoreSheetState.columnSettings[SCORE_DIM_COL_ID], col);
+            meta.maxScore = totalMax;
+            scoreSheetState.columnSettings[SCORE_DIM_COL_ID] = meta;
+          }
+        }
+        renderScoringTable();
+        scheduleScoreChartRender();
+      }
+
+      function updateScoreDimEvalPastePreview(text) {
+        if (!el.scoreDimEvalPastePreview) return;
+        var preview = el.scoreDimEvalPastePreview;
+        preview.classList.remove('is-ok', 'is-error');
+        var trimmed = String(text || '').trim();
+        if (!trimmed) {
+          preview.textContent = '';
+          return;
+        }
+        if (!looksLikeDimEvalPaste(trimmed)) {
+          preview.textContent = '표 형식(탭 또는 줄바꿈으로 구분된 No·Type·점수·측정항목)이 아닙니다.';
+          preview.classList.add('is-error');
+          return;
+        }
+        var rows = parseDimEvalPaste(trimmed);
+        if (!rows.length) {
+          preview.textContent = '읽을 수 있는 평가 항목이 없습니다.';
+          preview.classList.add('is-error');
+          return;
+        }
+        var totalMax = sumDimEvalItemScores(rows);
+        preview.textContent = rows.length + '개 항목' +
+          (totalMax != null ? ' · 만점 합계 ' + formatScoreDisplay(totalMax) : '');
+        preview.classList.add('is-ok');
+      }
+
+      function closeScoreDimEvalPasteModal() {
+        if (!el.scoreDimEvalPasteModal) return;
+        el.scoreDimEvalPasteModal.classList.remove('visible');
+        el.scoreDimEvalPasteModal.setAttribute('aria-hidden', 'true');
+      }
+
+      function openScoreDimEvalPasteModal() {
+        if (!el.scoreDimEvalPasteModal) return;
+        if (el.scoreDimEvalPasteTextarea) {
+          el.scoreDimEvalPasteTextarea.value = '';
+        }
+        updateScoreDimEvalPastePreview('');
+        el.scoreDimEvalPasteModal.classList.add('visible');
+        el.scoreDimEvalPasteModal.setAttribute('aria-hidden', 'false');
+
+        var tryClipboard = function () {
+          if (!navigator.clipboard || !navigator.clipboard.readText) return Promise.resolve('');
+          return navigator.clipboard.readText().catch(function () { return ''; });
+        };
+
+        tryClipboard().then(function (text) {
+          if (!el.scoreDimEvalPasteModal || !el.scoreDimEvalPasteModal.classList.contains('visible')) return;
+          if (!text || !looksLikeDimEvalPaste(text)) {
+            if (el.scoreDimEvalPasteTextarea) el.scoreDimEvalPasteTextarea.focus();
+            return;
+          }
+          if (el.scoreDimEvalPasteTextarea) {
+            el.scoreDimEvalPasteTextarea.value = text.trim();
+            updateScoreDimEvalPastePreview(text);
+          }
+        });
+      }
+
+      function confirmScoreDimEvalPaste() {
+        var text = el.scoreDimEvalPasteTextarea ? el.scoreDimEvalPasteTextarea.value : '';
+        if (!looksLikeDimEvalPaste(text)) {
+          showError('붙여넣은 데이터 형식을 확인해주세요.');
+          return;
+        }
+        var rows = parseDimEvalPaste(text);
+        if (!rows.length) {
+          showError('붙여넣은 데이터에서 평가 항목을 읽지 못했습니다.');
+          return;
+        }
+        applyDimEvalItems(rows);
+        closeScoreDimEvalPasteModal();
+      }
+
+      function getRoundsWithDimDetail(rounds) {
+        return (rounds || []).filter(function (round) {
+          return round.dimDetail && round.dimDetail.length;
+        });
+      }
+
+      function getScoreDimDetailRowCount(evalItems, roundsWithData) {
+        var count = evalItems.length;
+        roundsWithData.forEach(function (round) {
+          count = Math.max(count, round.dimDetail.length);
+        });
+        return count;
+      }
+
+      function getScoreDimMaxScore() {
+        var columns = getEnabledScoreColumns();
+        var i;
+        for (i = 0; i < columns.length; i++) {
+          if (columns[i].id === SCORE_DIM_COL_ID) return columns[i].maxScore;
+        }
+        var base = getScoreColumnById(SCORE_DIM_COL_ID);
+        return base ? base.maxScore : 59;
+      }
+
+      function applyDimDetailToRound(roundId, rows, tr) {
+        collectScoreSheetFromDOM();
+        var round = getScoreRoundById(roundId);
+        if (!round) return;
+        round.dimDetail = normalizeScoreDimDetail(rows);
+        var total = sumDimDetailScores(round.dimDetail);
+        if (total != null) {
+          var capped = Math.min(total, getScoreDimMaxScore());
+          round.scores[SCORE_DIM_COL_ID] = formatScoreDisplay(capped);
+          if (tr) {
+            var input = tr.querySelector('[data-score-col="' + SCORE_DIM_COL_ID + '"]');
+            if (input) input.value = round.scores[SCORE_DIM_COL_ID];
+            updateScoreRowTotal(tr, getEnabledScoreColumns());
+          }
+        }
+        renderScoreDimDetailPanel();
+        scheduleScoreChartRender();
+      }
+
+      function clearDimDetailForRound(roundId) {
+        collectScoreSheetFromDOM();
+        var round = getScoreRoundById(roundId);
+        if (!round) return;
+        round.dimDetail = [];
+        delete round.scores[SCORE_DIM_COL_ID];
+        renderScoringTable();
+        scheduleScoreChartRender();
+      }
+
+      function scoreDimPasteBtnSvg() {
+        return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+          '<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>' +
+          '<rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>' +
+          '</svg>';
+      }
+
+      function getScoreDimPasteTr(roundId) {
+        if (!el.scoringTableBody || !roundId) return null;
+        return el.scoringTableBody.querySelector('tr[data-score-round-id="' + roundId + '"]');
+      }
+
+      function updateScoreDimPastePreview(text) {
+        if (!el.scoreDimPastePreview) return;
+        var preview = el.scoreDimPastePreview;
+        preview.classList.remove('is-ok', 'is-error');
+        var trimmed = String(text || '').trim();
+        if (!trimmed) {
+          preview.textContent = '';
+          return;
+        }
+        if (!looksLikeDimDetailPaste(trimmed)) {
+          preview.textContent = '표 형식(탭 또는 줄바꿈으로 구분된 측정치수·오차·점수)이 아닙니다.';
+          preview.classList.add('is-error');
+          return;
+        }
+        var rows = parseDimDetailPaste(trimmed);
+        if (!rows.length) {
+          preview.textContent = '읽을 수 있는 데이터 행이 없습니다.';
+          preview.classList.add('is-error');
+          return;
+        }
+        var total = sumDimDetailScores(rows);
+        var max = getScoreDimMaxScore();
+        var totalText = total != null ? formatScoreDisplay(total) : '—';
+        preview.textContent = rows.length + '개 항목 · 점수 합계 ' + totalText +
+          (total != null && total > max ? ' (최대 ' + formatScoreDisplay(max) + '으로 반영)' : '');
+        preview.classList.add('is-ok');
+      }
+
+      function updateScoreDrawingLinkBtn() {
+        var link = scoreSheetState.drawingLink || '';
+        var hasLink = !!link;
+        if (el.scoreDrawingLinkBtn) {
+          el.scoreDrawingLinkBtn.hidden = hasLink;
+          el.scoreDrawingLinkBtn.title = '도면 링크 입력';
+          el.scoreDrawingLinkBtn.setAttribute('aria-label', '도면 링크 입력');
+        }
+        if (el.scoreDrawingViewBtn) {
+          el.scoreDrawingViewBtn.hidden = !hasLink;
+          el.scoreDrawingViewBtn.title = hasLink ? ('도면 보기: ' + link) : '도면 보기';
+          el.scoreDrawingViewBtn.setAttribute('aria-label', hasLink ? '도면 보기' : '');
+        }
+        if (el.scoreDrawingLinkClearIconBtn) {
+          el.scoreDrawingLinkClearIconBtn.hidden = !hasLink;
+        }
+      }
+
+      function updateScoreDrawingLinkModalActions() {
+        var raw = el.scoreDrawingLinkInput ? el.scoreDrawingLinkInput.value : '';
+        var valid = isValidDrawingLink(raw);
+        if (el.scoreDrawingLinkOpenBtn) {
+          el.scoreDrawingLinkOpenBtn.disabled = !valid;
+          el.scoreDrawingLinkOpenBtn.style.display = valid ? '' : 'none';
+        }
+        if (el.scoreDrawingLinkClearBtn) {
+          el.scoreDrawingLinkClearBtn.disabled = !raw.trim() && !scoreSheetState.drawingLink;
+        }
+      }
+
+      function closeScoreDrawingLinkModal() {
+        if (!el.scoreDrawingLinkModal) return;
+        el.scoreDrawingLinkModal.classList.remove('visible');
+        el.scoreDrawingLinkModal.setAttribute('aria-hidden', 'true');
+      }
+
+      function openScoreDrawingLinkModal() {
+        if (!el.scoreDrawingLinkModal) return;
+        if (el.scoreDrawingLinkInput) {
+          el.scoreDrawingLinkInput.value = scoreSheetState.drawingLink || '';
+        }
+        updateScoreDrawingLinkModalActions();
+        el.scoreDrawingLinkModal.classList.add('visible');
+        el.scoreDrawingLinkModal.setAttribute('aria-hidden', 'false');
+        if (el.scoreDrawingLinkInput) {
+          setTimeout(function () {
+            el.scoreDrawingLinkInput.focus();
+            el.scoreDrawingLinkInput.select();
+          }, 0);
+        }
+      }
+
+      function applyScoreDrawingLink(url) {
+        collectScoreSheetFromDOM();
+        scoreSheetState.drawingLink = normalizeDrawingLink(url);
+        updateScoreDrawingLinkBtn();
+        syncScoreSheetToEditingTarget(collectScoreSheetFromDOM());
+      }
+
+      function openScoreDrawingLinkInBrowser(url) {
+        url = normalizeDrawingLink(url || scoreSheetState.drawingLink);
+        if (!isValidDrawingLink(url)) {
+          showError('올바른 도면 링크 주소를 입력해주세요.');
+          return;
+        }
+        window.open(url, '_blank', 'noopener,noreferrer');
+      }
+
+      function confirmScoreDrawingLink() {
+        var raw = el.scoreDrawingLinkInput ? el.scoreDrawingLinkInput.value : '';
+        if (raw.trim() && !isValidDrawingLink(raw)) {
+          showError('올바른 http 또는 https 주소를 입력해주세요.');
+          return;
+        }
+        applyScoreDrawingLink(raw);
+        closeScoreDrawingLinkModal();
+      }
+
+      function clearScoreDrawingLink() {
+        if (el.scoreDrawingLinkInput) el.scoreDrawingLinkInput.value = '';
+        applyScoreDrawingLink('');
+        updateScoreDrawingLinkModalActions();
+      }
+
+      function clearScoreDrawingLinkFromHeader() {
+        applyScoreDrawingLink('');
+      }
+
+      function closeScoreDimPasteModal() {
+        if (!el.scoreDimPasteModal) return;
+        el.scoreDimPasteModal.classList.remove('visible');
+        el.scoreDimPasteModal.setAttribute('aria-hidden', 'true');
+        scoreDimPasteState.roundId = '';
+        scoreDimPasteState.tr = null;
+      }
+
+      function openScoreDimPasteModal(roundId, roundLabel) {
+        if (!el.scoreDimPasteModal) return;
+        scoreDimPasteState.roundId = roundId;
+        scoreDimPasteState.tr = getScoreDimPasteTr(roundId);
+        if (el.scoreDimPasteHint) {
+          var label = roundLabel || '선택한 회차';
+          el.scoreDimPasteHint.innerHTML = '<strong>' + escapeHtml(label) + '</strong> — 스프레드시트에서 <strong>측정치수 · 오차 · 점수</strong> 열을 복사한 뒤 아래 칸에 붙여넣으세요.';
+        }
+        if (el.scoreDimPasteTextarea) {
+          el.scoreDimPasteTextarea.value = '';
+        }
+        updateScoreDimPastePreview('');
+        el.scoreDimPasteModal.classList.add('visible');
+        el.scoreDimPasteModal.setAttribute('aria-hidden', 'false');
+
+        var tryClipboard = function () {
+          if (!navigator.clipboard || !navigator.clipboard.readText) return Promise.resolve('');
+          return navigator.clipboard.readText().catch(function () { return ''; });
+        };
+
+        tryClipboard().then(function (text) {
+          if (!el.scoreDimPasteModal || !el.scoreDimPasteModal.classList.contains('visible')) return;
+          if (scoreDimPasteState.roundId !== roundId) return;
+          if (!text || !looksLikeDimDetailPaste(text)) {
+            if (el.scoreDimPasteTextarea) el.scoreDimPasteTextarea.focus();
+            return;
+          }
+          if (el.scoreDimPasteTextarea) {
+            el.scoreDimPasteTextarea.value = text.trim();
+            updateScoreDimPastePreview(text);
+          }
+        });
+      }
+
+      function confirmScoreDimPaste() {
+        if (!scoreDimPasteState.roundId) {
+          closeScoreDimPasteModal();
+          return;
+        }
+        var text = el.scoreDimPasteTextarea ? el.scoreDimPasteTextarea.value : '';
+        if (!looksLikeDimDetailPaste(text)) {
+          showError('붙여넣은 데이터 형식을 확인해주세요.');
+          return;
+        }
+        var rows = parseDimDetailPaste(text);
+        if (!rows.length) {
+          showError('붙여넣은 데이터에서 측정치수·오차·점수를 읽지 못했습니다.');
+          return;
+        }
+        var roundId = scoreDimPasteState.roundId;
+        applyDimDetailToRound(roundId, rows, getScoreDimPasteTr(roundId));
+        closeScoreDimPasteModal();
+      }
+
+      function renderScoreDimDetailPanel() {
+        if (!el.scoreDimDetailPanel) return;
+        var dimEnabled = isScoreDimColumnEnabled();
+        if (el.scoreDimDetailWrap) {
+          el.scoreDimDetailWrap.style.display = dimEnabled ? '' : 'none';
+        }
+        if (!dimEnabled) {
+          el.scoreDimDetailPanel.innerHTML = '';
+          return;
+        }
+
+        var rounds = scoreSheetState.rounds || [];
+        var evalItems = scoreSheetState.dimEvalItems || [];
+        var roundsWithData = getRoundsWithDimDetail(rounds);
+        var hasEval = evalItems.length > 0;
+        var hasRoundData = roundsWithData.length > 0;
+        el.scoreDimDetailPanel.innerHTML = '';
+
+        if (!hasEval && !hasRoundData) {
+          var empty = document.createElement('p');
+          empty.className = 'score-dim-detail-empty';
+          empty.textContent = '아직 붙여넣은 치수정밀도 평가 항목이나 회차 기록이 없습니다.';
+          el.scoreDimDetailPanel.appendChild(empty);
+          return;
+        }
+
+        var rowCount = getScoreDimDetailRowCount(evalItems, roundsWithData);
+        if (!rowCount && hasEval) rowCount = evalItems.length;
+
+        function appendScoreDimEvalBlock(detailRowCount) {
+          var block = document.createElement('div');
+          block.className = 'score-dim-detail-round-block score-dim-detail-eval-block';
+          var table = document.createElement('table');
+          table.className = 'score-dim-detail-master-table';
+
+          var colgroup = document.createElement('colgroup');
+          ['col-eval-no', 'col-eval-type', 'col-eval-score', 'col-eval-target'].forEach(function (cls) {
+            var col = document.createElement('col');
+            col.className = cls;
+            colgroup.appendChild(col);
+          });
+          table.appendChild(colgroup);
+
+          var thead = document.createElement('thead');
+          var groupRow = document.createElement('tr');
+          var thEvalGroup = document.createElement('th');
+          thEvalGroup.colSpan = 4;
+          thEvalGroup.className = 'score-dim-eval-group';
+          thEvalGroup.textContent = '평가 항목';
+          groupRow.appendChild(thEvalGroup);
+          thead.appendChild(groupRow);
+
+          var colHeadRow = document.createElement('tr');
+          [
+            { text: 'No', title: '' },
+            { text: 'Type', title: 'D-길이 / A-각도 / R-라운드' },
+            { text: '점수', title: '' },
+            { text: '측정항목', title: '' }
+          ].forEach(function (col) {
+            var th = document.createElement('th');
+            th.className = 'score-dim-col-head';
+            th.textContent = col.text;
+            if (col.title) th.title = col.title;
+            colHeadRow.appendChild(th);
+          });
+          thead.appendChild(colHeadRow);
+          table.appendChild(thead);
+
+          var tbody = document.createElement('tbody');
+          var rowIdx;
+          for (rowIdx = 0; rowIdx < detailRowCount; rowIdx++) {
+            var evalItem = evalItems[rowIdx] || { no: '', type: '', itemScore: '', target: '' };
+            var tr = document.createElement('tr');
+            tr.className = rowIdx % 2 === 0 ? 'band-plain' : 'band-shade';
+            [
+              { key: 'no', cls: 'score-dim-eval-cell' },
+              { key: 'type', cls: 'score-dim-eval-cell' },
+              { key: 'itemScore', cls: 'score-dim-eval-cell' },
+              { key: 'target', cls: 'score-dim-eval-cell' }
+            ].forEach(function (col) {
+              var td = document.createElement('td');
+              td.className = col.cls;
+              td.textContent = evalItem[col.key];
+              tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+          }
+          table.appendChild(tbody);
+          block.appendChild(table);
+          el.scoreDimDetailPanel.appendChild(block);
+        }
+
+        function appendScoreDimRoundBlock(round, roundIndex, rowCount) {
+          var label = round.label || ((roundIndex + 1) + '회차');
+          var block = document.createElement('div');
+          block.className = 'score-dim-detail-round-block';
+          var table = document.createElement('table');
+          table.className = 'score-dim-detail-table';
+
+          var colgroup = document.createElement('colgroup');
+          ['col-measure', 'col-error', 'col-score'].forEach(function (cls) {
+            var col = document.createElement('col');
+            col.className = cls;
+            colgroup.appendChild(col);
+          });
+          table.appendChild(colgroup);
+
+          var thead = document.createElement('thead');
+          var groupRow = document.createElement('tr');
+          var total = sumDimDetailScores(round.dimDetail);
+          var thRoundGroup = document.createElement('th');
+          thRoundGroup.colSpan = 3;
+          thRoundGroup.className = 'score-dim-round-group';
+          var inner = document.createElement('div');
+          inner.className = 'score-dim-round-group-inner';
+          var title = document.createElement('span');
+          title.textContent = label;
+          inner.appendChild(title);
+          if (total != null) {
+            var sum = document.createElement('span');
+            sum.className = 'score-dim-round-group-sum';
+            sum.textContent = '합계 ' + formatScoreDisplay(total);
+            inner.appendChild(sum);
+          }
+          var clearBtn = document.createElement('button');
+          clearBtn.type = 'button';
+          clearBtn.className = 'score-dim-detail-clear';
+          clearBtn.textContent = '×';
+          clearBtn.title = '기록 지우기';
+          clearBtn.setAttribute('aria-label', label + ' 기록 지우기');
+          clearBtn.addEventListener('click', function () {
+            clearDimDetailForRound(round.id);
+          });
+          inner.appendChild(clearBtn);
+          thRoundGroup.appendChild(inner);
+          groupRow.appendChild(thRoundGroup);
+          thead.appendChild(groupRow);
+
+          var colHeadRow = document.createElement('tr');
+          ['측정치수', '오차', '점수'].forEach(function (headLabel) {
+            var th = document.createElement('th');
+            th.className = 'score-dim-col-head is-round';
+            th.textContent = headLabel;
+            colHeadRow.appendChild(th);
+          });
+          thead.appendChild(colHeadRow);
+          table.appendChild(thead);
+
+          var tbody = document.createElement('tbody');
+          var rowIdx;
+          for (rowIdx = 0; rowIdx < rowCount; rowIdx++) {
+            var detailRow = round.dimDetail[rowIdx] || { measure: '', error: '', score: '' };
+            var low = isDimDetailRowLowScore(detailRow);
+            var tr = document.createElement('tr');
+            tr.className = rowIdx % 2 === 0 ? 'band-plain' : 'band-shade';
+            if (low) tr.classList.add('is-low');
+            ['measure', 'error', 'score'].forEach(function (key) {
+              var td = document.createElement('td');
+              td.textContent = detailRow[key];
+              tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+          }
+          table.appendChild(tbody);
+          block.appendChild(table);
+          el.scoreDimDetailPanel.appendChild(block);
+        }
+
+        if (hasEval) {
+          appendScoreDimEvalBlock(rowCount);
+        }
+        if (hasRoundData) {
+          rounds.forEach(function (round, index) {
+            if (!round.dimDetail || !round.dimDetail.length) return;
+            appendScoreDimRoundBlock(round, index, rowCount);
+          });
+        }
+      }
+
       function calcRoundTotal(round, columns) {
         var sum = 0;
         var hasValue = false;
@@ -7348,10 +8776,12 @@
           tr.querySelectorAll('[data-score-col]').forEach(function (input) {
             scores[input.getAttribute('data-score-col')] = input.value;
           });
+          var existing = getScoreRoundById(id);
           next.push(normalizeScoreRound({
             id: id,
             label: labelEl ? labelEl.value : '',
-            scores: scores
+            scores: scores,
+            dimDetail: existing ? existing.dimDetail : []
           }));
         });
         if (next.length) scoreSheetState.rounds = next;
@@ -7367,12 +8797,15 @@
           id: scoreSheetState.id || '',
           workName: scoreSheetState.workName,
           savedDate: scoreSheetState.savedDate || todayStr(),
-          columnSettings: normalizeScoreColumnSettings(scoreSheetState.columnSettings),
+          drawingLink: scoreSheetState.drawingLink || '',
+          columnSettings: buildScoreSheetColumnSettingsPayload(),
+          dimEvalItems: normalizeDimEvalItems(scoreSheetState.dimEvalItems),
           rounds: scoreSheetState.rounds.map(function (round) {
             return {
               id: round.id,
               label: round.label,
-              scores: round.scores || {}
+              scores: round.scores || {},
+              dimDetail: normalizeScoreDimDetail(round.dimDetail)
             };
           })
         };
@@ -7483,7 +8916,26 @@
           maxInput.setAttribute('data-score-col-id', col.id);
           maxInput.title = '만점';
           maxInput.addEventListener('input', onScoreHeaderMetaChange);
-          td.appendChild(maxInput);
+          if (col.id === SCORE_DIM_COL_ID) {
+            var maxCellInner = document.createElement('div');
+            maxCellInner.className = 'score-max-cell-inner';
+            maxCellInner.appendChild(maxInput);
+            var evalPasteBtn = document.createElement('button');
+            evalPasteBtn.type = 'button';
+            evalPasteBtn.className = 'score-paste-btn';
+            evalPasteBtn.title = '스프레드시트(No·Type·점수·측정항목) 평가 항목 붙여넣기';
+            evalPasteBtn.setAttribute('aria-label', '치수정밀도 평가 항목 붙여넣기');
+            evalPasteBtn.innerHTML = scoreDimPasteBtnSvg();
+            evalPasteBtn.addEventListener('click', function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+              openScoreDimEvalPasteModal();
+            });
+            maxCellInner.appendChild(evalPasteBtn);
+            td.appendChild(maxCellInner);
+          } else {
+            td.appendChild(maxInput);
+          }
           tr3.appendChild(td);
         });
         var tdMaxTotal = document.createElement('td');
@@ -7500,6 +8952,7 @@
         if (!columns.length) {
           el.scoringTableHead.innerHTML = '';
           el.scoringTableBody.innerHTML = '<tr><td colspan="2" style="padding:16px;">표시할 채점 항목을 하나 이상 켜주세요.</td></tr>';
+          renderScoreDimDetailPanel();
           return;
         }
         var groups = getScoreColumnGroups(columns);
@@ -7571,7 +9024,39 @@
               updateScoreRowTotal(tr, getEnabledScoreColumns());
               scheduleScoreChartRender();
             });
-            td.appendChild(input);
+            if (col.id === SCORE_DIM_COL_ID) {
+              input.title = '스프레드시트(측정치수·오차·점수) 붙여넣기';
+              input.addEventListener('paste', function (e) {
+                var text = (e.clipboardData && e.clipboardData.getData('text/plain')) || '';
+                if (!looksLikeDimDetailPaste(text)) return;
+                e.preventDefault();
+                var rows = parseDimDetailPaste(text);
+                if (!rows.length) {
+                  showError('붙여넣은 데이터에서 측정치수·오차·점수를 읽지 못했습니다.');
+                  return;
+                }
+                applyDimDetailToRound(round.id, rows, tr);
+              });
+              var cellInner = document.createElement('div');
+              cellInner.className = 'score-cell-inner';
+              cellInner.appendChild(input);
+              var pasteBtn = document.createElement('button');
+              pasteBtn.type = 'button';
+              pasteBtn.className = 'score-paste-btn';
+              pasteBtn.title = '스프레드시트(측정치수·오차·점수) 붙여넣기';
+              pasteBtn.setAttribute('aria-label', '치수정밀도 점수 붙여넣기');
+              pasteBtn.innerHTML = scoreDimPasteBtnSvg();
+              pasteBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var label = round.label || ((index + 1) + '회차');
+                openScoreDimPasteModal(round.id, label);
+              });
+              cellInner.appendChild(pasteBtn);
+              td.appendChild(cellInner);
+            } else {
+              td.appendChild(input);
+            }
             tr.appendChild(td);
           });
 
@@ -7583,6 +9068,7 @@
 
           el.scoringTableBody.appendChild(tr);
         });
+        renderScoreDimDetailPanel();
       }
 
       function updateScoreRowTotal(tr, columns) {
@@ -7640,6 +9126,27 @@
         return { labels: labels, datasets: datasets };
       }
 
+      function calcScoreChartYRange(chartData) {
+        var values = [];
+        (chartData.datasets || []).forEach(function (ds) {
+          (ds.data || []).forEach(function (v) {
+            if (v != null && !isNaN(v)) values.push(Number(v));
+          });
+        });
+        if (!values.length) return { min: 0, max: 10 };
+        var min = Math.min.apply(Math, values);
+        var max = Math.max.apply(Math, values);
+        return { min: min - 1, max: max + 1 };
+      }
+
+      function applyScoreChartYRange(scaleOptions, chartData) {
+        var range = calcScoreChartYRange(chartData);
+        scaleOptions.min = range.min;
+        scaleOptions.max = range.max;
+        delete scaleOptions.beginAtZero;
+        delete scaleOptions.suggestedMax;
+      }
+
       var scoreChartTimer = null;
       function scheduleScoreChartRender() {
         clearTimeout(scoreChartTimer);
@@ -7673,8 +9180,6 @@
             },
             scales: {
               y: {
-                beginAtZero: true,
-                suggestedMax: calcMaxTotal(columnsAfter),
                 title: { display: true, text: '점수' }
               },
               x: {
@@ -7682,10 +9187,11 @@
               }
             }
           };
+          applyScoreChartYRange(options.scales.y, chartData);
           if (scoreChart) {
             scoreChart.data.labels = chartData.labels;
             scoreChart.data.datasets = chartData.datasets;
-            scoreChart.options.scales.y.suggestedMax = calcMaxTotal(columns);
+            applyScoreChartYRange(scoreChart.options.scales.y, chartData);
             scoreChart.update();
             return;
           }
@@ -7763,6 +9269,8 @@
             workName: payload.workName,
             savedDate: existing.savedDate || todayStr(),
             columnSettings: payload.columnSettings,
+            dimEvalItems: payload.dimEvalItems,
+            drawingLink: payload.drawingLink,
             rounds: payload.rounds
           });
         } else {
@@ -7770,9 +9278,12 @@
             workName: payload.workName,
             savedDate: todayStr(),
             columnSettings: payload.columnSettings,
+            dimEvalItems: payload.dimEvalItems,
+            drawingLink: payload.drawingLink,
             rounds: payload.rounds
           });
         }
+        sheetPayload.columnSettings = payload.columnSettings;
 
         run('saveScoreSheet', [currentUser, sheetPayload], '채점결과 저장 중...')
           .then(function (saved) {
@@ -9852,6 +11363,119 @@
         el.addScoreRoundBtn.addEventListener('click', function (e) {
           e.preventDefault();
           addScoreRound();
+        });
+      }
+      if (el.scoreDrawingLinkBtn) {
+        el.scoreDrawingLinkBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          openScoreDrawingLinkModal();
+        });
+      }
+      if (el.scoreDrawingViewBtn) {
+        el.scoreDrawingViewBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          openScoreDrawingLinkInBrowser();
+        });
+      }
+      if (el.scoreDrawingLinkClearIconBtn) {
+        el.scoreDrawingLinkClearIconBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          clearScoreDrawingLinkFromHeader();
+        });
+      }
+      if (el.scoreDrawingLinkCancelBtn) {
+        el.scoreDrawingLinkCancelBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          closeScoreDrawingLinkModal();
+        });
+      }
+      if (el.scoreDrawingLinkBackdrop) {
+        el.scoreDrawingLinkBackdrop.addEventListener('click', function (e) {
+          e.preventDefault();
+          closeScoreDrawingLinkModal();
+        });
+      }
+      if (el.scoreDrawingLinkConfirmBtn) {
+        el.scoreDrawingLinkConfirmBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          confirmScoreDrawingLink();
+        });
+      }
+      if (el.scoreDrawingLinkClearBtn) {
+        el.scoreDrawingLinkClearBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          clearScoreDrawingLink();
+        });
+      }
+      if (el.scoreDrawingLinkOpenBtn) {
+        el.scoreDrawingLinkOpenBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          openScoreDrawingLinkInBrowser(el.scoreDrawingLinkInput ? el.scoreDrawingLinkInput.value : '');
+        });
+      }
+      if (el.scoreDrawingLinkInput) {
+        el.scoreDrawingLinkInput.addEventListener('input', updateScoreDrawingLinkModalActions);
+        el.scoreDrawingLinkInput.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            confirmScoreDrawingLink();
+          }
+        });
+      }
+      if (el.scoreDimPasteCancelBtn) {
+        el.scoreDimPasteCancelBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          closeScoreDimPasteModal();
+        });
+      }
+      if (el.scoreDimPasteBackdrop) {
+        el.scoreDimPasteBackdrop.addEventListener('click', function (e) {
+          e.preventDefault();
+          closeScoreDimPasteModal();
+        });
+      }
+      if (el.scoreDimPasteConfirmBtn) {
+        el.scoreDimPasteConfirmBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          confirmScoreDimPaste();
+        });
+      }
+      if (el.scoreDimPasteTextarea) {
+        el.scoreDimPasteTextarea.addEventListener('input', function () {
+          updateScoreDimPastePreview(el.scoreDimPasteTextarea.value);
+        });
+        el.scoreDimPasteTextarea.addEventListener('paste', function () {
+          setTimeout(function () {
+            updateScoreDimPastePreview(el.scoreDimPasteTextarea.value);
+          }, 0);
+        });
+      }
+      if (el.scoreDimEvalPasteCancelBtn) {
+        el.scoreDimEvalPasteCancelBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          closeScoreDimEvalPasteModal();
+        });
+      }
+      if (el.scoreDimEvalPasteBackdrop) {
+        el.scoreDimEvalPasteBackdrop.addEventListener('click', function (e) {
+          e.preventDefault();
+          closeScoreDimEvalPasteModal();
+        });
+      }
+      if (el.scoreDimEvalPasteConfirmBtn) {
+        el.scoreDimEvalPasteConfirmBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          confirmScoreDimEvalPaste();
+        });
+      }
+      if (el.scoreDimEvalPasteTextarea) {
+        el.scoreDimEvalPasteTextarea.addEventListener('input', function () {
+          updateScoreDimEvalPastePreview(el.scoreDimEvalPasteTextarea.value);
+        });
+        el.scoreDimEvalPasteTextarea.addEventListener('paste', function () {
+          setTimeout(function () {
+            updateScoreDimEvalPastePreview(el.scoreDimEvalPasteTextarea.value);
+          }, 0);
         });
       }
       if (el.feedbackSavedToggle) {
