@@ -5965,7 +5965,7 @@
           html += '<div class="dim-detail-block dim-detail-eval"><table>' +
             '<thead>' +
             '<tr><th class="dim-group" colspan="4">평가 항목</th></tr>' +
-            '<tr><th>No</th><th>Type</th><th>점수</th><th>측정항목</th></tr>' +
+            '<tr><th>No</th><th>Type</th><th>점수</th><th class="dim-col-head">측정<br>항목</th></tr>' +
             '</thead><tbody>';
           for (rowIdx = 0; rowIdx < rowCount; rowIdx++) {
             var evalItem = evalItems[rowIdx] || { no: '', type: '', itemScore: '', target: '' };
@@ -5990,7 +5990,7 @@
           html += '<div class="dim-detail-block dim-detail-round"><table>' +
             '<thead>' +
             '<tr><th class="dim-group dim-round-group" colspan="3">' + escapeHtml(groupText) + '</th></tr>' +
-            '<tr><th>측정치수</th><th>오차</th><th>점수</th></tr>' +
+            '<tr><th class="dim-col-head">측정<br>치수</th><th>오차</th><th>점수</th></tr>' +
             '</thead><tbody>';
           for (rowIdx = 0; rowIdx < rowCount; rowIdx++) {
             var detailRow = round.dimDetail[rowIdx] || { measure: '', error: '', score: '' };
@@ -6094,7 +6094,9 @@
           '.dim-detail-block table { border-collapse: collapse; font-size: 0.68rem; table-layout: fixed; border: 1px solid #666; }' +
           '.dim-detail-eval table { width: 200px; }' +
           '.dim-detail-round table { width: 150px; }' +
-          '.dim-detail-block th, .dim-detail-block td { border: 1px solid #666; padding: 4px 3px; text-align: center; vertical-align: middle; word-break: break-all; }' +
+          '.dim-detail-block th, .dim-detail-block td { border: 1px solid #666; padding: 4px 3px; text-align: center; vertical-align: middle; }' +
+          '.dim-detail-block td { word-break: break-all; }' +
+          '.dim-detail-block th.dim-col-head { word-break: keep-all; line-height: 1.25; }' +
           '.dim-detail-block th.dim-group { background: #fff3cc; font-weight: 700; }' +
           '.dim-detail-block th.dim-round-group { background: #e8f4ff; }' +
           '.dim-detail-block tr.band-shade td { background: #f7f7f7; }' +
