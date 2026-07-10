@@ -1337,6 +1337,12 @@
       overflow-x: auto;
       align-items: flex-start;
       padding-bottom: 2px;
+      cursor: grab;
+      -webkit-overflow-scrolling: touch;
+    }
+    #scoreDimDetailPanel.is-drag-scrolling {
+      cursor: grabbing;
+      user-select: none;
     }
     #scoreDimDetailPanel .score-dim-detail-master-table,
     #scoreDimDetailPanel .score-dim-detail-table {
@@ -5793,9 +5799,10 @@
           html += '</tbody></table></div>';
         }
 
-        rounds.forEach(function (round, index) {
-          if (!round.dimDetail || !round.dimDetail.length) return;
-          var label = round.label || ((index + 1) + '회차');
+        for (var r = rounds.length - 1; r >= 0; r--) {
+          var round = rounds[r];
+          if (!round.dimDetail || !round.dimDetail.length) continue;
+          var label = round.label || ((r + 1) + '회차');
           var total = sumDimDetailScores(round.dimDetail);
           var groupText = label;
           if (total != null) groupText += ' · 합계 ' + formatScoreDisplay(total);
@@ -5815,7 +5822,7 @@
               '</tr>';
           }
           html += '</tbody></table></div>';
-        });
+        }
 
         html += '</div></div>';
         return html;
@@ -8674,11 +8681,54 @@
           appendScoreDimEvalBlock(rowCount);
         }
         if (hasRoundData) {
-          rounds.forEach(function (round, index) {
-            if (!round.dimDetail || !round.dimDetail.length) return;
-            appendScoreDimRoundBlock(round, index, rowCount);
-          });
+          for (var r = rounds.length - 1; r >= 0; r--) {
+            var round = rounds[r];
+            if (!round.dimDetail || !round.dimDetail.length) continue;
+            appendScoreDimRoundBlock(round, r, rowCount);
+          }
         }
+      }
+
+      function initScoreDimDetailDragScroll() {
+        if (!el.scoreDimDetailPanel) return;
+        var panel = el.scoreDimDetailPanel;
+        var interactiveSelector = 'button, a, input, textarea, select, label, [contenteditable="true"]';
+        var isDragging = false;
+        var pointerId = null;
+        var startX = 0;
+        var startScrollLeft = 0;
+
+        panel.addEventListener('pointerdown', function (event) {
+          if (event.button !== 0) return;
+          if (event.target.closest(interactiveSelector)) return;
+          if (!panel.querySelector('.score-dim-detail-round-block')) return;
+          if (panel.scrollWidth <= panel.clientWidth) return;
+          isDragging = true;
+          pointerId = event.pointerId;
+          startX = event.clientX;
+          startScrollLeft = panel.scrollLeft;
+          panel.classList.add('is-drag-scrolling');
+          if (panel.setPointerCapture) panel.setPointerCapture(pointerId);
+        });
+
+        panel.addEventListener('pointermove', function (event) {
+          if (!isDragging || event.pointerId !== pointerId) return;
+          panel.scrollLeft = startScrollLeft - (event.clientX - startX);
+          event.preventDefault();
+        });
+
+        function stopDragging(event) {
+          if (!isDragging || event.pointerId !== pointerId) return;
+          isDragging = false;
+          panel.classList.remove('is-drag-scrolling');
+          if (panel.releasePointerCapture) {
+            try { panel.releasePointerCapture(pointerId); } catch (e) { /* ignore */ }
+          }
+          pointerId = null;
+        }
+
+        panel.addEventListener('pointerup', stopDragging);
+        panel.addEventListener('pointercancel', stopDragging);
       }
 
       function calcRoundTotal(round, columns) {
@@ -11478,6 +11528,7 @@
           }, 0);
         });
       }
+      initScoreDimDetailDragScroll();
       if (el.feedbackSavedToggle) {
         el.feedbackSavedToggle.addEventListener('click', function (e) {
           e.preventDefault();
