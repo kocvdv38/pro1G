@@ -5464,67 +5464,72 @@
         return classes;
       }
 
-      function buildPrintBodyRowsHtml(rows, blocks, bandClasses) {
+      function buildPrintBodyRowsHtml(rows, blocks, bandClasses, pageSegments) {
         var html = [];
-        var i = 0;
         rows = rows || [];
-        while (i < rows.length) {
-          var cat = String(rows[i].category || '').trim();
-          var start = i;
-          while (i < rows.length && String(rows[i].category || '').trim() === cat) {
-            i++;
-          }
-          var span = i - start;
-          for (var r = start; r < i; r++) {
-            var row = rows[r];
-            var rowClass = 'data-row ' + (bandClasses[r] || 'band-plain');
-            html.push('<tr class="' + rowClass + '">');
-            if (r === start) {
-              html.push('<td class="cat" rowspan="' + span + '">' + escapeHtml(cat) + '</td>');
+        var segments = pageSegments && pageSegments.length
+          ? pageSegments
+          : [{ start: 0, end: rows.length }];
+
+        segments.forEach(function (segment) {
+          var segStart = segment.start;
+          var segEnd = segment.end;
+          var r = segStart;
+          while (r < segEnd) {
+            var cat = String(rows[r].category || '').trim();
+            var catStart = r;
+            while (r < segEnd && String(rows[r].category || '').trim() === cat) {
+              r++;
             }
-            html.push(
-              '<td class="content">' + escapeHtml(row.content) + '</td>' +
-              '<td class="num">' + escapeHtml(formatProcessCellMinutes(row.targetMin)) + '</td>' +
-              '<td class="num">' + escapeHtml(formatProcessCellMinutes(row.actualMin)) + '</td>' +
-              '<td class="num linked">' + escapeHtml(getProcessRowLinkedTimeDisplay(r, blocks)) + '</td>' +
-              '</tr>'
-            );
+            var span = r - catStart;
+            for (var rowIdx = catStart; rowIdx < r; rowIdx++) {
+              var row = rows[rowIdx];
+              var rowClass = 'data-row ' + (bandClasses[rowIdx] || 'band-plain');
+              html.push('<tr class="' + rowClass + '">');
+              if (rowIdx === catStart) {
+                html.push('<td class="cat" rowspan="' + span + '">' + escapeHtml(cat) + '</td>');
+              }
+              html.push(
+                '<td class="content">' + escapeHtml(row.content) + '</td>' +
+                '<td class="num">' + escapeHtml(formatProcessCellMinutes(row.targetMin)) + '</td>' +
+                '<td class="num">' + escapeHtml(formatProcessCellMinutes(row.actualMin)) + '</td>' +
+                '<td class="num linked">' + escapeHtml(getProcessRowLinkedTimeDisplay(rowIdx, blocks)) + '</td>' +
+                '</tr>'
+              );
+            }
           }
-        }
+        });
         return html.join('');
       }
 
-      function buildProcessPrintHtml(rows) {
-        var meta = getCurrentProcessSheetMeta();
-        var blocks = computeProcessBlocks(rows);
-        var totals = calcProcessTotals(rows);
-        var categories = calcProcessCategoryTotals(rows);
-        var bandClasses = getPrintCategoryBandClasses(rows);
-        var bodyRows = buildPrintBodyRowsHtml(rows, blocks, bandClasses);
-        var categoryRows = categories.length
-          ? '<tr class="section-header"><td colspan="5">작업 구분별 누적 시간</td></tr>' +
-            categories.map(function (item, idx) {
-              var rowClass = idx % 2 === 0 ? 'subtotal even' : 'subtotal odd';
-              return '<tr class="' + rowClass + '">' +
-                '<td colspan="2" class="cat">' + escapeHtml(item.category) + '</td>' +
-                '<td class="num">' + escapeHtml(formatProcessMinutes(item.targetSum)) + '</td>' +
-                '<td class="num">' + escapeHtml(formatProcessMinutes(item.actualSum)) + '</td>' +
-                '<td class="num">—</td>' +
-                '</tr>';
-            }).join('')
-          : '';
-        var userLine = meta.user
-          ? '<span>작성자: ' + escapeHtml(meta.user) + '</span>'
-          : '';
-        return '<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">' +
-          '<title>' + escapeHtml(meta.title) + ' - 공정표</title>' +
-          '<style>' +
-          '* { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }' +
-          'body { font-family: "Pretendard", "Malgun Gothic", sans-serif; color: #1a1a1a; margin: 24px; background: #fff; }' +
+      function buildProcessPrintDataTablesHtml(rows, blocks, bandClasses, pageSegments) {
+        var segments = pageSegments && pageSegments.length
+          ? pageSegments
+          : [{ start: 0, end: rows.length }];
+        var html = [];
+        segments.forEach(function (segment, pageIdx) {
+          var tableClass = 'process-print-data' + (pageIdx > 0 ? ' process-print-page' : '');
+          html.push('<table class="' + tableClass + '">');
+          html.push(getProcessPrintTableHeadHtml());
+          html.push('<tbody>');
+          html.push(buildPrintBodyRowsHtml(rows, blocks, bandClasses, [segment]));
+          html.push('</tbody></table>');
+        });
+        return html.join('');
+      }
+
+      var PROCESS_PRINT_MARGIN_MM = 14;
+      var PROCESS_PRINT_MARGIN_TOP_MM = 18;
+      var PROCESS_PRINT_PAGE_WIDTH_PX = Math.round((210 - PROCESS_PRINT_MARGIN_MM * 2) * 96 / 25.4);
+
+      function getProcessPrintStyles() {
+        return '* { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }' +
+          'body { font-family: "Pretendard", "Malgun Gothic", sans-serif; color: #1a1a1a; margin: 0; background: #fff; }' +
           'h1 { margin: 0 0 8px; font-size: 1.35rem; color: #111; }' +
           '.meta { margin: 0 0 18px; color: #555; font-size: 0.9rem; display: flex; flex-wrap: wrap; gap: 12px 20px; }' +
           'table { width: 100%; border-collapse: collapse; font-size: 0.88rem; border-top: 2px solid #3d3d3d; border-bottom: 2px solid #3d3d3d; border-left: none; border-right: none; table-layout: fixed; }' +
           'table.process-print-data { border-bottom: none; }' +
+          'table.process-print-data.process-print-page { page-break-before: always; break-before: page; }' +
           'th, td { border: 1px solid #8a8a8a; padding: 9px 10px; vertical-align: middle; }' +
           'th:first-child, td:first-child { border-left: none; }' +
           'th:last-child, td:last-child { border-right: none; }' +
@@ -5552,16 +5557,11 @@
           'tr.subtotal td { font-weight: 600; text-align: center; }' +
           'tr.subtotal.even td { background: #ffffff; }' +
           'tr.subtotal.odd td { background: #eef2f7; }' +
-          '@media print { body { margin: 12mm; } @page { margin: 12mm; } table { page-break-inside: auto; } tr { page-break-inside: avoid; } .process-print-summary { page-break-inside: avoid; } }' +
-          '</style></head><body>' +
-          '<h1>' + escapeHtml(meta.title) + '</h1>' +
-          '<p class="meta">' +
-          userLine +
-          '<span>일자: ' + escapeHtml(meta.dateLabel) + '</span>' +
-          '<span>인쇄: ' + escapeHtml(new Date().toLocaleString('ko-KR')) + '</span>' +
-          '</p>' +
-          '<table class="process-print-data">' +
-          '<colgroup>' +
+          '@media print { body { margin: 0; } @page { margin: ' + PROCESS_PRINT_MARGIN_TOP_MM + 'mm ' + PROCESS_PRINT_MARGIN_MM + 'mm ' + PROCESS_PRINT_MARGIN_MM + 'mm ' + PROCESS_PRINT_MARGIN_MM + 'mm; size: A4; } table.process-print-data { page-break-inside: auto; break-inside: auto; } table.process-print-data tr.data-row { page-break-inside: avoid; break-inside: avoid-page; } .process-print-summary { page-break-inside: avoid; } }';
+      }
+
+      function getProcessPrintTableHeadHtml() {
+        return '<colgroup>' +
           '<col class="col-cat">' +
           '<col class="col-content">' +
           '<col class="col-target">' +
@@ -5570,17 +5570,182 @@
           '</colgroup>' +
           '<thead><tr>' +
           '<th class="cat">작업 구분</th><th class="content">작업 내용</th><th class="num">목표 시간</th><th class="num">실제 작업 시간</th><th class="num">동일 작업 연계 시간</th>' +
-          '</tr></thead>' +
+          '</tr></thead>';
+      }
+
+      function buildProcessPrintMeasureHtml(rows) {
+        var meta = getCurrentProcessSheetMeta();
+        var blocks = computeProcessBlocks(rows);
+        var totals = calcProcessTotals(rows);
+        var categories = calcProcessCategoryTotals(rows);
+        var bandClasses = getPrintCategoryBandClasses(rows);
+        var bodyRows = buildPrintBodyRowsHtmlFlat(rows, blocks, bandClasses);
+        var categoryRows = categories.length
+          ? '<tr class="section-header"><td colspan="5">작업 구분별 누적 시간</td></tr>' +
+            categories.map(function (item, idx) {
+              var rowClass = idx % 2 === 0 ? 'subtotal even' : 'subtotal odd';
+              return '<tr class="' + rowClass + '">' +
+                '<td colspan="2" class="cat">' + escapeHtml(item.category) + '</td>' +
+                '<td class="num">' + escapeHtml(formatProcessMinutes(item.targetSum)) + '</td>' +
+                '<td class="num">' + escapeHtml(formatProcessMinutes(item.actualSum)) + '</td>' +
+                '<td class="num">—</td>' +
+                '</tr>';
+            }).join('')
+          : '';
+        var userLine = meta.user
+          ? '<span>작성자: ' + escapeHtml(meta.user) + '</span>'
+          : '';
+        return '<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">' +
+          '<title>' + escapeHtml(meta.title) + ' - 공정표</title>' +
+          '<style>' + getProcessPrintStyles() + '</style></head><body>' +
+          '<h1>' + escapeHtml(meta.title) + '</h1>' +
+          '<p class="meta">' +
+          userLine +
+          '<span>일자: ' + escapeHtml(meta.dateLabel) + '</span>' +
+          '<span>인쇄: ' + escapeHtml(new Date().toLocaleString('ko-KR')) + '</span>' +
+          '</p>' +
+          '<table class="process-print-data">' +
+          getProcessPrintTableHeadHtml() +
           '<tbody>' + bodyRows + '</tbody>' +
           '</table>' +
           '<table class="process-print-summary">' +
-          '<colgroup>' +
-          '<col class="col-cat">' +
-          '<col class="col-content">' +
-          '<col class="col-target">' +
-          '<col class="col-actual">' +
-          '<col class="col-linked">' +
-          '</colgroup>' +
+          getProcessPrintTableHeadHtml() +
+          '<tbody>' +
+          '<tr class="grand-total">' +
+          '<td colspan="2" class="cat label">전체 시간</td>' +
+          '<td class="num">' + escapeHtml(formatProcessMinutes(totals.targetSum)) + '</td>' +
+          '<td class="num">' + escapeHtml(formatProcessMinutes(totals.actualSum)) + '</td>' +
+          '<td class="num">—</td>' +
+          '</tr>' +
+          categoryRows +
+          '</tbody></table></body></html>';
+      }
+
+      function measureProcessPrintLayout(doc) {
+        var mmToPx = 96 / 25.4;
+        var printableHeight = Math.round(297 * mmToPx) -
+          Math.round(PROCESS_PRINT_MARGIN_TOP_MM * mmToPx) -
+          Math.round(PROCESS_PRINT_MARGIN_MM * mmToPx);
+        var h1 = doc.querySelector('h1');
+        var meta = doc.querySelector('.meta');
+        var thead = doc.querySelector('table.process-print-data thead');
+        var summary = doc.querySelector('table.process-print-summary');
+        var firstPageOverhead = (h1 ? h1.offsetHeight : 0) +
+          (meta ? meta.offsetHeight : 0) +
+          (thead ? thead.offsetHeight : 0) + 4;
+        var nextPageOverhead = (thead ? thead.offsetHeight : 0) + 2;
+        return {
+          printableHeight: printableHeight,
+          firstPageAvail: Math.max(120, printableHeight - firstPageOverhead),
+          nextPageAvail: Math.max(120, printableHeight - nextPageOverhead),
+          summaryHeight: summary ? summary.offsetHeight + 4 : 100,
+          fillTolerance: 20
+        };
+      }
+
+      function paginateProcessPrintRows(rowHeights, layout) {
+        var pages = [];
+        var i = 0;
+        var n = rowHeights.length;
+        var pageNum = 0;
+        while (i < n) {
+          var baseCapacity = (pageNum === 0 ? layout.firstPageAvail : layout.nextPageAvail) + layout.fillTolerance;
+          var remainingHeight = 0;
+          var j;
+          for (j = i; j < n; j++) remainingHeight += rowHeights[j];
+          var capacity = baseCapacity;
+          if (remainingHeight <= baseCapacity) {
+            capacity = Math.max(100, baseCapacity - layout.summaryHeight);
+          }
+          var used = 0;
+          var start = i;
+          while (i < n) {
+            if (used + rowHeights[i] > capacity && i > start) break;
+            used += rowHeights[i];
+            i++;
+          }
+          if (i === start) {
+            used += rowHeights[i];
+            i++;
+          }
+          pages.push({ start: start, end: i });
+          pageNum++;
+        }
+        return pages;
+      }
+
+      function buildPrintBodyRowsHtmlFlat(rows, blocks, bandClasses) {
+        var html = [];
+        rows = rows || [];
+        for (var r = 0; r < rows.length; r++) {
+          var row = rows[r];
+          var cat = String(row.category || '').trim();
+          var isFirstInGroup = r === 0 || String(rows[r - 1].category || '').trim() !== cat;
+          var rowClass = 'data-row ' + (bandClasses[r] || 'band-plain');
+          html.push('<tr class="' + rowClass + '">');
+          html.push('<td class="cat">' + (isFirstInGroup ? escapeHtml(cat) : '&nbsp;') + '</td>');
+          html.push(
+            '<td class="content">' + escapeHtml(row.content) + '</td>' +
+            '<td class="num">' + escapeHtml(formatProcessCellMinutes(row.targetMin)) + '</td>' +
+            '<td class="num">' + escapeHtml(formatProcessCellMinutes(row.actualMin)) + '</td>' +
+            '<td class="num linked">' + escapeHtml(getProcessRowLinkedTimeDisplay(r, blocks)) + '</td>' +
+            '</tr>'
+          );
+        }
+        return html.join('');
+      }
+
+      function measureProcessPrintPageSegments(rows, doc) {
+        var rowEls = doc.querySelectorAll('table.process-print-data tbody tr.data-row');
+        if (!rowEls.length) return [{ start: 0, end: rows.length }];
+        var rowHeights = [];
+        var idx;
+        for (idx = 0; idx < rowEls.length; idx++) {
+          rowHeights.push(rowEls[idx].offsetHeight);
+        }
+        var layout = measureProcessPrintLayout(doc);
+        var totalHeight = 0;
+        for (idx = 0; idx < rowHeights.length; idx++) totalHeight += rowHeights[idx];
+        if (totalHeight + layout.summaryHeight <= layout.firstPageAvail + layout.fillTolerance) {
+          return [{ start: 0, end: rows.length }];
+        }
+        return paginateProcessPrintRows(rowHeights, layout);
+      }
+
+      function buildProcessPrintHtml(rows, pageSegments) {
+        var meta = getCurrentProcessSheetMeta();
+        var blocks = computeProcessBlocks(rows);
+        var totals = calcProcessTotals(rows);
+        var categories = calcProcessCategoryTotals(rows);
+        var bandClasses = getPrintCategoryBandClasses(rows);
+        var dataTables = buildProcessPrintDataTablesHtml(rows, blocks, bandClasses, pageSegments);
+        var categoryRows = categories.length
+          ? '<tr class="section-header"><td colspan="5">작업 구분별 누적 시간</td></tr>' +
+            categories.map(function (item, idx) {
+              var rowClass = idx % 2 === 0 ? 'subtotal even' : 'subtotal odd';
+              return '<tr class="' + rowClass + '">' +
+                '<td colspan="2" class="cat">' + escapeHtml(item.category) + '</td>' +
+                '<td class="num">' + escapeHtml(formatProcessMinutes(item.targetSum)) + '</td>' +
+                '<td class="num">' + escapeHtml(formatProcessMinutes(item.actualSum)) + '</td>' +
+                '<td class="num">—</td>' +
+                '</tr>';
+            }).join('')
+          : '';
+        var userLine = meta.user
+          ? '<span>작성자: ' + escapeHtml(meta.user) + '</span>'
+          : '';
+        return '<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">' +
+          '<title>' + escapeHtml(meta.title) + ' - 공정표</title>' +
+          '<style>' + getProcessPrintStyles() + '</style></head><body>' +
+          '<h1>' + escapeHtml(meta.title) + '</h1>' +
+          '<p class="meta">' +
+          userLine +
+          '<span>일자: ' + escapeHtml(meta.dateLabel) + '</span>' +
+          '<span>인쇄: ' + escapeHtml(new Date().toLocaleString('ko-KR')) + '</span>' +
+          '</p>' +
+          dataTables +
+          '<table class="process-print-summary">' +
+          getProcessPrintTableHeadHtml() +
           '<tbody>' +
           '<tr class="grand-total">' +
           '<td colspan="2" class="cat label">전체 시간</td>' +
@@ -5600,23 +5765,39 @@
           showError('인쇄할 공정표 행이 없습니다.');
           return;
         }
-        var html = buildProcessPrintHtml(rows);
         var iframe = document.createElement('iframe');
         iframe.setAttribute('aria-hidden', 'true');
-        iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
+        iframe.style.cssText = 'position:fixed;left:-10000px;top:0;width:' + PROCESS_PRINT_PAGE_WIDTH_PX + 'px;height:600px;border:0;visibility:hidden;';
         document.body.appendChild(iframe);
         var printWindow = iframe.contentWindow;
         var printDoc = printWindow.document;
+
+        function finishPrint(pageSegments) {
+          var html = buildProcessPrintHtml(rows, pageSegments);
+          printDoc.open();
+          printDoc.write(html);
+          printDoc.close();
+          setTimeout(function () {
+            printWindow.focus();
+            printWindow.print();
+            setTimeout(function () {
+              if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+            }, 1000);
+          }, 300);
+        }
+
         printDoc.open();
-        printDoc.write(html);
+        printDoc.write(buildProcessPrintMeasureHtml(rows));
         printDoc.close();
         setTimeout(function () {
-          printWindow.focus();
-          printWindow.print();
-          setTimeout(function () {
-            if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-          }, 1000);
-        }, 300);
+          var pageSegments;
+          try {
+            pageSegments = measureProcessPrintPageSegments(rows, printDoc);
+          } catch (e) {
+            pageSegments = [{ start: 0, end: rows.length }];
+          }
+          finishPrint(pageSegments);
+        }, 120);
       }
 
       function formatPrintMultiline(text) {
