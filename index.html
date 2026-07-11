@@ -8956,6 +8956,10 @@
           meta.label = input.value.trim() || col.label;
           scoreSheetState.columnSettings[id] = meta;
         });
+      }
+
+      function collectScoreMaxColumnsFromDOM() {
+        if (!el.scoringTableHead) return;
         el.scoringTableHead.querySelectorAll('.score-max-input').forEach(function (input) {
           var id = input.getAttribute('data-score-col-id');
           var col = getScoreColumnById(id);
@@ -8967,34 +8971,57 @@
         });
       }
 
-      function updateScoreMaxTotalCell() {
-        if (!el.scoringTableHead) return;
-        var cell = el.scoringTableHead.querySelector('[data-score-max-total]');
-        if (cell) cell.textContent = formatScoreDisplay(calcMaxTotal(getEnabledScoreColumns()));
+      function getScoreMaxValuesFromDOM() {
+        var maxById = {};
+        if (!el.scoringTableHead) return maxById;
+        el.scoringTableHead.querySelectorAll('.score-max-input').forEach(function (input) {
+          var id = input.getAttribute('data-score-col-id');
+          var val = parseScoreValue(input.value);
+          if (id && val != null && val >= 0) maxById[id] = val;
+        });
+        return maxById;
       }
 
-      function updateScoreBodyMaxLimits() {
-        if (!el.scoringTableBody) return;
-        var colMap = {};
-        getEnabledScoreColumns().forEach(function (col) {
-          colMap[col.id] = col;
+      function calcMaxTotalFromDOM(columns) {
+        var domMax = getScoreMaxValuesFromDOM();
+        var sum = 0;
+        (columns || getEnabledScoreColumns()).forEach(function (col) {
+          sum += domMax[col.id] != null ? domMax[col.id] : col.maxScore;
         });
-        el.scoringTableBody.querySelectorAll('[data-score-col]').forEach(function (input) {
-          var id = input.getAttribute('data-score-col');
-          var col = colMap[id];
-          if (!col) return;
-          var val = parseScoreValue(input.value);
-          if (val != null && val > col.maxScore) input.value = String(col.maxScore);
-        });
-        el.scoringTableBody.querySelectorAll('tr[data-score-round-id]').forEach(function (tr) {
-          updateScoreRowTotal(tr, getEnabledScoreColumns());
-        });
+        return sum;
+      }
+
+      function updateScoreMaxTotalCell(useDomPreview) {
+        if (!el.scoringTableHead) return;
+        var cell = el.scoringTableHead.querySelector('[data-score-max-total]');
+        if (!cell) return;
+        var total = useDomPreview
+          ? calcMaxTotalFromDOM()
+          : calcMaxTotal(getEnabledScoreColumns());
+        cell.textContent = formatScoreDisplay(total);
       }
 
       function onScoreHeaderMetaChange() {
         collectScoreColumnsFromDOM();
-        updateScoreMaxTotalCell();
-        updateScoreBodyMaxLimits();
+        updateScoreMaxTotalCell(false);
+        renderScoreColumnSettings();
+        scheduleScoreChartRender();
+      }
+
+      function onScoreMaxInput() {
+        updateScoreMaxTotalCell(true);
+      }
+
+      function onScoreMaxBlur(e) {
+        var input = e && e.target;
+        if (input) {
+          var val = parseScoreValue(input.value);
+          if (val != null && val >= 0) {
+            input.value = formatScoreMax(val);
+          }
+        }
+        collectScoreMaxColumnsFromDOM();
+        updateScoreMaxTotalCell(false);
         renderScoreColumnSettings();
         scheduleScoreChartRender();
       }
@@ -9022,6 +9049,7 @@
 
       function collectScoreSheetFromDOM() {
         collectScoreColumnsFromDOM();
+        collectScoreMaxColumnsFromDOM();
         collectScoreRoundsFromDOM();
         if (el.scoreWorkNameInput) {
           scoreSheetState.workName = el.scoreWorkNameInput.value.trim() || '채점결과';
@@ -9148,7 +9176,8 @@
           maxInput.value = formatScoreMax(col.maxScore);
           maxInput.setAttribute('data-score-col-id', col.id);
           maxInput.title = '만점';
-          maxInput.addEventListener('input', onScoreHeaderMetaChange);
+          maxInput.addEventListener('input', onScoreMaxInput);
+          maxInput.addEventListener('blur', onScoreMaxBlur);
           if (col.id === SCORE_DIM_COL_ID) {
             var maxCellInner = document.createElement('div');
             maxCellInner.className = 'score-max-cell-inner';
@@ -9245,11 +9274,12 @@
             input.value = round.scores[col.id] != null ? String(round.scores[col.id]) : '';
             input.placeholder = '0';
             input.addEventListener('input', function () {
-              collectScoreColumnsFromDOM();
               var maxScore = col.maxScore;
               getEnabledScoreColumns().forEach(function (c) {
                 if (c.id === col.id) maxScore = c.maxScore;
               });
+              var domMax = getScoreMaxValuesFromDOM();
+              if (domMax[col.id] != null) maxScore = domMax[col.id];
               var val = parseScoreValue(input.value);
               if (val != null && val > maxScore) {
                 input.value = String(maxScore);
