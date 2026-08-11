@@ -3239,6 +3239,10 @@
           <span class="rsidebar-tab-icon" aria-hidden="true">📊</span>
           <span class="rsidebar-tab-label">채점결과</span>
         </button>
+        <button type="button" class="rsidebar-tab" id="coverTabBtn" aria-pressed="false" title="표지 인쇄">
+          <span class="rsidebar-tab-icon" aria-hidden="true">📑</span>
+          <span class="rsidebar-tab-label">표지</span>
+        </button>
       </nav>
     </aside>
   </div>
@@ -4327,6 +4331,7 @@
         ganttTabBtn: document.getElementById('ganttTabBtn'),
         feedbackTabBtn: document.getElementById('feedbackTabBtn'),
         scoringTabBtn: document.getElementById('scoringTabBtn'),
+        coverTabBtn: document.getElementById('coverTabBtn'),
         processCard: document.getElementById('processCard'),
         feedbackCard: document.getElementById('feedbackCard'),
         scoringCard: document.getElementById('scoringCard'),
@@ -5611,6 +5616,72 @@
         var printDoc = printWindow.document;
         printDoc.open();
         printDoc.write(buildProcessPrintHtml(rows));
+        printDoc.close();
+        setTimeout(function () {
+          printWindow.focus();
+          printWindow.print();
+          setTimeout(function () {
+            if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+          }, 1000);
+        }, 250);
+      }
+
+      function buildCoverPrintHtml(userName) {
+        var name = String(userName || '').trim() || '이름';
+        return '<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">' +
+          '<title>포트폴리오 표지 — ' + escapeHtml(name) + '</title>' +
+          '<style>' +
+          '* { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }' +
+          'html, body { margin: 0; padding: 0; height: 100%; }' +
+          'body { font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; background: #fff; color: #1c1c1c; }' +
+          '.sheet { width: 210mm; height: 297mm; margin: 0 auto; padding: 18mm 20mm; position: relative; }' +
+          '.frame { position: absolute; inset: 14mm; border: 1.2px solid #2a2a2a; pointer-events: none; }' +
+          '.frame::before { content: ""; position: absolute; inset: 3.5mm; border: 0.6px solid #8a8a8a; }' +
+          '.inner { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 28mm 10mm 24mm; text-align: center; }' +
+          '.top-block { width: 100%; }' +
+          '.eyebrow { margin: 0 0 18px; font-size: 12.5pt; font-weight: 600; letter-spacing: 0.18em; color: #4a5560; }' +
+          '.rule { width: 42mm; height: 1.5px; margin: 0 auto 22px; background: #1f6f8b; border: 0; }' +
+          '.job { margin: 0 0 14px; font-size: 18pt; font-weight: 700; letter-spacing: -0.02em; color: #1a1a1a; }' +
+          '.title { margin: 0; font-size: 22pt; font-weight: 800; letter-spacing: -0.03em; line-height: 1.45; color: #111; }' +
+          '.mid-mark { width: 1px; height: 28mm; margin: 0 auto; background: linear-gradient(to bottom, transparent, #b0b8bf 20%, #b0b8bf 80%, transparent); }' +
+          '.name-block { width: 100%; }' +
+          '.name-label { margin: 0 0 10px; font-size: 10.5pt; font-weight: 600; letter-spacing: 0.22em; color: #6b7280; }' +
+          '.name { margin: 0; font-size: 28pt; font-weight: 800; letter-spacing: -0.03em; color: #111; }' +
+          '.name-rule { width: 56mm; height: 1px; margin: 14px auto 0; background: #c5ccd3; border: 0; }' +
+          '@media print { @page { size: A4 portrait; margin: 0; } html, body { width: 210mm; height: 297mm; } .sheet { margin: 0; page-break-after: avoid; } }' +
+          '@media screen { body { background: #e8eaed; padding: 16px 0; } .sheet { background: #fff; box-shadow: 0 8px 28px rgba(0,0,0,0.12); } }' +
+          '</style></head><body>' +
+          '<div class="sheet">' +
+          '<div class="frame" aria-hidden="true"></div>' +
+          '<div class="inner">' +
+          '<div class="top-block">' +
+          '<p class="eyebrow">전공심화동아리</p>' +
+          '<hr class="rule">' +
+          '<p class="job">프로토타입모델링 직종</p>' +
+          '<p class="title">전국기능경기대회 대비 훈련</p>' +
+          '</div>' +
+          '<div class="mid-mark" aria-hidden="true"></div>' +
+          '<div class="name-block">' +
+          '<p class="name-label">이름</p>' +
+          '<p class="name">' + escapeHtml(name) + '</p>' +
+          '<hr class="name-rule">' +
+          '</div>' +
+          '</div></div></body></html>';
+      }
+
+      function printCoverPage() {
+        if (!currentUser || !el.nameCard || !el.nameCard.classList.contains('name-locked')) {
+          showError('이름을 선택한 뒤 표지를 인쇄할 수 있습니다.');
+          return;
+        }
+        var iframe = document.createElement('iframe');
+        iframe.setAttribute('aria-hidden', 'true');
+        iframe.style.cssText = 'position:fixed;left:-10000px;top:0;width:794px;height:1123px;border:0;visibility:hidden;';
+        document.body.appendChild(iframe);
+        var printWindow = iframe.contentWindow;
+        var printDoc = printWindow.document;
+        printDoc.open();
+        printDoc.write(buildCoverPrintHtml(currentUser));
         printDoc.close();
         setTimeout(function () {
           printWindow.focus();
@@ -11422,6 +11493,12 @@
         el.scoringTabBtn.addEventListener('click', function (e) {
           e.preventDefault();
           showScoringView();
+        });
+      }
+      if (el.coverTabBtn) {
+        el.coverTabBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          printCoverPage();
         });
       }
       if (el.saveScoreSheetBtn) {
