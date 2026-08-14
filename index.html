@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" class="theme-dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,125 +16,137 @@
       --ease: cubic-bezier(0.34, 1.2, 0.64, 1);
       --sidebar-width: 216px;
     }
-    /* 선셋 — 따뜻한 밝은 오렌지 */
+    /* 선셋 — 어두운 석양, 구리빛 (눈부심 없음) */
     html[data-theme="sunrise"] {
-      --bg: #fff9f5;
-      --bg-elevated: #ffffff;
-      --card: rgba(255, 255, 255, 0.92);
-      --card-solid: #ffffff;
-      --input-bg: #fff3eb;
-      --border: rgba(255, 87, 34, 0.18);
-      --border-strong: rgba(255, 87, 34, 0.32);
-      --text: #2a221c;
-      --muted: #7a6f65;
-      --accent: #ff5722;
-      --accent-2: #ffb300;
-      --accent-soft: rgba(255, 87, 34, 0.14);
-      --accent-hover: #ff7043;
-      --electric: #1e88e5;
-      --electric-soft: rgba(30, 136, 229, 0.12);
-      --success: #00c853;
-      --success-soft: rgba(0, 200, 83, 0.14);
-      --danger: #e53935;
-      --admin: #f9a825;
-      --pct-low: #ff8f00;
-      --pct-mid: #00c853;
-      --pct-high: #1e88e5;
-      --on-accent: #ffffff;
-      --on-success: #ffffff;
-      --shadow: 0 10px 32px rgba(255, 87, 34, 0.12);
-      --shadow-sm: 0 2px 12px rgba(42, 34, 28, 0.08);
-      --body-bg: var(--bg);
+      --bg: #16110f;
+      --bg-elevated: #1e1714;
+      --card: rgba(255, 255, 255, 0.04);
+      --card-solid: #221c18;
+      --input-bg: rgba(0, 0, 0, 0.38);
+      --border: rgba(196, 122, 78, 0.18);
+      --border-strong: rgba(196, 122, 78, 0.3);
+      --text: #efe6de;
+      --muted: #a8988c;
+      --accent: #c97a4e;
+      --accent-2: #c4a05c;
+      --accent-soft: rgba(201, 122, 78, 0.16);
+      --accent-hover: #d99266;
+      --electric: #6e8eb0;
+      --electric-soft: rgba(110, 142, 176, 0.14);
+      --success: #6fba7e;
+      --success-soft: rgba(111, 186, 126, 0.14);
+      --danger: #d17676;
+      --admin: #c4a05c;
+      --pct-low: #c4a05c;
+      --pct-mid: #6fba7e;
+      --pct-high: #6e8eb0;
+      --on-accent: #16110f;
+      --on-success: #12160f;
+      --shadow: 0 12px 36px rgba(0, 0, 0, 0.42);
+      --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.28);
+      --body-bg:
+        radial-gradient(ellipse 80% 50% at 0% -6%, rgba(201, 122, 78, 0.14), transparent 52%),
+        var(--bg);
+      --title-gradient: linear-gradient(115deg, #f3ebe4 0%, #c97a4e 48%, #c4a05c 100%);
     }
-    /* 전기 — 시원한 밝은 블루 */
+    /* 전기 — 어두운 인디고, 네온 없음 */
     html[data-theme="electric"] {
-      --bg: #f4f8ff;
-      --bg-elevated: #ffffff;
-      --card: rgba(255, 255, 255, 0.95);
-      --card-solid: #ffffff;
-      --input-bg: #eef4ff;
-      --border: rgba(41, 98, 255, 0.16);
-      --border-strong: rgba(41, 98, 255, 0.28);
-      --text: #152238;
-      --muted: #5c6b82;
-      --accent: #2962ff;
-      --accent-2: #ff3d00;
-      --accent-soft: rgba(41, 98, 255, 0.12);
-      --accent-hover: #448aff;
-      --electric: #2962ff;
-      --electric-soft: rgba(41, 98, 255, 0.1);
-      --success: #00e676;
-      --success-soft: rgba(0, 230, 118, 0.12);
-      --danger: #ff1744;
-      --admin: #ffc400;
-      --pct-low: #ff9100;
-      --pct-mid: #00e676;
-      --pct-high: #2962ff;
-      --on-accent: #ffffff;
-      --on-success: #0a1f12;
-      --shadow: 0 10px 32px rgba(41, 98, 255, 0.14);
-      --shadow-sm: 0 2px 12px rgba(21, 34, 56, 0.08);
-      --body-bg: var(--bg);
+      --bg: #0f141c;
+      --bg-elevated: #161c28;
+      --card: rgba(255, 255, 255, 0.04);
+      --card-solid: #1a2230;
+      --input-bg: rgba(0, 0, 0, 0.38);
+      --border: rgba(91, 126, 176, 0.18);
+      --border-strong: rgba(91, 126, 176, 0.3);
+      --text: #e4eaf2;
+      --muted: #8e9aab;
+      --accent: #6a8ec0;
+      --accent-2: #c48662;
+      --accent-soft: rgba(106, 142, 192, 0.16);
+      --accent-hover: #86a6d0;
+      --electric: #6a8ec0;
+      --electric-soft: rgba(106, 142, 192, 0.14);
+      --success: #6fba8a;
+      --success-soft: rgba(111, 186, 138, 0.14);
+      --danger: #d17676;
+      --admin: #c4a05c;
+      --pct-low: #c4a05c;
+      --pct-mid: #6fba8a;
+      --pct-high: #6a8ec0;
+      --on-accent: #0f141c;
+      --on-success: #0f141c;
+      --shadow: 0 12px 36px rgba(0, 0, 0, 0.42);
+      --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.28);
+      --body-bg:
+        radial-gradient(ellipse 75% 48% at 100% 0%, rgba(106, 142, 192, 0.12), transparent 50%),
+        var(--bg);
+      --title-gradient: linear-gradient(115deg, #eef3f8 0%, #6a8ec0 50%, #8aa6cc 100%);
     }
-    /* 라임 — 밝은 라임·핑크 */
+    /* 라임 — 어두운 황록, 형광·핑크 없음 */
     html[data-theme="lime"] {
-      --bg: #f8fdf2;
-      --bg-elevated: #ffffff;
-      --card: rgba(255, 255, 255, 0.94);
-      --card-solid: #ffffff;
-      --input-bg: #f0fce4;
-      --border: rgba(124, 179, 66, 0.22);
-      --border-strong: rgba(124, 179, 66, 0.36);
-      --text: #1f2e14;
-      --muted: #5f6f52;
-      --accent: #e91e8c;
-      --accent-2: #9ccc20;
-      --accent-soft: rgba(233, 30, 140, 0.1);
-      --accent-hover: #f06292;
-      --electric: #7cb342;
-      --electric-soft: rgba(124, 179, 66, 0.12);
-      --success: #43a047;
-      --success-soft: rgba(67, 160, 71, 0.14);
-      --danger: #d81b60;
-      --admin: #cddc39;
-      --pct-low: #fbc02d;
-      --pct-mid: #43a047;
-      --pct-high: #7cb342;
-      --on-accent: #ffffff;
-      --on-success: #ffffff;
-      --shadow: 0 10px 32px rgba(124, 179, 66, 0.14);
-      --shadow-sm: 0 2px 12px rgba(31, 46, 20, 0.08);
-      --body-bg: var(--bg);
+      --bg: #13160c;
+      --bg-elevated: #1a1f12;
+      --card: rgba(255, 255, 255, 0.04);
+      --card-solid: #1e2416;
+      --input-bg: rgba(0, 0, 0, 0.38);
+      --border: rgba(168, 176, 74, 0.2);
+      --border-strong: rgba(168, 176, 74, 0.32);
+      --text: #eceee0;
+      --muted: #9aa084;
+      --accent: #a3b04a;
+      --accent-2: #c4a05c;
+      --accent-soft: rgba(163, 176, 74, 0.16);
+      --accent-hover: #b6c45e;
+      --electric: #7a9aaa;
+      --electric-soft: rgba(122, 154, 170, 0.14);
+      --success: #6fba7e;
+      --success-soft: rgba(111, 186, 126, 0.14);
+      --danger: #d17676;
+      --admin: #c4a05c;
+      --pct-low: #c4a05c;
+      --pct-mid: #6fba7e;
+      --pct-high: #a3b04a;
+      --on-accent: #13160c;
+      --on-success: #13160c;
+      --shadow: 0 12px 36px rgba(0, 0, 0, 0.42);
+      --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.28);
+      --body-bg:
+        radial-gradient(ellipse 80% 50% at 0% -6%, rgba(163, 176, 74, 0.12), transparent 52%),
+        var(--bg);
+      --title-gradient: linear-gradient(115deg, #eef2dc 0%, #a3b04a 48%, #c4a05c 100%);
     }
-    /* 스카이 — 맑은 하늘 */
+    /* 스카이 — 어두운 청회색 */
     html[data-theme="sky"] {
-      --bg: #f0f9ff;
-      --bg-elevated: #ffffff;
-      --card: rgba(255, 255, 255, 0.96);
-      --card-solid: #ffffff;
-      --input-bg: #e8f6fc;
-      --border: rgba(2, 132, 199, 0.18);
-      --border-strong: rgba(2, 132, 199, 0.32);
-      --text: #0c2d48;
-      --muted: #5a7a94;
-      --accent: #0284c7;
-      --accent-2: #f59e0b;
-      --accent-soft: rgba(2, 132, 199, 0.12);
-      --accent-hover: #0ea5e9;
-      --electric: #0284c7;
-      --electric-soft: rgba(2, 132, 199, 0.1);
-      --success: #10b981;
-      --success-soft: rgba(16, 185, 129, 0.12);
-      --danger: #ef4444;
-      --admin: #f59e0b;
-      --pct-low: #f59e0b;
-      --pct-mid: #10b981;
-      --pct-high: #0284c7;
-      --on-accent: #ffffff;
-      --on-success: #ffffff;
-      --shadow: 0 10px 32px rgba(2, 132, 199, 0.12);
-      --shadow-sm: 0 2px 12px rgba(12, 45, 72, 0.08);
-      --body-bg: var(--bg);
+      --bg: #0f151a;
+      --bg-elevated: #161e24;
+      --card: rgba(255, 255, 255, 0.04);
+      --card-solid: #1a232a;
+      --input-bg: rgba(0, 0, 0, 0.38);
+      --border: rgba(94, 138, 163, 0.18);
+      --border-strong: rgba(94, 138, 163, 0.3);
+      --text: #e4edf2;
+      --muted: #8a9aa6;
+      --accent: #6e97ae;
+      --accent-2: #c4a06a;
+      --accent-soft: rgba(110, 151, 174, 0.16);
+      --accent-hover: #8aafc2;
+      --electric: #6e97ae;
+      --electric-soft: rgba(110, 151, 174, 0.14);
+      --success: #6fba8a;
+      --success-soft: rgba(111, 186, 138, 0.14);
+      --danger: #d17676;
+      --admin: #c4a06a;
+      --pct-low: #c4a06a;
+      --pct-mid: #6fba8a;
+      --pct-high: #6e97ae;
+      --on-accent: #0f151a;
+      --on-success: #0f151a;
+      --shadow: 0 12px 36px rgba(0, 0, 0, 0.42);
+      --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.28);
+      --body-bg:
+        radial-gradient(ellipse 75% 48% at 100% 0%, rgba(110, 151, 174, 0.12), transparent 50%),
+        var(--bg);
+      --title-gradient: linear-gradient(115deg, #e8f0f4 0%, #6e97ae 50%, #c4a06a 100%);
     }
     /* 연필 — 누른 종이에 연필(검정)로 쓴 듯한 스케치 */
     html[data-theme="sketch"] {
@@ -221,6 +233,171 @@
         radial-gradient(ellipse 65% 45% at 100% 0%, rgba(77, 159, 255, 0.12), transparent 48%),
         var(--bg);
       --title-gradient: linear-gradient(115deg, #fff8f2 0%, #ff8f4a 42%, #ffc53d 100%);
+    }
+    /* 심야 — OLED에 가까운 저채도, 야간·교실 모니터용 */
+    html[data-theme="midnight"] {
+      --bg: #08090c;
+      --bg-elevated: #101218;
+      --card: rgba(255, 255, 255, 0.035);
+      --card-solid: #12141b;
+      --input-bg: rgba(0, 0, 0, 0.42);
+      --border: rgba(138, 155, 176, 0.14);
+      --border-strong: rgba(138, 155, 176, 0.26);
+      --text: #d5dae3;
+      --muted: #8b929e;
+      --accent: #7e93aa;
+      --accent-2: #9aa3b0;
+      --accent-soft: rgba(126, 147, 170, 0.14);
+      --accent-hover: #97abbf;
+      --electric: #7e93aa;
+      --electric-soft: rgba(126, 147, 170, 0.12);
+      --success: #6aaa7c;
+      --success-soft: rgba(106, 170, 124, 0.14);
+      --danger: #c77a82;
+      --admin: #b8a56a;
+      --pct-low: #b8a56a;
+      --pct-mid: #6aaa7c;
+      --pct-high: #7e93aa;
+      --on-accent: #08090c;
+      --on-success: #08090c;
+      --shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+      --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.35);
+      --body-bg:
+        radial-gradient(ellipse 70% 40% at 50% -10%, rgba(126, 147, 170, 0.08), transparent 55%),
+        var(--bg);
+      --title-gradient: linear-gradient(115deg, #e8edf4 0%, #7e93aa 55%, #9aa3b0 100%);
+    }
+    /* 카본 — 무채색 다크모드, 색 부담 없음 */
+    html[data-theme="carbon"] {
+      --bg: #111111;
+      --bg-elevated: #191919;
+      --card: rgba(255, 255, 255, 0.04);
+      --card-solid: #1c1c1c;
+      --input-bg: rgba(0, 0, 0, 0.4);
+      --border: rgba(255, 255, 255, 0.1);
+      --border-strong: rgba(255, 255, 255, 0.2);
+      --text: #ececec;
+      --muted: #9a9a9a;
+      --accent: #d8d8d8;
+      --accent-2: #8e8e8e;
+      --accent-soft: rgba(255, 255, 255, 0.08);
+      --accent-hover: #ffffff;
+      --electric: #b0b0b0;
+      --electric-soft: rgba(255, 255, 255, 0.08);
+      --success: #8fbf8f;
+      --success-soft: rgba(143, 191, 143, 0.14);
+      --danger: #c98989;
+      --admin: #c4b06a;
+      --pct-low: #c4b06a;
+      --pct-mid: #8fbf8f;
+      --pct-high: #a8b4c4;
+      --on-accent: #111111;
+      --on-success: #111111;
+      --shadow: 0 12px 36px rgba(0, 0, 0, 0.48);
+      --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.32);
+      --body-bg: var(--bg);
+      --title-gradient: linear-gradient(115deg, #ffffff 0%, #c8c8c8 55%, #9a9a9a 100%);
+    }
+    /* 스틸 — 가공실·로봇 금속감 */
+    html[data-theme="steel"] {
+      --bg: #101318;
+      --bg-elevated: #171c24;
+      --card: rgba(255, 255, 255, 0.04);
+      --card-solid: #1b222c;
+      --input-bg: rgba(0, 0, 0, 0.38);
+      --border: rgba(122, 147, 168, 0.16);
+      --border-strong: rgba(122, 147, 168, 0.28);
+      --text: #e6ebf0;
+      --muted: #8e9aa6;
+      --accent: #7a93a8;
+      --accent-2: #b8955a;
+      --accent-soft: rgba(122, 147, 168, 0.16);
+      --accent-hover: #93abc0;
+      --electric: #7a93a8;
+      --electric-soft: rgba(122, 147, 168, 0.14);
+      --success: #6fba8a;
+      --success-soft: rgba(111, 186, 138, 0.14);
+      --danger: #c98989;
+      --admin: #b8955a;
+      --pct-low: #b8955a;
+      --pct-mid: #6fba8a;
+      --pct-high: #7a93a8;
+      --on-accent: #101318;
+      --on-success: #101318;
+      --shadow: 0 12px 36px rgba(0, 0, 0, 0.44);
+      --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.3);
+      --body-bg:
+        radial-gradient(ellipse 70% 45% at 100% 0%, rgba(184, 149, 90, 0.1), transparent 48%),
+        radial-gradient(ellipse 80% 50% at 0% -8%, rgba(122, 147, 168, 0.1), transparent 52%),
+        var(--bg);
+      --title-gradient: linear-gradient(115deg, #eef2f6 0%, #7a93a8 46%, #b8955a 100%);
+    }
+    /* 올리브 — 야외·군용 톤, 형광 라임 아님 */
+    html[data-theme="olive"] {
+      --bg: #11140f;
+      --bg-elevated: #181c14;
+      --card: rgba(255, 255, 255, 0.04);
+      --card-solid: #1c2218;
+      --input-bg: rgba(0, 0, 0, 0.38);
+      --border: rgba(139, 154, 98, 0.18);
+      --border-strong: rgba(139, 154, 98, 0.3);
+      --text: #e8eadf;
+      --muted: #959b86;
+      --accent: #8b9a62;
+      --accent-2: #b8a56a;
+      --accent-soft: rgba(139, 154, 98, 0.16);
+      --accent-hover: #a2b176;
+      --electric: #7a92a0;
+      --electric-soft: rgba(122, 146, 160, 0.14);
+      --success: #6fba7e;
+      --success-soft: rgba(111, 186, 126, 0.14);
+      --danger: #c98989;
+      --admin: #b8a56a;
+      --pct-low: #b8a56a;
+      --pct-mid: #6fba7e;
+      --pct-high: #8b9a62;
+      --on-accent: #11140f;
+      --on-success: #11140f;
+      --shadow: 0 12px 36px rgba(0, 0, 0, 0.44);
+      --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.3);
+      --body-bg:
+        radial-gradient(ellipse 80% 50% at 0% -6%, rgba(139, 154, 98, 0.12), transparent 52%),
+        var(--bg);
+      --title-gradient: linear-gradient(115deg, #eef0e4 0%, #8b9a62 48%, #b8a56a 100%);
+    }
+    /* 네이비 — 교복 네이비 + 금색 */
+    html[data-theme="navy"] {
+      --bg: #0b1020;
+      --bg-elevated: #12182c;
+      --card: rgba(255, 255, 255, 0.04);
+      --card-solid: #161e34;
+      --input-bg: rgba(0, 0, 0, 0.4);
+      --border: rgba(212, 178, 74, 0.16);
+      --border-strong: rgba(212, 178, 74, 0.28);
+      --text: #ece8dc;
+      --muted: #9aa0b4;
+      --accent: #d4b24a;
+      --accent-2: #5a74b0;
+      --accent-soft: rgba(212, 178, 74, 0.14);
+      --accent-hover: #e0c46a;
+      --electric: #6a82c0;
+      --electric-soft: rgba(106, 130, 192, 0.14);
+      --success: #6fba8a;
+      --success-soft: rgba(111, 186, 138, 0.14);
+      --danger: #c98989;
+      --admin: #d4b24a;
+      --pct-low: #d4b24a;
+      --pct-mid: #6fba8a;
+      --pct-high: #6a82c0;
+      --on-accent: #0b1020;
+      --on-success: #0b1020;
+      --shadow: 0 12px 36px rgba(0, 0, 0, 0.46);
+      --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.32);
+      --body-bg:
+        radial-gradient(ellipse 70% 45% at 100% 0%, rgba(90, 116, 176, 0.14), transparent 50%),
+        radial-gradient(ellipse 80% 50% at 0% -8%, rgba(212, 178, 74, 0.1), transparent 52%),
+        var(--bg);
+      --title-gradient: linear-gradient(115deg, #f4efe0 0%, #d4b24a 46%, #8fa4d4 100%);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -618,7 +795,9 @@
     body.main-view-feedback .task-diary-row,
     body.main-view-feedback #chartCard,
     body.main-view-scoring .task-diary-row,
-    body.main-view-scoring #chartCard {
+    body.main-view-scoring #chartCard,
+    body.main-view-share .task-diary-row,
+    body.main-view-share #chartCard {
       display: none !important;
     }
     #feedbackCard {
@@ -967,6 +1146,299 @@
     }
     #scoringCard.visible {
       display: flex;
+    }
+    #shareCard {
+      display: none;
+      flex-direction: column;
+      gap: 0;
+    }
+    #shareCard.visible {
+      display: flex;
+    }
+    .share-card-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px 16px;
+      margin-bottom: 8px;
+    }
+    .share-card-header h2 {
+      font-size: 1.05rem;
+      margin: 0;
+    }
+    .share-admin-pill {
+      display: none;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--admin);
+      border: 1px solid var(--admin);
+      border-radius: 999px;
+      padding: 3px 8px;
+    }
+    .share-admin-pill.show { display: inline-flex; }
+    .share-create {
+      display: grid;
+      grid-template-columns: minmax(140px, 1.2fr) minmax(160px, 1.4fr) auto;
+      gap: 10px 12px;
+      align-items: stretch;
+      margin: 12px 0 18px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--input-bg);
+    }
+    .share-create label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 0;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .share-create input {
+      width: 100%;
+      margin-bottom: 0;
+      padding: 10px 12px;
+      font-size: 0.92rem;
+      line-height: 1.3;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--input-bg);
+      color: var(--text);
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+    .share-create input:focus {
+      outline: none;
+      border-color: var(--border-strong);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+      background: var(--input-bg);
+    }
+    .share-create-action {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 76px;
+    }
+    .share-create-action-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      line-height: 1.2;
+      visibility: hidden;
+      user-select: none;
+    }
+    .share-create .btn {
+      white-space: nowrap;
+      flex: 1;
+      margin: 0;
+      padding: 10px 18px;
+      line-height: 1.3;
+      box-sizing: border-box;
+    }
+    .share-setup {
+      display: none;
+      margin-bottom: 14px;
+      padding: 12px 14px;
+      border: 1px dashed var(--border-strong);
+      border-radius: var(--radius);
+      background: var(--input-bg);
+      font-size: 0.82rem;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+    .share-setup.show { display: block; }
+    .share-setup code, .share-setup pre {
+      display: block;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-top: 8px;
+      font-size: 0.75rem;
+      color: var(--text);
+    }
+    .share-empty {
+      color: var(--muted);
+      font-size: 0.88rem;
+      padding: 18px 4px;
+    }
+    .share-work {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card-solid, var(--card));
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+    .share-work-line {
+      display: flex;
+      align-items: stretch;
+      gap: 4px;
+    }
+    .share-work-row {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      margin: 0;
+      border: none;
+      background: transparent;
+      color: inherit;
+      font-family: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+    .share-work-row:hover {
+      background: var(--accent-soft);
+    }
+    .share-work-main {
+      flex: 1;
+      min-width: 0;
+    }
+    .share-work-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .share-work-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .share-work-count {
+      flex-shrink: 0;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .share-work-chevron {
+      flex-shrink: 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+    .share-work-actions, .share-comment-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px;
+      padding-right: 8px;
+    }
+    .share-work-panel {
+      width: min(640px, 100%);
+      max-height: min(86vh, 860px);
+      overflow: auto;
+    }
+    .share-work-modal-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .share-work-modal-head h2 {
+      margin: 0 0 4px;
+    }
+    .share-link-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .share-link-row a {
+      color: var(--accent-hover);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .share-edit-grid {
+      display: grid;
+      grid-template-columns: minmax(140px, 1.2fr) minmax(160px, 1.4fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .share-edit-grid input {
+      width: 100%;
+      margin-bottom: 0;
+      padding: 8px 10px;
+      font-size: 0.88rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--input-bg);
+      color: var(--text);
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+    .share-comments {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .share-comments-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .share-comment {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .share-comment:last-of-type { border-bottom: none; }
+    .share-comment-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px 10px;
+      margin-bottom: 4px;
+    }
+    .share-comment-author { font-size: 0.82rem; font-weight: 700; }
+    .share-comment-date { font-size: 0.72rem; color: var(--muted); margin-left: 6px; font-weight: 500; }
+    .share-comment-body {
+      font-size: 0.88rem;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .share-comment-form, .share-comment-edit {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .share-comment-form textarea,
+    .share-comment-edit textarea {
+      width: 100%;
+      min-height: 72px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--input-bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.88rem;
+      resize: vertical;
+    }
+    .share-comment-form textarea:focus,
+    .share-comment-edit textarea:focus {
+      outline: none;
+      border-color: var(--border-strong);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    @media (max-width: 720px) {
+      .share-create,
+      .share-edit-grid {
+        grid-template-columns: 1fr;
+      }
+      .share-create-action-label { display: none; }
     }
     .scoring-card-header {
       display: flex;
@@ -1466,8 +1938,7 @@
     .score-dim-detail-master-table .score-dim-eval-cell {
       background: rgba(255, 250, 235, 0.55);
     }
-    html[data-theme="ember"] .score-dim-detail-master-table .score-dim-eval-cell,
-    html:not([data-theme]) .score-dim-detail-master-table .score-dim-eval-cell {
+    html.theme-dark .score-dim-detail-master-table .score-dim-eval-cell {
       background: rgba(255, 255, 255, 0.04);
     }
     .score-dim-detail-master-table tr.band-plain td:not(.score-dim-eval-cell):not(.is-low) {
@@ -2004,10 +2475,9 @@
       letter-spacing: -0.03em;
       color: var(--accent);
     }
-    html:not([data-theme]) h1:not(.admin-hint),
-    html[data-theme="ember"] h1:not(.admin-hint) {
+    html.theme-dark h1:not(.admin-hint) {
       color: transparent;
-      background: linear-gradient(115deg, #fff8f2 0%, #ff8f4a 42%, #ffc53d 100%);
+      background: var(--title-gradient, var(--accent));
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -2099,6 +2569,7 @@
     }
     input[type="text"],
     input[type="password"],
+    input[type="url"],
     select {
       width: 100%;
       padding: 14px 16px;
@@ -2582,6 +3053,28 @@
     .readonly-badge.is-visible {
       display: inline-flex;
     }
+    .admin-login-badge {
+      display: none;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--admin);
+      background: var(--input-bg);
+      border: 1px solid var(--admin);
+    }
+    .admin-login-badge.is-visible {
+      display: inline-flex;
+    }
+    .admin-login-box {
+      margin-bottom: 18px;
+      padding: 14px;
+      border: 1px solid var(--admin);
+      border-radius: var(--radius);
+      background: var(--input-bg);
+    }
+    .admin-login-box .btn { width: 100%; }
     .name-display-actions {
       display: flex;
       align-items: center;
@@ -3013,11 +3506,17 @@
   </style>
   <script>
     (function () {
-      var THEMES = ['sunrise', 'electric', 'lime', 'sky', 'sketch', 'ember'];
+      var THEMES = ['sunrise', 'electric', 'lime', 'sky', 'sketch', 'ember', 'midnight', 'carbon', 'steel', 'olive', 'navy'];
+      var LIGHT_THEMES = { sketch: 1 };
       try {
         var t = localStorage.getItem('proDiary_theme');
         if (t && THEMES.indexOf(t) !== -1 && t !== 'ember') {
           document.documentElement.setAttribute('data-theme', t);
+        }
+        if (t && LIGHT_THEMES[t]) {
+          document.documentElement.classList.remove('theme-dark');
+        } else {
+          document.documentElement.classList.add('theme-dark');
         }
       } catch (e) { /* ignore */ }
     })();
@@ -3049,6 +3548,11 @@
         <label for="themeSelect">색 테마</label>
         <select id="themeSelect" aria-label="색 테마 선택">
           <option value="ember">파워</option>
+          <option value="midnight">심야</option>
+          <option value="carbon">카본</option>
+          <option value="steel">스틸</option>
+          <option value="olive">올리브</option>
+          <option value="navy">네이비</option>
           <option value="sunrise">선셋</option>
           <option value="electric">전기</option>
           <option value="lime">라임</option>
@@ -3086,6 +3590,7 @@
           <div class="name-display-row">
             <strong id="displayName"></strong>
             <span id="readonlyBadge" class="readonly-badge" hidden>읽기 전용</span>
+            <span id="adminBadge" class="admin-login-badge" hidden>관리자</span>
             <span id="userProBadgeWrap" class="pro-badge-wrap user-pro-badge-wrap" aria-label="프로 뱃지"></span>
           </div>
           <div class="name-display-actions">
@@ -3314,10 +3819,36 @@
           <div id="scoreDimDetailPanel"></div>
         </div>
       </div>
+
+      <div class="card" id="shareCard">
+        <div class="share-card-header">
+          <h2>작품 공유회</h2>
+          <span class="share-admin-pill" id="shareAdminPill">관리자 권한</span>
+        </div>
+        <p class="hint" style="margin-top:0;">모든 사용자가 같은 목록을 봅니다. 작품명·도면 링크는 <strong>처음 등록한 사람</strong>과 <strong>관리자</strong>만 수정·삭제할 수 있고, 댓글도 <strong>작성자</strong>와 <strong>관리자</strong>만 수정·삭제할 수 있습니다.</p>
+        <div class="share-create">
+          <label for="shareTitleInput">작품명
+            <input type="text" id="shareTitleInput" placeholder="작품 이름" maxlength="80">
+          </label>
+          <label for="shareLinkInput">도면 링크
+            <input type="url" id="shareLinkInput" placeholder="https://..." spellcheck="false">
+          </label>
+          <div class="share-create-action">
+            <span class="share-create-action-label" aria-hidden="true">등록</span>
+            <button type="button" class="btn btn-primary" id="shareCreateBtn">등록</button>
+          </div>
+        </div>
+        <div class="share-setup" id="shareSetupHint"></div>
+        <div id="shareList"></div>
+      </div>
     </div>
 
     <div class="card admin-panel" id="adminPanel">
       <h2>관리자 모드</h2>
+      <div class="admin-login-box">
+        <p class="hint" style="margin-top:0;">관리자로 로그인하면 모든 사용자의 일지·공정표·자가피드백·채점결과·작품 공유회를 보고 수정·삭제할 수 있습니다. 일반 로그인 목록과 왼쪽 일지 목록에는 관리자가 나타나지 않습니다.</p>
+        <button type="button" class="btn btn-primary" id="adminLoginBtn">관리자로 로그인</button>
+      </div>
       <label for="newUserName">새 사용자 추가</label>
       <input type="text" id="newUserName" placeholder="추가할 이름">
       <button type="button" class="btn btn-primary" id="addUserBtn">사용자 추가</button>
@@ -3349,6 +3880,10 @@
         <button type="button" class="rsidebar-tab" id="scoringTabBtn" aria-pressed="false" aria-controls="scoringCard" title="채점결과">
           <span class="rsidebar-tab-icon" aria-hidden="true">📊</span>
           <span class="rsidebar-tab-label">채점결과</span>
+        </button>
+        <button type="button" class="rsidebar-tab" id="shareTabBtn" aria-pressed="false" aria-controls="shareCard" title="작품 공유회">
+          <span class="rsidebar-tab-icon" aria-hidden="true">🔗</span>
+          <span class="rsidebar-tab-label">작품 공유회</span>
         </button>
         <button type="button" class="rsidebar-tab" id="coverTabBtn" aria-pressed="false" title="표지 인쇄">
           <span class="rsidebar-tab-icon" aria-hidden="true">📑</span>
@@ -3422,6 +3957,20 @@
         <button type="button" class="btn btn-outline" id="scoreDrawingLinkCancelBtn">취소</button>
         <button type="button" class="btn btn-primary" id="scoreDrawingLinkConfirmBtn">저장</button>
       </div>
+    </div>
+  </div>
+
+  <div id="shareWorkModal" class="diary-print-modal" aria-hidden="true" role="dialog" aria-labelledby="shareWorkModalTitle">
+    <div class="diary-print-backdrop" id="shareWorkBackdrop"></div>
+    <div class="diary-print-panel share-work-panel">
+      <div class="share-work-modal-head">
+        <div>
+          <h2 id="shareWorkModalTitle">작품</h2>
+          <p class="share-work-meta" id="shareWorkModalMeta"></p>
+        </div>
+        <button type="button" class="link-btn" id="shareWorkModalClose">닫기</button>
+      </div>
+      <div id="shareWorkModalBody"></div>
     </div>
   </div>
 
@@ -3779,6 +4328,7 @@
   async function addUser(name) {
     name = String(name || '').trim();
     if (!name) throw new Error('이름을 입력해주세요.');
+    if (name === '관리자') throw new Error('관리자는 사용자로 추가할 수 없습니다. 관리자 모드에서 로그인하세요.');
     var users = await getUsers();
     if (users.indexOf(name) !== -1) throw new Error('이미 등록된 사용자입니다.');
     var db = requireConfig();
@@ -4453,6 +5003,218 @@
     return getScoreSheets(userName);
   }
 
+  var SHARE_SETUP_SQL =
+    'create table if not exists public.share_works (\n' +
+    '  id uuid primary key default gen_random_uuid(),\n' +
+    '  title text not null,\n' +
+    '  drawing_link text not null default \'\',\n' +
+    '  created_by text not null,\n' +
+    '  comments jsonb not null default \'[]\'::jsonb,\n' +
+    '  created_at timestamptz not null default now(),\n' +
+    '  updated_at timestamptz not null default now()\n' +
+    ');\n' +
+    'alter table public.share_works enable row level security;\n' +
+    'drop policy if exists share_works_all on public.share_works;\n' +
+    'create policy share_works_all on public.share_works for all using (true) with check (true);';
+
+  function shareSetupError() {
+    return new Error('작품 공유회 저장을 위해 Supabase SQL Editor에서 안내된 테이블 생성 SQL을 실행해주세요.');
+  }
+
+  function mapShareComment(row) {
+    row = row || {};
+    return {
+      id: String(row.id || ''),
+      author: String(row.author || '').trim(),
+      body: String(row.body || ''),
+      createdAt: String(row.createdAt || row.created_at || ''),
+      updatedAt: String(row.updatedAt || row.updated_at || '')
+    };
+  }
+
+  function mapShareWork(row) {
+    var comments = [];
+    if (row && Array.isArray(row.comments)) comments = row.comments.map(mapShareComment);
+    return {
+      id: row && row.id,
+      title: String(row && row.title || '').trim(),
+      drawingLink: String((row && (row.drawing_link || row.drawingLink)) || '').trim(),
+      createdBy: String((row && (row.created_by || row.createdBy)) || '').trim(),
+      comments: comments,
+      createdAt: String(row && row.created_at || ''),
+      updatedAt: String(row && row.updated_at || '')
+    };
+  }
+
+  function canManageShareItem(actorName, ownerName, isAdmin) {
+    if (isAdmin) return true;
+    return String(actorName || '').trim() === String(ownerName || '').trim();
+  }
+
+  function newShareCommentId() {
+    return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+
+  async function getShareWorks() {
+    var db = requireConfig();
+    var res = await db.from('share_works')
+      .select('id, title, drawing_link, created_by, comments, created_at, updated_at')
+      .order('created_at', { ascending: false });
+    if (res.error) {
+      if (isMissingRelationError(res.error)) throw shareSetupError();
+      throw new Error(res.error.message);
+    }
+    return (res.data || []).map(mapShareWork);
+  }
+
+  async function addShareWork(actorName, title, drawingLink) {
+    actorName = String(actorName || '').trim();
+    title = String(title || '').trim();
+    drawingLink = String(drawingLink || '').trim();
+    if (!actorName) throw new Error('로그인 후 등록할 수 있습니다.');
+    if (!title) throw new Error('작품명을 입력해주세요.');
+    var db = requireConfig();
+    var ins = await db.from('share_works').insert({
+      title: title,
+      drawing_link: drawingLink,
+      created_by: actorName,
+      comments: []
+    }).select('id, title, drawing_link, created_by, comments, created_at, updated_at').single();
+    if (ins.error) {
+      if (isMissingRelationError(ins.error)) throw shareSetupError();
+      throw new Error(ins.error.message);
+    }
+    return mapShareWork(ins.data);
+  }
+
+  async function updateShareWork(actorName, workId, title, drawingLink, isAdmin) {
+    actorName = String(actorName || '').trim();
+    workId = String(workId || '').trim();
+    title = String(title || '').trim();
+    drawingLink = String(drawingLink || '').trim();
+    if (!actorName) throw new Error('로그인 후 수정할 수 있습니다.');
+    if (!workId) throw new Error('수정할 작품을 찾을 수 없습니다.');
+    if (!title) throw new Error('작품명을 입력해주세요.');
+    var db = requireConfig();
+    var found = await db.from('share_works').select('id, created_by').eq('id', workId).maybeSingle();
+    if (found.error) throw new Error(found.error.message);
+    if (!found.data) throw new Error('작품을 찾을 수 없습니다.');
+    if (!canManageShareItem(actorName, found.data.created_by, isAdmin)) {
+      throw new Error('처음 등록한 사람과 관리자만 수정할 수 있습니다.');
+    }
+    var upd = await db.from('share_works').update({
+      title: title,
+      drawing_link: drawingLink,
+      updated_at: new Date().toISOString()
+    }).eq('id', workId).select('id, title, drawing_link, created_by, comments, created_at, updated_at').maybeSingle();
+    if (upd.error) throw new Error(upd.error.message);
+    if (!upd.data) throw new Error('작품을 찾을 수 없습니다.');
+    return mapShareWork(upd.data);
+  }
+
+  async function deleteShareWork(actorName, workId, isAdmin) {
+    actorName = String(actorName || '').trim();
+    workId = String(workId || '').trim();
+    if (!actorName) throw new Error('로그인 후 삭제할 수 있습니다.');
+    if (!workId) throw new Error('삭제할 작품을 찾을 수 없습니다.');
+    var db = requireConfig();
+    var found = await db.from('share_works').select('id, created_by').eq('id', workId).maybeSingle();
+    if (found.error) throw new Error(found.error.message);
+    if (!found.data) throw new Error('작품을 찾을 수 없습니다.');
+    if (!canManageShareItem(actorName, found.data.created_by, isAdmin)) {
+      throw new Error('처음 등록한 사람과 관리자만 삭제할 수 있습니다.');
+    }
+    var del = await db.from('share_works').delete().eq('id', workId).select('id');
+    if (del.error) throw new Error(del.error.message);
+    return getShareWorks();
+  }
+
+  async function addShareComment(actorName, workId, body) {
+    actorName = String(actorName || '').trim();
+    workId = String(workId || '').trim();
+    body = String(body || '').trim();
+    if (!actorName) throw new Error('로그인 후 댓글을 작성할 수 있습니다.');
+    if (!workId) throw new Error('작품을 찾을 수 없습니다.');
+    if (!body) throw new Error('댓글 내용을 입력해주세요.');
+    var db = requireConfig();
+    var found = await db.from('share_works').select('id, comments').eq('id', workId).maybeSingle();
+    if (found.error) throw new Error(found.error.message);
+    if (!found.data) throw new Error('작품을 찾을 수 없습니다.');
+    var comments = Array.isArray(found.data.comments) ? found.data.comments.map(mapShareComment) : [];
+    var now = new Date().toISOString();
+    comments.push({
+      id: newShareCommentId(),
+      author: actorName,
+      body: body,
+      createdAt: now,
+      updatedAt: now
+    });
+    var upd = await db.from('share_works').update({
+      comments: comments,
+      updated_at: now
+    }).eq('id', workId).select('id, title, drawing_link, created_by, comments, created_at, updated_at').maybeSingle();
+    if (upd.error) throw new Error(upd.error.message);
+    return mapShareWork(upd.data);
+  }
+
+  async function updateShareComment(actorName, workId, commentId, body, isAdmin) {
+    actorName = String(actorName || '').trim();
+    workId = String(workId || '').trim();
+    commentId = String(commentId || '').trim();
+    body = String(body || '').trim();
+    if (!actorName) throw new Error('로그인 후 수정할 수 있습니다.');
+    if (!body) throw new Error('댓글 내용을 입력해주세요.');
+    var db = requireConfig();
+    var found = await db.from('share_works').select('id, comments').eq('id', workId).maybeSingle();
+    if (found.error) throw new Error(found.error.message);
+    if (!found.data) throw new Error('작품을 찾을 수 없습니다.');
+    var comments = Array.isArray(found.data.comments) ? found.data.comments.map(mapShareComment) : [];
+    var idx = -1;
+    var i;
+    for (i = 0; i < comments.length; i++) {
+      if (comments[i].id === commentId) { idx = i; break; }
+    }
+    if (idx < 0) throw new Error('댓글을 찾을 수 없습니다.');
+    if (!canManageShareItem(actorName, comments[idx].author, isAdmin)) {
+      throw new Error('작성자와 관리자만 댓글을 수정할 수 있습니다.');
+    }
+    comments[idx].body = body;
+    comments[idx].updatedAt = new Date().toISOString();
+    var upd = await db.from('share_works').update({
+      comments: comments,
+      updated_at: comments[idx].updatedAt
+    }).eq('id', workId).select('id, title, drawing_link, created_by, comments, created_at, updated_at').maybeSingle();
+    if (upd.error) throw new Error(upd.error.message);
+    return mapShareWork(upd.data);
+  }
+
+  async function deleteShareComment(actorName, workId, commentId, isAdmin) {
+    actorName = String(actorName || '').trim();
+    workId = String(workId || '').trim();
+    commentId = String(commentId || '').trim();
+    if (!actorName) throw new Error('로그인 후 삭제할 수 있습니다.');
+    var db = requireConfig();
+    var found = await db.from('share_works').select('id, comments').eq('id', workId).maybeSingle();
+    if (found.error) throw new Error(found.error.message);
+    if (!found.data) throw new Error('작품을 찾을 수 없습니다.');
+    var comments = Array.isArray(found.data.comments) ? found.data.comments.map(mapShareComment) : [];
+    var target = null;
+    comments = comments.filter(function (c) {
+      if (c.id === commentId) { target = c; return false; }
+      return true;
+    });
+    if (!target) throw new Error('댓글을 찾을 수 없습니다.');
+    if (!canManageShareItem(actorName, target.author, isAdmin)) {
+      throw new Error('작성자와 관리자만 댓글을 삭제할 수 있습니다.');
+    }
+    var upd = await db.from('share_works').update({
+      comments: comments,
+      updated_at: new Date().toISOString()
+    }).eq('id', workId).select('id, title, drawing_link, created_by, comments, created_at, updated_at').maybeSingle();
+    if (upd.error) throw new Error(upd.error.message);
+    return mapShareWork(upd.data);
+  }
+
   global.ProDiaryApi = {
     isReady: function () {
       return Boolean(global.SUPABASE_URL && global.SUPABASE_ANON_KEY &&
@@ -4484,7 +5246,15 @@
     deleteFeedbackSheet: deleteFeedbackSheet,
     getScoreSheets: getScoreSheets,
     saveScoreSheet: saveScoreSheet,
-    deleteScoreSheet: deleteScoreSheet
+    deleteScoreSheet: deleteScoreSheet,
+    getShareWorks: getShareWorks,
+    addShareWork: addShareWork,
+    updateShareWork: updateShareWork,
+    deleteShareWork: deleteShareWork,
+    addShareComment: addShareComment,
+    updateShareComment: updateShareComment,
+    deleteShareComment: deleteShareComment,
+    shareSetupSql: function () { return SHARE_SETUP_SQL; }
   };
 })(window);
 
@@ -4493,9 +5263,12 @@
     (function () {
       var STORAGE_KEY = 'proDiary_userName';
       var STORAGE_AUTH = 'proDiary_authSession';
+      var ADMIN_NAME = '관리자';
+      var STORAGE_ADMIN = 'proDiary_adminUnlocked';
       var STORAGE_THEME = 'proDiary_theme';
-      var THEME_IDS = ['sunrise', 'electric', 'lime', 'sky', 'sketch', 'ember'];
+      var THEME_IDS = ['sunrise', 'electric', 'lime', 'sky', 'sketch', 'ember', 'midnight', 'carbon', 'steel', 'olive', 'navy'];
       var DEFAULT_THEME = 'ember';
+      var LIGHT_THEMES = ['sketch'];
 
       function getSavedTheme() {
         try {
@@ -4519,6 +5292,11 @@
         try {
           localStorage.setItem(STORAGE_THEME, id);
         } catch (e) { /* ignore */ }
+        if (LIGHT_THEMES.indexOf(id) !== -1) {
+          document.documentElement.classList.remove('theme-dark');
+        } else {
+          document.documentElement.classList.add('theme-dark');
+        }
         var sel = document.getElementById('themeSelect');
         if (sel && sel.value !== id) sel.value = id;
         refreshChartColorsForTheme();
@@ -4579,6 +5357,7 @@
       var processSavedListOpen = false;
       var feedbackSavedListOpen = false;
       var scoreSavedListOpen = false;
+      var shareState = { works: [], editingWorkId: '', editingCommentKey: '', openWorkId: '', setupError: '' };
       var PROCESS_CATEGORIES = [
         '재단', 'CAD', 'CAM', '3D 프린터', 'CNC', '밀링', '선반', '일반가공', '도색', '조립'
       ];
@@ -4602,6 +5381,7 @@
       var chartJsPromise = null;
       var currentUser = '';
       var loggedInUser = '';
+      var adminUnlocked = false;
       var viewDate = '';
       var users = [];
       var usersAuth = [];
@@ -4635,6 +5415,7 @@
         loginBtn: document.getElementById('loginBtn'),
         displayName: document.getElementById('displayName'),
         readonlyBadge: document.getElementById('readonlyBadge'),
+        adminBadge: document.getElementById('adminBadge'),
         backToMyDiaryBtn: document.getElementById('backToMyDiaryBtn'),
         logoutBtn: document.getElementById('logoutBtn'),
         userProBadgeWrap: document.getElementById('userProBadgeWrap'),
@@ -4670,6 +5451,7 @@
         addUserBtn: document.getElementById('addUserBtn'),
         userChips: document.getElementById('userChips'),
         closeAdminBtn: document.getElementById('closeAdminBtn'),
+        adminLoginBtn: document.getElementById('adminLoginBtn'),
         busyOverlay: document.getElementById('busyOverlay'),
         busyMessage: document.getElementById('busyMessage'),
         sidebar: document.getElementById('sidebar'),
@@ -4684,10 +5466,24 @@
         ganttTabBtn: document.getElementById('ganttTabBtn'),
         feedbackTabBtn: document.getElementById('feedbackTabBtn'),
         scoringTabBtn: document.getElementById('scoringTabBtn'),
+        shareTabBtn: document.getElementById('shareTabBtn'),
         coverTabBtn: document.getElementById('coverTabBtn'),
         processCard: document.getElementById('processCard'),
         feedbackCard: document.getElementById('feedbackCard'),
         scoringCard: document.getElementById('scoringCard'),
+        shareCard: document.getElementById('shareCard'),
+        shareAdminPill: document.getElementById('shareAdminPill'),
+        shareTitleInput: document.getElementById('shareTitleInput'),
+        shareLinkInput: document.getElementById('shareLinkInput'),
+        shareCreateBtn: document.getElementById('shareCreateBtn'),
+        shareSetupHint: document.getElementById('shareSetupHint'),
+        shareList: document.getElementById('shareList'),
+        shareWorkModal: document.getElementById('shareWorkModal'),
+        shareWorkBackdrop: document.getElementById('shareWorkBackdrop'),
+        shareWorkModalTitle: document.getElementById('shareWorkModalTitle'),
+        shareWorkModalMeta: document.getElementById('shareWorkModalMeta'),
+        shareWorkModalBody: document.getElementById('shareWorkModalBody'),
+        shareWorkModalClose: document.getElementById('shareWorkModalClose'),
         processTableBody: document.getElementById('processTableBody'),
         processTableFoot: document.getElementById('processTableFoot'),
         processEmpty: document.getElementById('processEmpty'),
@@ -6469,6 +7265,10 @@
       }
 
       function triggerContextPrint() {
+        if (mainViewMode === 'share') {
+          printShareWorks();
+          return;
+        }
         if (!currentUser || !el.nameCard || !el.nameCard.classList.contains('name-locked')) {
           showError('이름을 선택한 뒤 인쇄할 수 있습니다.');
           return;
@@ -6482,6 +7282,141 @@
         } else if (mainViewMode === 'scoring') {
           printScoreSheet();
         }
+      }
+
+      function buildSharePrintHtml(works) {
+        var blocks = (works || []).map(function (work) {
+          var comments = work.comments || [];
+          var commentHtml;
+          if (!comments.length) {
+            commentHtml = '<p class="empty-comment">등록된 댓글이 없습니다.</p>';
+          } else {
+            commentHtml = comments.map(function (c) {
+              return '<div class="comment">' +
+                '<div class="comment-head"><strong>' + escapeHtml(c.author || '알 수 없음') + '</strong>' +
+                (c.createdAt ? ' <span>' + escapeHtml(formatShareDate(c.createdAt)) + '</span>' : '') +
+                '</div>' +
+                '<div class="comment-body">' + formatPrintMultiline(c.body || '') + '</div>' +
+                '</div>';
+            }).join('');
+          }
+          var headRight = '';
+          var linkHtml;
+          if (work.drawingLink) {
+            var qrSrc = 'https://api.qrserver.com/v1/create-qr-code/?size=120x120&margin=6&ecc=M&data=' +
+              encodeURIComponent(work.drawingLink);
+            headRight =
+              '<div class="qr-wrap">' +
+              '<img class="qr" src="' + qrSrc.replace(/"/g, '&quot;') + '" alt="도면 링크 QR 코드">' +
+              '<p class="qr-caption">QR로 열기</p>' +
+              '</div>';
+            linkHtml =
+              '<p class="link-label">도면 링크</p>' +
+              '<p class="link">' + escapeHtml(work.drawingLink) + '</p>';
+          } else {
+            linkHtml = '<p class="link">등록된 도면 링크가 없습니다.</p>';
+          }
+          return '<section class="work">' +
+            '<div class="work-head">' +
+            '<div class="work-head-text">' +
+            '<h2>' + escapeHtml(work.title || '제목 없음') + '</h2>' +
+            '<p class="meta">' + escapeHtml(work.createdBy || '알 수 없음') +
+            (work.createdAt ? ' · ' + escapeHtml(formatShareDate(work.createdAt)) : '') +
+            ' 등록 · 댓글 ' + comments.length + '개</p>' +
+            linkHtml +
+            '</div>' +
+            headRight +
+            '</div>' +
+            '<h3>공정 설명 · 댓글</h3>' +
+            commentHtml +
+            '</section>';
+        }).join('');
+        if (!blocks) {
+          blocks = '<p>등록된 작품이 없습니다.</p>';
+        }
+        return '<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">' +
+          '<title>작품 공유회</title>' +
+          '<style>' +
+          '* { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }' +
+          'body { font-family: "Pretendard", "Malgun Gothic", sans-serif; color: #111; margin: 24px; background: #fff; }' +
+          'h1 { margin: 0 0 6px; font-size: 1.35rem; text-align: center; }' +
+          '.print-meta { text-align: center; color: #555; font-size: 0.85rem; margin: 0 0 22px; }' +
+          '.work { border: 1px solid #ccc; border-radius: 8px; padding: 14px 16px; margin: 0 0 16px; page-break-inside: avoid; }' +
+          '.work-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin: 0 0 4px; }' +
+          '.work-head-text { flex: 1; min-width: 0; }' +
+          '.work h2 { margin: 0 0 4px; font-size: 1.12rem; }' +
+          '.work h3 { margin: 10px 0 8px; font-size: 0.92rem; }' +
+          '.meta { margin: 0 0 6px; color: #444; font-size: 0.85rem; }' +
+          '.link-label { margin: 0 0 2px; font-size: 0.78rem; font-weight: 700; color: #555; }' +
+          '.link { margin: 0; color: #444; font-size: 0.85rem; word-break: break-all; }' +
+          '.qr-wrap { flex-shrink: 0; width: 88px; text-align: center; margin-top: -2px; }' +
+          '.qr { width: 80px; height: 80px; border: 1px solid #ddd; background: #fff; display: block; margin: 0 auto; }' +
+          '.qr-caption { margin: 3px 0 0; font-size: 0.68rem; color: #666; }' +
+          '.comment { padding: 8px 0; border-top: 1px solid #ddd; }' +
+          '.comment-head { font-size: 0.82rem; margin-bottom: 4px; }' +
+          '.comment-head span { color: #666; font-weight: 400; }' +
+          '.comment-body { font-size: 0.9rem; line-height: 1.55; white-space: pre-wrap; }' +
+          '.empty-comment { color: #666; font-size: 0.88rem; }' +
+          '@media print { body { margin: 12mm; } @page { margin: 12mm; } .work { page-break-inside: avoid; } }' +
+          '</style></head><body>' +
+          '<h1>작품 공유회</h1>' +
+          '<p class="print-meta">인쇄: ' + escapeHtml(new Date().toLocaleString('ko-KR')) + '</p>' +
+          blocks +
+          '</body></html>';
+      }
+
+      function printShareWorks() {
+        if (!loggedInUser && !adminUnlocked) {
+          showError('로그인 후 인쇄할 수 있습니다.');
+          return;
+        }
+        var iframe = document.createElement('iframe');
+        iframe.setAttribute('aria-hidden', 'true');
+        iframe.style.cssText = 'position:fixed;left:-10000px;top:0;width:794px;height:1123px;border:0;visibility:hidden;';
+        document.body.appendChild(iframe);
+        var printWindow = iframe.contentWindow;
+        var printDoc = printWindow.document;
+        printDoc.open();
+        printDoc.write(buildSharePrintHtml(shareState.works || []));
+        printDoc.close();
+
+        function startPrint() {
+          try {
+            printWindow.focus();
+            printWindow.print();
+          } catch (e) { /* ignore */ }
+          setTimeout(function () {
+            if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+          }, 1200);
+        }
+
+        var imgs = printDoc.images ? Array.prototype.slice.call(printDoc.images) : [];
+        if (!imgs.length) {
+          setTimeout(startPrint, 200);
+          return;
+        }
+        var remaining = imgs.length;
+        var printed = false;
+        var finish = function () {
+          if (printed) return;
+          remaining -= 1;
+          if (remaining <= 0) {
+            printed = true;
+            setTimeout(startPrint, 80);
+          }
+        };
+        setTimeout(function () {
+          if (printed) return;
+          printed = true;
+          startPrint();
+        }, 2500);
+        imgs.forEach(function (img) {
+          if (img.complete && img.naturalWidth) finish();
+          else {
+            img.addEventListener('load', finish);
+            img.addEventListener('error', finish);
+          }
+        });
       }
 
       function formatMonthLabel(yearMonth) {
@@ -9850,14 +10785,601 @@
         applyMainViewMode();
       }
 
+      function loadAdminUnlocked() {
+        try {
+          return localStorage.getItem(STORAGE_ADMIN) === '1';
+        } catch (e) {
+          return false;
+        }
+      }
+
+      function setAdminUnlocked(on) {
+        adminUnlocked = !!on;
+        try {
+          if (adminUnlocked) localStorage.setItem(STORAGE_ADMIN, '1');
+          else localStorage.removeItem(STORAGE_ADMIN);
+        } catch (e) { /* ignore */ }
+        updateShareAdminUi();
+        updateAdminLoginButton();
+        if (mainViewMode === 'share') renderShareList();
+      }
+
+      function isAdminAccountName(name) {
+        return namesMatch(name, ADMIN_NAME);
+      }
+
+      function appUsers() {
+        return (users || []).filter(function (u) {
+          return !isAdminAccountName(u);
+        });
+      }
+
+      function updateAdminLoginButton() {
+        if (!el.adminLoginBtn) return;
+        if (adminUnlocked) {
+          el.adminLoginBtn.textContent = '관리자 로그아웃';
+          el.adminLoginBtn.classList.remove('btn-primary');
+          el.adminLoginBtn.classList.add('btn-outline');
+        } else {
+          el.adminLoginBtn.textContent = '관리자로 로그인';
+          el.adminLoginBtn.classList.add('btn-primary');
+          el.adminLoginBtn.classList.remove('btn-outline');
+        }
+      }
+
+      function loginAsAdmin() {
+        setAdminUnlocked(true);
+        if (!loggedInUser || isAdminAccountName(loggedInUser)) {
+          loggedInUser = ADMIN_NAME;
+        }
+        closeAdmin();
+        el.mainView.style.display = 'block';
+        if (currentUser && !isAdminAccountName(currentUser)) {
+          showTaskUI();
+        } else {
+          currentUser = '';
+          setNameLocked(true);
+          if (el.displayName) el.displayName.textContent = ADMIN_NAME;
+          if (el.taskDiaryRow) el.taskDiaryRow.style.display = 'none';
+          el.taskCard.style.display = 'none';
+          el.chartCard.style.display = 'none';
+          populateUserSelect();
+          loadSidebarPerUser();
+          updateReadonlyUi();
+        }
+        showError('관리자로 로그인했습니다. 왼쪽에서 사용자를 선택하면 해당 데이터를 수정·삭제할 수 있습니다.');
+        el.errorBox.style.background = 'rgba(34, 197, 94, 0.15)';
+        el.errorBox.style.color = '#86efac';
+      }
+
+      function logoutAdminOnly() {
+        var wasAdminIdentity = isAdminAccountName(loggedInUser);
+        setAdminUnlocked(false);
+        if (wasAdminIdentity) {
+          logoutUser();
+          return;
+        }
+        updateReadonlyUi();
+        if (mainViewMode === 'share') renderShareList();
+        showError('관리자 권한이 해제되었습니다.');
+      }
+
+      function toggleAdminLogin() {
+        if (adminUnlocked) logoutAdminOnly();
+        else loginAsAdmin();
+      }
+
+      function isShareAdmin() {
+        return !!adminUnlocked;
+      }
+
+      function canManageShareWork(work) {
+        return isShareAdmin() || namesMatch(loggedInUser, work && work.createdBy);
+      }
+
+      function canManageShareComment(comment) {
+        return isShareAdmin() || namesMatch(loggedInUser, comment && comment.author);
+      }
+
+      function shareCommentKey(workId, commentId) {
+        return String(workId || '') + '::' + String(commentId || '');
+      }
+
+      function formatShareDate(iso) {
+        if (!iso) return '';
+        var d = new Date(iso);
+        if (isNaN(d.getTime())) return String(iso).substring(0, 10);
+        return d.getFullYear() + '-' +
+          String(d.getMonth() + 1).padStart(2, '0') + '-' +
+          String(d.getDate()).padStart(2, '0') + ' ' +
+          String(d.getHours()).padStart(2, '0') + ':' +
+          String(d.getMinutes()).padStart(2, '0');
+      }
+
+      function updateShareAdminUi() {
+        if (el.shareAdminPill) el.shareAdminPill.classList.toggle('show', isShareAdmin());
+      }
+
+      function showShareSetup(on) {
+        if (!el.shareSetupHint) return;
+        if (!on) {
+          el.shareSetupHint.classList.remove('show');
+          el.shareSetupHint.innerHTML = '';
+          shareState.setupError = '';
+          return;
+        }
+        var sql = '';
+        try {
+          sql = window.ProDiaryApi && window.ProDiaryApi.shareSetupSql
+            ? window.ProDiaryApi.shareSetupSql()
+            : '';
+        } catch (e) { sql = ''; }
+        el.shareSetupHint.innerHTML =
+          '작품 공유회를 쓰려면 Supabase SQL Editor에서 아래를 한 번 실행하세요.' +
+          (sql ? '<pre>' + escapeHtml(sql) + '</pre>' : '');
+        el.shareSetupHint.classList.add('show');
+      }
+
+      function upsertShareWorkInState(work) {
+        if (!work || !work.id) return;
+        var i;
+        for (i = 0; i < shareState.works.length; i++) {
+          if (shareState.works[i].id === work.id) {
+            shareState.works[i] = work;
+            return;
+          }
+        }
+        shareState.works.unshift(work);
+      }
+
+      function loadShareWorks() {
+        updateShareAdminUi();
+        return runSilent('getShareWorks', [])
+          .then(function (list) {
+            shareState.works = list || [];
+            shareState.setupError = '';
+            showShareSetup(false);
+            renderShareList();
+          })
+          .catch(function (e) {
+            shareState.works = [];
+            shareState.setupError = e && e.message ? e.message : String(e);
+            if (/테이블 생성 SQL|share_works|relation/i.test(shareState.setupError)) {
+              showShareSetup(true);
+            } else {
+              showShareSetup(false);
+              showError(shareState.setupError);
+            }
+            renderShareList();
+          });
+      }
+
+      function renderShareList() {
+        if (!el.shareList) return;
+        updateShareAdminUi();
+        el.shareList.innerHTML = '';
+        if (!shareState.works.length) {
+          var empty = document.createElement('p');
+          empty.className = 'share-empty';
+          empty.textContent = shareState.setupError
+            ? '작품을 불러오지 못했습니다. 위 SQL을 실행한 뒤 다시 열어주세요.'
+            : '아직 등록된 작품이 없습니다. 위에서 작품명과 도면 링크를 등록하세요.';
+          el.shareList.appendChild(empty);
+          return;
+        }
+        shareState.works.forEach(function (work) {
+          el.shareList.appendChild(buildShareWorkEl(work));
+        });
+      }
+
+      function getShareWorkById(id) {
+        id = String(id || '');
+        var i;
+        for (i = 0; i < shareState.works.length; i++) {
+          if (String(shareState.works[i].id) === id) return shareState.works[i];
+        }
+        return null;
+      }
+
+      function openShareWorkModal(workId) {
+        var work = getShareWorkById(workId);
+        if (!work) return;
+        shareState.openWorkId = String(work.id);
+        renderShareWorkModal();
+        if (el.shareWorkModal) {
+          el.shareWorkModal.classList.add('visible');
+          el.shareWorkModal.setAttribute('aria-hidden', 'false');
+        }
+      }
+
+      function closeShareWorkModal() {
+        shareState.openWorkId = '';
+        shareState.editingWorkId = '';
+        shareState.editingCommentKey = '';
+        if (el.shareWorkModal) {
+          el.shareWorkModal.classList.remove('visible');
+          el.shareWorkModal.setAttribute('aria-hidden', 'true');
+        }
+        if (el.shareWorkModalBody) el.shareWorkModalBody.innerHTML = '';
+      }
+
+      function refreshShareOpenModal() {
+        if (!shareState.openWorkId) return;
+        if (!getShareWorkById(shareState.openWorkId)) {
+          closeShareWorkModal();
+          return;
+        }
+        renderShareWorkModal();
+      }
+
+      function renderShareWorkModal() {
+        var work = getShareWorkById(shareState.openWorkId);
+        if (!work || !el.shareWorkModalBody) return;
+        if (el.shareWorkModalTitle) el.shareWorkModalTitle.textContent = work.title || '제목 없음';
+        if (el.shareWorkModalMeta) {
+          el.shareWorkModalMeta.textContent = (work.createdBy || '알 수 없음') +
+            (work.createdAt ? ' · ' + formatShareDate(work.createdAt) : '') +
+            ' 등록';
+        }
+        el.shareWorkModalBody.innerHTML = '';
+
+        if (canManageShareWork(work)) {
+          var actions = document.createElement('div');
+          actions.className = 'share-work-actions';
+          actions.style.paddingRight = '0';
+          actions.style.marginBottom = '10px';
+          var editBtn = document.createElement('button');
+          editBtn.type = 'button';
+          editBtn.className = 'link-btn';
+          editBtn.textContent = shareState.editingWorkId === work.id ? '수정 취소' : '수정';
+          editBtn.addEventListener('click', function () {
+            shareState.editingWorkId = shareState.editingWorkId === work.id ? '' : work.id;
+            renderShareWorkModal();
+          });
+          var delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'link-btn';
+          delBtn.textContent = '삭제';
+          delBtn.addEventListener('click', function () { deleteShareWorkUi(work); });
+          actions.appendChild(editBtn);
+          actions.appendChild(delBtn);
+          el.shareWorkModalBody.appendChild(actions);
+        }
+
+        if (shareState.editingWorkId === work.id && canManageShareWork(work)) {
+          var editGrid = document.createElement('div');
+          editGrid.className = 'share-edit-grid';
+          var titleInput = document.createElement('input');
+          titleInput.type = 'text';
+          titleInput.maxLength = 80;
+          titleInput.value = work.title || '';
+          titleInput.placeholder = '작품명';
+          var linkInput = document.createElement('input');
+          linkInput.type = 'url';
+          linkInput.value = work.drawingLink || '';
+          linkInput.placeholder = 'https://...';
+          editGrid.appendChild(titleInput);
+          editGrid.appendChild(linkInput);
+          el.shareWorkModalBody.appendChild(editGrid);
+          var saveRow = document.createElement('div');
+          saveRow.className = 'share-work-actions';
+          saveRow.style.paddingRight = '0';
+          saveRow.style.margin = '8px 0 12px';
+          var saveBtn = document.createElement('button');
+          saveBtn.type = 'button';
+          saveBtn.className = 'btn btn-primary btn-sm';
+          saveBtn.textContent = '저장';
+          saveBtn.addEventListener('click', function () {
+            saveShareWorkUi(work.id, titleInput.value, linkInput.value);
+          });
+          saveRow.appendChild(saveBtn);
+          el.shareWorkModalBody.appendChild(saveRow);
+        } else if (work.drawingLink) {
+          var linkRow = document.createElement('div');
+          linkRow.className = 'share-link-row';
+          var a = document.createElement('a');
+          a.href = work.drawingLink;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.textContent = '도면 보기';
+          linkRow.appendChild(a);
+          el.shareWorkModalBody.appendChild(linkRow);
+        } else {
+          var noLink = document.createElement('p');
+          noLink.className = 'share-work-meta';
+          noLink.style.margin = '0 0 8px';
+          noLink.textContent = '등록된 도면 링크가 없습니다.';
+          el.shareWorkModalBody.appendChild(noLink);
+        }
+
+        var commentsWrap = document.createElement('div');
+        commentsWrap.className = 'share-comments';
+        var commentsTitle = document.createElement('p');
+        commentsTitle.className = 'share-comments-title';
+        commentsTitle.textContent = '공정 설명 · 댓글 ' + (work.comments || []).length + '개';
+        commentsWrap.appendChild(commentsTitle);
+
+        (work.comments || []).forEach(function (comment) {
+          commentsWrap.appendChild(buildShareCommentEl(work, comment));
+        });
+
+        if (loggedInUser || adminUnlocked) {
+          var form = document.createElement('div');
+          form.className = 'share-comment-form';
+          var ta = document.createElement('textarea');
+          ta.rows = 4;
+          ta.maxLength = 2000;
+          ta.placeholder = '이 작품 공정에 대한 설명을 댓글로 남기세요.';
+          var postBtn = document.createElement('button');
+          postBtn.type = 'button';
+          postBtn.className = 'btn btn-primary';
+          postBtn.textContent = '댓글 등록';
+          postBtn.addEventListener('click', function () {
+            addShareCommentUi(work.id, ta.value);
+          });
+          form.appendChild(ta);
+          form.appendChild(postBtn);
+          commentsWrap.appendChild(form);
+        }
+        el.shareWorkModalBody.appendChild(commentsWrap);
+      }
+
+      function buildShareWorkEl(work) {
+        var wrap = document.createElement('article');
+        wrap.className = 'share-work';
+        wrap.setAttribute('data-share-id', work.id);
+
+        var line = document.createElement('div');
+        line.className = 'share-work-line';
+
+        var rowBtn = document.createElement('button');
+        rowBtn.type = 'button';
+        rowBtn.className = 'share-work-row';
+        rowBtn.title = (work.title || '작품') + ' 열기';
+
+        var main = document.createElement('div');
+        main.className = 'share-work-main';
+        var titleEl = document.createElement('h3');
+        titleEl.className = 'share-work-title';
+        titleEl.textContent = work.title || '제목 없음';
+        var meta = document.createElement('div');
+        meta.className = 'share-work-meta';
+        meta.textContent = (work.createdBy || '알 수 없음') +
+          (work.createdAt ? ' · ' + formatShareDate(work.createdAt) : '') +
+          ' 등록';
+        main.appendChild(titleEl);
+        main.appendChild(meta);
+
+        var count = document.createElement('span');
+        count.className = 'share-work-count';
+        count.textContent = '댓글 ' + ((work.comments || []).length) + '개';
+        var chevron = document.createElement('span');
+        chevron.className = 'share-work-chevron';
+        chevron.setAttribute('aria-hidden', 'true');
+        chevron.textContent = '▶';
+
+        rowBtn.appendChild(main);
+        rowBtn.appendChild(count);
+        rowBtn.appendChild(chevron);
+        rowBtn.addEventListener('click', function () {
+          openShareWorkModal(work.id);
+        });
+        line.appendChild(rowBtn);
+        wrap.appendChild(line);
+        return wrap;
+      }
+
+      function buildShareCommentEl(work, comment) {
+        var box = document.createElement('div');
+        box.className = 'share-comment';
+        var head = document.createElement('div');
+        head.className = 'share-comment-head';
+        var who = document.createElement('div');
+        var author = document.createElement('span');
+        author.className = 'share-comment-author';
+        author.textContent = comment.author || '알 수 없음';
+        who.appendChild(author);
+        if (comment.createdAt) {
+          var when = document.createElement('span');
+          when.className = 'share-comment-date';
+          when.textContent = formatShareDate(comment.createdAt);
+          who.appendChild(when);
+        }
+        head.appendChild(who);
+        if (canManageShareComment(comment)) {
+          var actions = document.createElement('div');
+          actions.className = 'share-comment-actions';
+          var key = shareCommentKey(work.id, comment.id);
+          var editBtn = document.createElement('button');
+          editBtn.type = 'button';
+          editBtn.className = 'link-btn';
+          editBtn.textContent = shareState.editingCommentKey === key ? '취소' : '수정';
+          editBtn.addEventListener('click', function () {
+            shareState.editingCommentKey = shareState.editingCommentKey === key ? '' : key;
+            renderShareWorkModal();
+          });
+          var delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'link-btn';
+          delBtn.textContent = '삭제';
+          delBtn.addEventListener('click', function () { deleteShareCommentUi(work, comment); });
+          actions.appendChild(editBtn);
+          actions.appendChild(delBtn);
+          head.appendChild(actions);
+        }
+        box.appendChild(head);
+
+        if (shareState.editingCommentKey === shareCommentKey(work.id, comment.id) && canManageShareComment(comment)) {
+          var edit = document.createElement('div');
+          edit.className = 'share-comment-edit';
+          var ta = document.createElement('textarea');
+          ta.rows = 3;
+          ta.maxLength = 2000;
+          ta.value = comment.body || '';
+          var saveBtn = document.createElement('button');
+          saveBtn.type = 'button';
+          saveBtn.className = 'btn btn-primary btn-sm';
+          saveBtn.textContent = '댓글 저장';
+          saveBtn.addEventListener('click', function () {
+            saveShareCommentUi(work.id, comment.id, ta.value);
+          });
+          edit.appendChild(ta);
+          edit.appendChild(saveBtn);
+          box.appendChild(edit);
+        } else {
+          var body = document.createElement('div');
+          body.className = 'share-comment-body';
+          body.textContent = comment.body || '';
+          box.appendChild(body);
+        }
+        return box;
+      }
+
+      function createShareWorkUi() {
+        if (!loggedInUser) {
+          showError('작품을 등록하려면 먼저 로그인해주세요.');
+          return;
+        }
+        var title = el.shareTitleInput ? el.shareTitleInput.value.trim() : '';
+        var link = el.shareLinkInput ? el.shareLinkInput.value.trim() : '';
+        if (!title) {
+          showError('작품명을 입력해주세요.');
+          return;
+        }
+        if (link) {
+          link = normalizeDrawingLink(link);
+          if (!isValidDrawingLink(link)) {
+            showError('올바른 도면 링크를 입력해주세요.');
+            return;
+          }
+        }
+        run('addShareWork', [loggedInUser, title, link], '작품 등록 중...')
+          .then(function (work) {
+            if (el.shareTitleInput) el.shareTitleInput.value = '';
+            if (el.shareLinkInput) el.shareLinkInput.value = '';
+            upsertShareWorkInState(work);
+            renderShareList();
+            showError('작품이 등록되었습니다.');
+            el.errorBox.style.background = 'rgba(34, 197, 94, 0.15)';
+            el.errorBox.style.color = '#86efac';
+          })
+          .catch(function (e) {
+            var msg = e && e.message ? e.message : String(e);
+            if (/테이블 생성 SQL/.test(msg)) showShareSetup(true);
+            showError(msg);
+          });
+      }
+
+      function saveShareWorkUi(workId, title, link) {
+        title = String(title || '').trim();
+        link = String(link || '').trim();
+        if (!title) {
+          showError('작품명을 입력해주세요.');
+          return;
+        }
+        if (link) {
+          link = normalizeDrawingLink(link);
+          if (!isValidDrawingLink(link)) {
+            showError('올바른 도면 링크를 입력해주세요.');
+            return;
+          }
+        }
+        run('updateShareWork', [loggedInUser, workId, title, link, isShareAdmin()], '작품 저장 중...')
+          .then(function (work) {
+            shareState.editingWorkId = '';
+            upsertShareWorkInState(work);
+            renderShareList();
+            refreshShareOpenModal();
+            showError('작품이 수정되었습니다.');
+            el.errorBox.style.background = 'rgba(34, 197, 94, 0.15)';
+            el.errorBox.style.color = '#86efac';
+          })
+          .catch(function (e) { showError(e.message || String(e)); });
+      }
+
+      function deleteShareWorkUi(work) {
+        if (!work) return;
+        if (!confirm('"' + (work.title || '작품') + '"을(를) 삭제할까요? 댓글도 함께 삭제됩니다.')) return;
+        run('deleteShareWork', [loggedInUser, work.id, isShareAdmin()], '작품 삭제 중...')
+          .then(function (list) {
+            shareState.works = list || [];
+            if (shareState.editingWorkId === work.id) shareState.editingWorkId = '';
+            if (String(shareState.openWorkId) === String(work.id)) closeShareWorkModal();
+            renderShareList();
+            showError('작품이 삭제되었습니다.');
+            el.errorBox.style.background = 'rgba(34, 197, 94, 0.15)';
+            el.errorBox.style.color = '#86efac';
+          })
+          .catch(function (e) { showError(e.message || String(e)); });
+      }
+
+      function addShareCommentUi(workId, body) {
+        body = String(body || '').trim();
+        if (!body) {
+          showError('댓글 내용을 입력해주세요.');
+          return;
+        }
+        run('addShareComment', [loggedInUser || ADMIN_NAME, workId, body], '댓글 등록 중...')
+          .then(function (work) {
+            upsertShareWorkInState(work);
+            renderShareList();
+            refreshShareOpenModal();
+          })
+          .catch(function (e) { showError(e.message || String(e)); });
+      }
+
+      function saveShareCommentUi(workId, commentId, body) {
+        body = String(body || '').trim();
+        if (!body) {
+          showError('댓글 내용을 입력해주세요.');
+          return;
+        }
+        run('updateShareComment', [loggedInUser, workId, commentId, body, isShareAdmin()], '댓글 저장 중...')
+          .then(function (work) {
+            shareState.editingCommentKey = '';
+            upsertShareWorkInState(work);
+            renderShareList();
+            refreshShareOpenModal();
+          })
+          .catch(function (e) { showError(e.message || String(e)); });
+      }
+
+      function deleteShareCommentUi(work, comment) {
+        if (!work || !comment) return;
+        if (!confirm('이 댓글을 삭제할까요?')) return;
+        run('deleteShareComment', [loggedInUser, work.id, comment.id, isShareAdmin()], '댓글 삭제 중...')
+          .then(function (updated) {
+            upsertShareWorkInState(updated);
+            renderShareList();
+            refreshShareOpenModal();
+          })
+          .catch(function (e) { showError(e.message || String(e)); });
+      }
+
+      function persistShareView() { /* 공유회는 입력 즉시 저장 */ }
+
+      function showShareView() {
+        if (!loggedInUser && !adminUnlocked) {
+          showError('작품 공유회를 보려면 먼저 로그인해주세요.');
+          return;
+        }
+        if (mainViewMode === 'process') persistProcessRowsToMemory();
+        else if (mainViewMode === 'feedback') persistFeedbackToMemory();
+        else if (mainViewMode === 'scoring') persistScoreToMemory();
+        mainViewMode = 'share';
+        applyMainViewMode();
+      }
+
       function applyMainViewMode() {
         var isProcess = mainViewMode === 'process';
         var isFeedback = mainViewMode === 'feedback';
         var isScoring = mainViewMode === 'scoring';
+        var isShare = mainViewMode === 'share';
         var isDiary = mainViewMode === 'diary';
         document.body.classList.toggle('main-view-process', isProcess);
         document.body.classList.toggle('main-view-feedback', isFeedback);
         document.body.classList.toggle('main-view-scoring', isScoring);
+        document.body.classList.toggle('main-view-share', isShare);
         if (el.processCard) {
           el.processCard.classList.toggle('visible', isProcess);
         }
@@ -9866,6 +11388,9 @@
         }
         if (el.scoringCard) {
           el.scoringCard.classList.toggle('visible', isScoring);
+        }
+        if (el.shareCard) {
+          el.shareCard.classList.toggle('visible', isShare);
         }
         if (el.ganttTabBtn) {
           el.ganttTabBtn.classList.toggle('active', isProcess);
@@ -9879,10 +11404,15 @@
           el.scoringTabBtn.classList.toggle('active', isScoring);
           el.scoringTabBtn.setAttribute('aria-pressed', isScoring ? 'true' : 'false');
         }
+        if (el.shareTabBtn) {
+          el.shareTabBtn.classList.toggle('active', isShare);
+          el.shareTabBtn.setAttribute('aria-pressed', isShare ? 'true' : 'false');
+        }
         if (el.diaryTabBtn) {
           el.diaryTabBtn.classList.toggle('active', isDiary);
           el.diaryTabBtn.setAttribute('aria-pressed', isDiary ? 'true' : 'false');
         }
+        if (!isShare) closeShareWorkModal();
         if (isDiary) {
           if (el.taskCard && el.taskCard.style.display !== 'none') {
             if (el.taskDiaryRow) el.taskDiaryRow.style.display = 'flex';
@@ -9917,8 +11447,11 @@
               showError(e.message || '채점결과를 불러오지 못했습니다.');
               restoreScoringViewFromState();
             });
+        } else if (isShare) {
+          loadShareWorks();
         }
         updateProcessSavedPanelVisibility();
+        updateNameHint();
       }
 
       function showDiaryView() {
@@ -9929,6 +11462,8 @@
           persistFeedbackToMemory();
         } else if (mainViewMode === 'scoring') {
           persistScoreToMemory();
+        } else if (mainViewMode === 'share') {
+          persistShareView();
         }
         mainViewMode = 'diary';
         applyMainViewMode();
@@ -10246,7 +11781,8 @@
       }
 
       function canEditCurrentUser() {
-        return !!loggedInUser && namesMatch(loggedInUser, currentUser);
+        if (adminUnlocked && currentUser && !isAdminAccountName(currentUser)) return true;
+        return !!loggedInUser && namesMatch(loggedInUser, currentUser) && !isAdminAccountName(currentUser);
       }
 
       function assertCanEdit() {
@@ -10290,8 +11826,16 @@
 
       function updateNameHint() {
         if (!el.nameHint) return;
-        if (!loggedInUser) {
+        if (!loggedInUser && !adminUnlocked) {
           el.nameHint.textContent = '이름을 선택하고 비밀번호를 입력하세요. 한 번 로그인하면 이 브라우저에서는 다음부터 자동으로 로그인됩니다.';
+        } else if (mainViewMode === 'share') {
+          el.nameHint.textContent = adminUnlocked
+            ? '관리자 권한으로 작품 공유회의 모든 작품과 댓글을 수정·삭제할 수 있습니다.'
+            : '작품 공유회는 모든 사용자가 함께 봅니다. 본인이 등록한 작품·댓글만 수정·삭제할 수 있습니다.';
+        } else if (adminUnlocked && (!currentUser || isAdminAccountName(currentUser))) {
+          el.nameHint.textContent = '왼쪽에서 사용자를 선택하면 그 데이터를 보고 수정·삭제할 수 있습니다.';
+        } else if (adminUnlocked) {
+          el.nameHint.textContent = '관리자 권한으로 이 사용자의 데이터를 수정·삭제할 수 있습니다.';
         } else if (!canEditCurrentUser()) {
           el.nameHint.textContent = loggedInUser + '으로 로그인 중입니다. 이 일지는 볼 수만 있습니다.';
         } else {
@@ -10307,11 +11851,16 @@
           el.readonlyBadge.hidden = !showReadonly;
           el.readonlyBadge.classList.toggle('is-visible', showReadonly);
         }
+        if (el.adminBadge) {
+          el.adminBadge.hidden = !adminUnlocked;
+          el.adminBadge.classList.toggle('is-visible', !!adminUnlocked);
+        }
         if (el.backToMyDiaryBtn) {
-          el.backToMyDiaryBtn.hidden = !loggedInUser || canEditCurrentUser();
+          var hasOwnDiary = !!loggedInUser && !isAdminAccountName(loggedInUser);
+          el.backToMyDiaryBtn.hidden = !hasOwnDiary || canEditCurrentUser();
         }
         if (el.logoutBtn) {
-          el.logoutBtn.hidden = !loggedInUser;
+          el.logoutBtn.hidden = !loggedInUser && !adminUnlocked;
         }
         if (el.taskInput) el.taskInput.disabled = readonly;
         if (el.tomorrowTaskInput) el.tomorrowTaskInput.disabled = readonly;
@@ -10848,9 +12397,10 @@
 
       function applySavedNameToSelect() {
         var saved = loadUserName();
-        if (!saved) return;
-        if (users.length > 0) {
-          if (users.indexOf(saved) !== -1) {
+        if (!saved || isAdminAccountName(saved)) return;
+        var list = appUsers();
+        if (list.length > 0) {
+          if (list.indexOf(saved) !== -1) {
             el.userSelect.value = saved;
           }
         } else {
@@ -10860,13 +12410,13 @@
 
       function populateUserSelect() {
         el.userSelect.innerHTML = '<option value="">이름 선택</option>';
-        users.forEach(function (u) {
+        appUsers().forEach(function (u) {
           var opt = document.createElement('option');
           opt.value = u;
           opt.textContent = u;
           el.userSelect.appendChild(opt);
         });
-        if (users.length > 0) {
+        if (appUsers().length > 0) {
           el.userSelect.style.display = 'block';
           el.userName.style.display = 'none';
         } else {
@@ -11085,6 +12635,9 @@
         el.sidebarYesterdayDate.textContent = yesterdayStr();
         el.diaryTodayList.innerHTML = '';
         el.diaryYesterdayList.innerHTML = '';
+        userList = (userList || []).filter(function (name) {
+          return !isAdminAccountName(name);
+        });
 
         if (!userList || !userList.length) {
           el.sidebar.style.display = 'none';
@@ -11109,15 +12662,16 @@
       }
 
       function loadSidebarPerUser() {
-        if (!users.length) {
+        var list = appUsers();
+        if (!list.length) {
           el.sidebar.style.display = 'none';
           return;
         }
 
         var cached = loadSidebarUsersCache();
-        renderSidebarShell(users, cached);
+        renderSidebarShell(list, cached);
 
-        var loads = users.map(function (name) {
+        var loads = list.map(function (name) {
           return runSilent('getUserDiaryStatus', [name, todayStr()])
             .then(function (data) {
               applySidebarUserStatus(name, data.today, data.yesterday);
@@ -11149,13 +12703,14 @@
           showError('등록되지 않은 사용자입니다.');
           return;
         }
-        if (!loggedInUser) {
+        if (!loggedInUser && !adminUnlocked) {
           if (users.length > 0) el.userSelect.value = name;
           else el.userName.value = name;
           if (el.userPassword) el.userPassword.focus();
           showError('로그인한 뒤 일지를 볼 수 있습니다.');
           return;
         }
+        if (isAdminAccountName(name)) return;
 
         var targetDate = viewDateForSidebarSection(section);
         activeSidebarSection = section;
@@ -11753,6 +13308,7 @@
         loggedInUser = '';
         currentUser = '';
         clearAuthSession();
+        setAdminUnlocked(false);
         mainViewMode = 'diary';
         if (typeof applyMainViewMode === 'function') applyMainViewMode();
         if (el.taskDiaryRow) el.taskDiaryRow.style.display = 'none';
@@ -11768,12 +13324,17 @@
       }
 
       function confirmUser() {
-        var name = (users.length > 0 && el.userSelect.value)
+        var list = appUsers();
+        var name = (list.length > 0 && el.userSelect.value)
           ? el.userSelect.value.trim()
           : el.userName.value.trim();
         var password = el.userPassword ? el.userPassword.value : '';
         if (!name) {
           showError('이름을 입력하거나 선택해주세요.');
+          return;
+        }
+        if (isAdminAccountName(name)) {
+          showError('관리자는 이름 목록에서 고르지 않습니다. 제목을 세 번 누른 뒤 관리자 모드에서 로그인하세요.');
           return;
         }
         run('verifyUserPassword', [name, password], '로그인 중...')
@@ -11929,6 +13490,7 @@
         el.adminPanel.classList.add('show');
         el.mainView.style.opacity = '0.5';
         el.title.classList.add('admin-hint');
+        updateAdminLoginButton();
         renderAdminUsers();
         refreshUsersAuth();
       }
@@ -12023,6 +13585,12 @@
       });
 
       el.closeAdminBtn.addEventListener('click', closeAdmin);
+      if (el.adminLoginBtn) {
+        el.adminLoginBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          toggleAdminLogin();
+        });
+      }
 
       if (el.diaryTabBtn) {
         el.diaryTabBtn.addEventListener('click', function (e) {
@@ -12066,6 +13634,42 @@
           showScoringView();
         });
       }
+      if (el.shareTabBtn) {
+        el.shareTabBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          showShareView();
+        });
+      }
+      if (el.shareCreateBtn) {
+        el.shareCreateBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          createShareWorkUi();
+        });
+      }
+      if (el.shareTitleInput) {
+        el.shareTitleInput.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') { e.preventDefault(); createShareWorkUi(); }
+        });
+      }
+      if (el.shareLinkInput) {
+        el.shareLinkInput.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') { e.preventDefault(); createShareWorkUi(); }
+        });
+      }
+      if (el.shareWorkModalClose) {
+        el.shareWorkModalClose.addEventListener('click', function (e) {
+          e.preventDefault();
+          closeShareWorkModal();
+        });
+      }
+      if (el.shareWorkBackdrop) {
+        el.shareWorkBackdrop.addEventListener('click', function () {
+          closeShareWorkModal();
+        });
+      }
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && shareState.openWorkId) closeShareWorkModal();
+      });
       if (el.coverTabBtn) {
         el.coverTabBtn.addEventListener('click', function (e) {
           e.preventDefault();
@@ -12292,6 +13896,7 @@
       }
 
       initThemePicker();
+      adminUnlocked = loadAdminUnlocked();
       viewDate = todayStr();
       activeSidebarSection = 'today';
       updateDateBadge();
@@ -12302,6 +13907,10 @@
       el.sidebarYesterdayDate.textContent = yesterdayStr();
 
       var savedSession = loadAuthSession();
+      if (savedSession && isAdminAccountName(savedSession.name)) {
+        savedSession = null;
+        setAdminUnlocked(true);
+      }
       var savedOnBoot = savedSession ? savedSession.name : '';
       var bootAuthOk = !!savedOnBoot;
       if (savedOnBoot) {
@@ -12311,6 +13920,18 @@
         applyCachedBootData();
         if (canEditCurrentUser()) el.taskInput.focus();
         scheduleChartLoad();
+      } else if (adminUnlocked) {
+        loggedInUser = ADMIN_NAME;
+        el.mainView.style.display = 'block';
+        setNameLocked(true);
+        if (el.displayName) el.displayName.textContent = ADMIN_NAME;
+        var cachedUsersOnlyAdmin = loadUsersCache();
+        if (cachedUsersOnlyAdmin && cachedUsersOnlyAdmin.length) {
+          users = cachedUsersOnlyAdmin;
+          populateUserSelect();
+          loadSidebarPerUser();
+        }
+        updateReadonlyUi();
       } else {
         var cachedUsersOnly = loadUsersCache();
         if (cachedUsersOnly && cachedUsersOnly.length) {
