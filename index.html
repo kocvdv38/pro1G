@@ -2517,6 +2517,38 @@
     .admin-panel.show { display: block; }
     .admin-panel h2 { font-size: 1rem; color: var(--admin); margin-bottom: 16px; }
     .user-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .admin-user-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .admin-user-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--input-bg);
+    }
+    .admin-user-row .admin-user-name {
+      font-weight: 700;
+      min-width: 72px;
+    }
+    .admin-user-row .admin-pw-status {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .admin-user-row .admin-pw-status.is-set { color: var(--success); }
+    .admin-user-row input[type="password"] {
+      flex: 1;
+      min-width: 140px;
+      margin-bottom: 0;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+    }
     .chip {
       display: inline-flex;
       align-items: center;
@@ -2535,6 +2567,76 @@
       font-size: 1rem;
       line-height: 1;
       padding: 0 2px;
+    }
+    .readonly-badge {
+      display: none;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+    }
+    .readonly-badge.is-visible {
+      display: inline-flex;
+    }
+    .name-display-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .name-edit #loginBtn { width: 100%; }
+    html.is-readonly .task-input-wrap,
+    html.is-readonly label[for="taskInput"],
+    html.is-readonly label[for="tomorrowTaskInput"],
+    html.is-readonly #taskCard > .hint,
+    html.is-readonly #tomorrowTaskCard > .hint,
+    html.is-readonly .task-delete,
+    html.is-readonly .process-card-actions,
+    html.is-readonly .process-actions,
+    html.is-readonly .process-row-delete,
+    html.is-readonly th.col-delete,
+    html.is-readonly td.col-delete,
+    html.is-readonly th.col-move,
+    html.is-readonly td.col-move,
+    html.is-readonly .feedback-card-actions,
+    html.is-readonly .feedback-actions,
+    html.is-readonly .feedback-row-delete,
+    html.is-readonly .scoring-card-actions,
+    html.is-readonly .scoring-actions,
+    html.is-readonly .process-saved-item-del,
+    html.is-readonly .score-column-settings,
+    html.is-readonly .score-drawing-link-btn,
+    html.is-readonly .score-drawing-link-clear,
+    html.is-readonly .score-paste-btn,
+    html.is-readonly .score-round-del,
+    html.is-readonly .score-dim-detail-clear,
+    html.is-readonly .score-dim-detail-hint,
+    html.is-readonly .feedback-photo-actions,
+    html.is-readonly .feedback-photo-input,
+    html.is-readonly .feedback-photo-placeholder {
+      display: none !important;
+    }
+    html.is-readonly .task-state-btn {
+      pointer-events: none;
+      cursor: default;
+    }
+    html.is-readonly .feedback-photo-preview {
+      pointer-events: none;
+    }
+    html.is-readonly #processCard input,
+    html.is-readonly #processCard select,
+    html.is-readonly #processCard textarea,
+    html.is-readonly #feedbackCard input:not([readonly]),
+    html.is-readonly #feedbackCard textarea,
+    html.is-readonly #feedbackCard select,
+    html.is-readonly #scoringCard input,
+    html.is-readonly #scoringCard textarea,
+    html.is-readonly #scoringCard select {
+      pointer-events: none;
     }
     .loading {
       text-align: center;
@@ -2970,19 +3072,27 @@
 
     <div id="mainView">
       <div class="card" id="nameCard">
-        <label for="userName">이름</label>
+        <label for="userSelect">이름</label>
         <div class="name-edit">
           <select id="userSelect" style="display:none;">
             <option value="">이름 선택</option>
           </select>
-          <input type="text" id="userName" placeholder="이름을 입력하세요" autocomplete="name">
+          <input type="text" id="userName" placeholder="이름을 입력하세요" autocomplete="username">
+          <label for="userPassword">비밀번호</label>
+          <input type="password" id="userPassword" placeholder="비밀번호를 입력하세요" autocomplete="current-password">
+          <button type="button" class="btn btn-primary" id="loginBtn">로그인</button>
         </div>
         <div class="name-display">
           <div class="name-display-row">
             <strong id="displayName"></strong>
+            <span id="readonlyBadge" class="readonly-badge" hidden>읽기 전용</span>
             <span id="userProBadgeWrap" class="pro-badge-wrap user-pro-badge-wrap" aria-label="프로 뱃지"></span>
           </div>
-          <button type="button" class="btn btn-outline context-print-btn" id="contextPrintBtn">인쇄</button>
+          <div class="name-display-actions">
+            <button type="button" class="link-btn" id="backToMyDiaryBtn" hidden>내 일지</button>
+            <button type="button" class="link-btn" id="logoutBtn" hidden>로그아웃</button>
+            <button type="button" class="btn btn-outline context-print-btn" id="contextPrintBtn">인쇄</button>
+          </div>
         </div>
         <div class="process-saved-panel" id="processSavedPanel">
           <button type="button" class="process-saved-toggle" id="processSavedToggle" aria-expanded="false">
@@ -3014,7 +3124,7 @@
             <ul class="process-saved-list" id="scoreSavedList"></ul>
           </div>
         </div>
-        <p class="hint" id="nameHint">이름을 선택하면 이 컴퓨터·브라우저에 저장되어, 다음 접속 시 마지막으로 선택한 이름이 자동으로 선택됩니다.</p>
+        <p class="hint" id="nameHint">이름을 선택하고 비밀번호를 입력하세요. 한 번 로그인하면 이 브라우저에서는 다음부터 자동으로 로그인됩니다.</p>
       </div>
 
       <div class="task-diary-row" id="taskDiaryRow" style="display:none;">
@@ -3212,7 +3322,8 @@
       <input type="text" id="newUserName" placeholder="추가할 이름">
       <button type="button" class="btn btn-primary" id="addUserBtn">사용자 추가</button>
       <p class="section-title" style="margin-top:20px;">등록된 사용자</p>
-      <div class="user-chips" id="userChips"></div>
+      <p class="hint">각 사용자 비밀번호를 설정하세요. 비밀번호 저장이 실패하면 Supabase SQL Editor에서 다음을 실행하세요: <code>alter table public.users add column if not exists password_hash text;</code></p>
+      <div class="admin-user-list" id="userChips"></div>
       <p style="margin-top:16px;">
         <button type="button" class="link-btn" id="closeAdminBtn">관리자 모드 닫기</button>
       </p>
@@ -3428,6 +3539,228 @@
     return formatDate(base);
   }
 
+  var passwordStorage = '';
+
+  function isMissingRelationError(err) {
+    var msg = String(err && err.message || '').toLowerCase();
+    return msg.indexOf('does not exist') !== -1 ||
+      msg.indexOf('could not find') !== -1 ||
+      msg.indexOf('schema cache') !== -1 ||
+      msg.indexOf('password_hash') !== -1;
+  }
+
+  function utf8BinaryString(str) {
+    str = String(str || '');
+    try {
+      return unescape(encodeURIComponent(str));
+    } catch (e) {
+      return str;
+    }
+  }
+
+  function sha256hex(ascii) {
+    function rotr(n, x) { return (x >>> n) | (x << (32 - n)); }
+    ascii = utf8BinaryString(ascii);
+    var mathPow = Math.pow;
+    var maxWord = mathPow(2, 32);
+    var lengthProperty = 'length';
+    var i, j;
+    var result = '';
+    var words = [];
+    var asciiBitLength = ascii[lengthProperty] * 8;
+    var hash = sha256hex.h = sha256hex.h || [];
+    var k = sha256hex.k = sha256hex.k || [];
+    var primeCounter = k[lengthProperty];
+    var isComposite = {};
+    for (var candidate = 2; primeCounter < 64; candidate++) {
+      if (!isComposite[candidate]) {
+        for (i = 0; i < 313; i += candidate) isComposite[i] = candidate;
+        hash[primeCounter] = (mathPow(candidate, 0.5) * maxWord) | 0;
+        k[primeCounter++] = (mathPow(candidate, 1 / 3) * maxWord) | 0;
+      }
+    }
+    ascii += '\x80';
+    while (ascii[lengthProperty] % 64 - 56) ascii += '\x00';
+    for (i = 0; i < ascii[lengthProperty]; i++) {
+      j = ascii.charCodeAt(i);
+      words[i >> 2] |= j << ((3 - i) % 4) * 8;
+    }
+    words[words[lengthProperty]] = ((asciiBitLength / maxWord) | 0);
+    words[words[lengthProperty]] = asciiBitLength;
+    for (j = 0; j < words[lengthProperty];) {
+      var w = words.slice(j, j += 16);
+      var oldHash = hash;
+      hash = hash.slice(0, 8);
+      for (i = 0; i < 64; i++) {
+        var w15 = w[i - 15], w2 = w[i - 2];
+        var a = hash[0], e = hash[4];
+        var temp1 = hash[7] +
+          (rotr(6, e) ^ rotr(11, e) ^ rotr(25, e)) +
+          ((e & hash[5]) ^ ((~e) & hash[6])) +
+          k[i] +
+          (w[i] = (i < 16) ? w[i] : (
+            w[i - 16] +
+            (rotr(7, w15) ^ rotr(18, w15) ^ (w15 >>> 3)) +
+            w[i - 7] +
+            (rotr(17, w2) ^ rotr(19, w2) ^ (w2 >>> 10))
+          ) | 0);
+        var temp2 = (rotr(2, a) ^ rotr(13, a) ^ rotr(22, a)) +
+          ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+        hash = [(temp1 + temp2) | 0].concat(hash);
+        hash[4] = (hash[4] + temp1) | 0;
+      }
+      for (i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i]) | 0;
+    }
+    for (i = 0; i < 8; i++) {
+      for (j = 3; j + 1; j--) {
+        var b = (hash[i] >> (j * 8)) & 255;
+        result += (b < 16 ? '0' : '') + b.toString(16);
+      }
+    }
+    return result;
+  }
+
+  function hashPassword(name, password) {
+    return sha256hex('proDiary.v1|' + String(name || '').trim() + '|' + String(password || ''));
+  }
+
+  async function ensurePasswordStorage() {
+    if (passwordStorage === 'column' || passwordStorage === 'table' || passwordStorage === 'none') {
+      return passwordStorage;
+    }
+    var db = requireConfig();
+    var col = await db.from('users').select('password_hash').limit(1);
+    if (!col.error) {
+      passwordStorage = 'column';
+      return passwordStorage;
+    }
+    if (!isMissingRelationError(col.error)) {
+      throw new Error(col.error.message);
+    }
+    var tbl = await db.from('user_passwords').select('name').limit(1);
+    if (!tbl.error) {
+      passwordStorage = 'table';
+      return passwordStorage;
+    }
+    passwordStorage = 'none';
+    return passwordStorage;
+  }
+
+  function passwordSetupSqlError() {
+    return new Error('비밀번호를 저장하려면 Supabase SQL Editor에서 다음을 실행하세요: alter table public.users add column if not exists password_hash text;');
+  }
+
+  async function getPasswordHashForUser(name) {
+    name = String(name || '').trim();
+    if (!name) return '';
+    var mode = await ensurePasswordStorage();
+    var db = requireConfig();
+    if (mode === 'column') {
+      var res = await db.from('users').select('password_hash').eq('name', name).maybeSingle();
+      if (res.error) throw new Error(res.error.message);
+      return res.data && res.data.password_hash ? String(res.data.password_hash) : '';
+    }
+    if (mode === 'table') {
+      var res2 = await db.from('user_passwords').select('password_hash').eq('name', name).maybeSingle();
+      if (res2.error) throw new Error(res2.error.message);
+      return res2.data && res2.data.password_hash ? String(res2.data.password_hash) : '';
+    }
+    return '';
+  }
+
+  async function getUsersAuth() {
+    var names = await getUsers();
+    var hashByName = {};
+    var mode = 'none';
+    try {
+      mode = await ensurePasswordStorage();
+    } catch (e) {
+      mode = 'none';
+    }
+    var db = requireConfig();
+    if (mode === 'column') {
+      var res = await db.from('users').select('name, password_hash');
+      if (!res.error && res.data) {
+        res.data.forEach(function (r) {
+          hashByName[String(r.name).trim()] = r.password_hash;
+        });
+      }
+    } else if (mode === 'table') {
+      var res2 = await db.from('user_passwords').select('name, password_hash');
+      if (!res2.error && res2.data) {
+        res2.data.forEach(function (r) {
+          hashByName[String(r.name).trim()] = r.password_hash;
+        });
+      }
+    }
+    return names.map(function (n) {
+      var hash = hashByName[n];
+      return { name: n, hasPassword: !!(hash && String(hash).trim()) };
+    });
+  }
+
+  async function setUserPassword(name, password) {
+    name = String(name || '').trim();
+    password = String(password || '');
+    if (!name) throw new Error('사용자를 찾을 수 없습니다.');
+    if (password.length < 4) throw new Error('비밀번호는 4자 이상 입력해주세요.');
+    var user = await getUserByName(name);
+    if (!user) throw new Error('사용자를 찾을 수 없습니다.');
+    var hash = hashPassword(name, password);
+    var mode = await ensurePasswordStorage();
+    var db = requireConfig();
+    if (mode === 'column') {
+      var res = await db.from('users').update({ password_hash: hash }).eq('name', name).select('id');
+      if (res.error) throw new Error(res.error.message);
+      if (!res.data || !res.data.length) throw new Error('사용자를 찾을 수 없습니다.');
+      return { ok: true };
+    }
+    if (mode === 'table') {
+      var up = await db.from('user_passwords').upsert({ name: name, password_hash: hash }, { onConflict: 'name' });
+      if (up.error) throw new Error(up.error.message);
+      return { ok: true };
+    }
+    throw passwordSetupSqlError();
+  }
+
+  async function verifyUserPassword(name, password) {
+    name = String(name || '').trim();
+    password = String(password || '');
+    if (!name) throw new Error('이름을 선택해주세요.');
+    var users = await getUsers();
+    if (users.length > 0 && users.indexOf(name) === -1) {
+      throw new Error('등록되지 않은 사용자입니다. 관리자에게 등록을 요청하세요.');
+    }
+    var stored = '';
+    try {
+      stored = await getPasswordHashForUser(name);
+    } catch (e) {
+      stored = '';
+    }
+    if (!stored) {
+      return { name: name, passwordHash: '' };
+    }
+    if (!password) throw new Error('비밀번호를 입력해주세요.');
+    var hash = hashPassword(name, password);
+    if (hash !== stored) throw new Error('비밀번호가 올바르지 않습니다.');
+    return { name: name, passwordHash: hash };
+  }
+
+  async function verifyStoredSession(name, hash) {
+    name = String(name || '').trim();
+    hash = String(hash || '');
+    if (!name) return false;
+    var users = await getUsers();
+    if (users.length > 0 && users.indexOf(name) === -1) return false;
+    var stored;
+    try {
+      stored = await getPasswordHashForUser(name);
+    } catch (e) {
+      return true;
+    }
+    return stored === hash;
+  }
+
   async function getUserByName(name) {
     var db = requireConfig();
     name = String(name || '').trim();
@@ -3457,6 +3790,14 @@
   async function removeUser(name) {
     name = String(name || '').trim();
     var db = requireConfig();
+    if (passwordStorage === '' || passwordStorage === 'table') {
+      try {
+        var mode = await ensurePasswordStorage();
+        if (mode === 'table') {
+          await db.from('user_passwords').delete().eq('name', name);
+        }
+      } catch (e) { /* ignore */ }
+    }
     var res = await db.from('users').delete().eq('name', name).select('id');
     if (res.error) throw new Error(res.error.message);
     if (!res.data || !res.data.length) throw new Error('사용자를 찾을 수 없습니다.');
@@ -4118,8 +4459,12 @@
         !String(global.SUPABASE_URL).includes('YOUR_PROJECT'));
     },
     getUsers: getUsers,
+    getUsersAuth: getUsersAuth,
     addUser: addUser,
     removeUser: removeUser,
+    setUserPassword: setUserPassword,
+    verifyUserPassword: verifyUserPassword,
+    verifyStoredSession: verifyStoredSession,
     getTasks: getTasks,
     addTask: addTask,
     cycleTaskState: cycleTaskState,
@@ -4147,6 +4492,7 @@
   <script>
     (function () {
       var STORAGE_KEY = 'proDiary_userName';
+      var STORAGE_AUTH = 'proDiary_authSession';
       var STORAGE_THEME = 'proDiary_theme';
       var THEME_IDS = ['sunrise', 'electric', 'lime', 'sky', 'sketch', 'ember'];
       var DEFAULT_THEME = 'ember';
@@ -4255,8 +4601,10 @@
       var chart = null;
       var chartJsPromise = null;
       var currentUser = '';
+      var loggedInUser = '';
       var viewDate = '';
       var users = [];
+      var usersAuth = [];
       var busyCount = 0;
       var busyHideTimer = null;
       var chartLoadToken = 0;
@@ -4283,7 +4631,12 @@
         nameCard: document.getElementById('nameCard'),
         userSelect: document.getElementById('userSelect'),
         userName: document.getElementById('userName'),
+        userPassword: document.getElementById('userPassword'),
+        loginBtn: document.getElementById('loginBtn'),
         displayName: document.getElementById('displayName'),
+        readonlyBadge: document.getElementById('readonlyBadge'),
+        backToMyDiaryBtn: document.getElementById('backToMyDiaryBtn'),
+        logoutBtn: document.getElementById('logoutBtn'),
         userProBadgeWrap: document.getElementById('userProBadgeWrap'),
         contextPrintBtn: document.getElementById('contextPrintBtn'),
         nameHint: document.getElementById('nameHint'),
@@ -5069,6 +5422,7 @@
       }
 
       function deleteSavedProcessSheet(sheetId) {
+        if (!assertCanEdit()) return;
         var sheet = getProcessSheetById(sheetId);
         if (!sheet) return;
         if (!confirm('"' + sheet.name + '" (' + formatDateOptionLabel(sheet.savedDate) + ') 공정표를 삭제할까요?')) {
@@ -5123,6 +5477,7 @@
       }
 
       function saveProcessSheet() {
+        if (!assertCanEdit()) return;
         if (!currentUser) {
           showError('이름을 선택한 뒤 저장할 수 있습니다.');
           return;
@@ -6706,6 +7061,7 @@
       }
 
       function addProcessRow() {
+        if (!assertCanEdit()) return;
         if (!currentUser) {
           showError('이름을 선택한 뒤 행을 추가할 수 있습니다.');
           return;
@@ -6733,6 +7089,7 @@
       }
 
       function removeProcessRow(id) {
+        if (!assertCanEdit()) return;
         persistProcessRows();
         processRows = processRows.filter(function (r) { return r.id !== id; });
         var tr = el.processTableBody &&
@@ -6993,6 +7350,7 @@
       }
 
       function deleteSavedFeedbackSheet(sheetId) {
+        if (!assertCanEdit()) return;
         if (!currentUser) return;
         var sheet = getFeedbackSheetById(sheetId);
         if (!sheet) return;
@@ -7166,6 +7524,7 @@
       }
 
       function saveFeedbackSheet() {
+        if (!assertCanEdit()) return;
         if (!currentUser) {
           showError('이름을 선택한 뒤 저장할 수 있습니다.');
           return;
@@ -7333,6 +7692,9 @@
       }
 
       function processFeedbackPhotoFile(file, photoBox, row) {
+        if (!canEditCurrentUser()) {
+          return Promise.reject(new Error('다른 사용자의 데이터는 볼 수만 있습니다.'));
+        }
         if (!file) return Promise.reject(new Error('선택한 파일이 없습니다.'));
         if (!/^image\//i.test(file.type || '')) {
           return Promise.reject(new Error('이미지 파일만 업로드할 수 있습니다.'));
@@ -7401,6 +7763,7 @@
       }
 
       function openFeedbackImageEditor(photoData, photoBox, row) {
+        if (!assertCanEdit()) return;
         photoData = row && row.photo ? row.photo : photoData;
         if (!photoData || !el.feedbackImageEditorModal || !el.feedbackEditorImage) return;
         ensureCropperJs().then(function () {
@@ -7604,6 +7967,7 @@
       }
 
       function addFeedbackRow() {
+        if (!assertCanEdit()) return;
         collectFeedbackRowsFromDOM();
         feedbackRows.push(createFeedbackRow());
         renderFeedbackTable(true);
@@ -8043,6 +8407,7 @@
       }
 
       function deleteSavedScoreSheet(sheetId) {
+        if (!assertCanEdit()) return;
         if (!currentUser) return;
         var sheet = getScoreSheetById(sheetId);
         if (!sheet) return;
@@ -9390,6 +9755,7 @@
       }
 
       function addScoreRound() {
+        if (!assertCanEdit()) return;
         collectScoreSheetFromDOM();
         var n = scoreSheetState.rounds.length + 1;
         scoreSheetState.rounds.push(createScoreRound(n + '회차'));
@@ -9403,6 +9769,7 @@
       }
 
       function saveScoreSheet() {
+        if (!assertCanEdit()) return;
         if (!currentUser) {
           showError('이름을 선택한 뒤 저장할 수 있습니다.');
           return;
@@ -9633,10 +10000,6 @@
       function isSidebarRowActive(li) {
         return namesMatch(li.getAttribute('data-sidebar-user'), currentUser) &&
           li.getAttribute('data-sidebar-section') === activeSidebarSection;
-      }
-
-      function namesMatch(a, b) {
-        return String(a || '').trim() === String(b || '').trim();
       }
 
       function normalizeDiaryItem(item) {
@@ -9874,20 +10237,97 @@
           el.nameCard.classList.remove('name-locked');
           if (el.userProBadgeWrap) el.userProBadgeWrap.innerHTML = '';
         }
+        updateReadonlyUi();
         updateProcessSavedPanelVisibility();
+      }
+
+      function namesMatch(a, b) {
+        return String(a || '').trim() === String(b || '').trim();
+      }
+
+      function canEditCurrentUser() {
+        return !!loggedInUser && namesMatch(loggedInUser, currentUser);
+      }
+
+      function assertCanEdit() {
+        if (canEditCurrentUser()) return true;
+        showError('다른 사용자의 데이터는 볼 수만 있습니다.');
+        return false;
+      }
+
+      function saveAuthSession(name, hash) {
+        name = String(name || '').trim();
+        if (!name) return;
+        try {
+          localStorage.setItem(STORAGE_AUTH, JSON.stringify({
+            name: name,
+            hash: String(hash || '')
+          }));
+          localStorage.setItem(STORAGE_KEY, name);
+        } catch (e) { /* private mode 등 */ }
+      }
+
+      function loadAuthSession() {
+        try {
+          var raw = localStorage.getItem(STORAGE_AUTH);
+          if (!raw) return null;
+          var parsed = JSON.parse(raw);
+          if (!parsed || !parsed.name) return null;
+          return {
+            name: String(parsed.name).trim(),
+            hash: String(parsed.hash || '')
+          };
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function clearAuthSession() {
+        try {
+          localStorage.removeItem(STORAGE_AUTH);
+        } catch (e) { /* ignore */ }
+      }
+
+      function updateNameHint() {
+        if (!el.nameHint) return;
+        if (!loggedInUser) {
+          el.nameHint.textContent = '이름을 선택하고 비밀번호를 입력하세요. 한 번 로그인하면 이 브라우저에서는 다음부터 자동으로 로그인됩니다.';
+        } else if (!canEditCurrentUser()) {
+          el.nameHint.textContent = loggedInUser + '으로 로그인 중입니다. 이 일지는 볼 수만 있습니다.';
+        } else {
+          el.nameHint.textContent = '할 일을 입력하고 Enter를 누르세요.';
+        }
+      }
+
+      function updateReadonlyUi() {
+        var readonly = !canEditCurrentUser();
+        document.documentElement.classList.toggle('is-readonly', readonly && !!currentUser);
+        if (el.readonlyBadge) {
+          var showReadonly = readonly && !!currentUser && !!loggedInUser;
+          el.readonlyBadge.hidden = !showReadonly;
+          el.readonlyBadge.classList.toggle('is-visible', showReadonly);
+        }
+        if (el.backToMyDiaryBtn) {
+          el.backToMyDiaryBtn.hidden = !loggedInUser || canEditCurrentUser();
+        }
+        if (el.logoutBtn) {
+          el.logoutBtn.hidden = !loggedInUser;
+        }
+        if (el.taskInput) el.taskInput.disabled = readonly;
+        if (el.tomorrowTaskInput) el.tomorrowTaskInput.disabled = readonly;
+        updateNameHint();
       }
 
       function saveUserName(name) {
         name = String(name || '').trim();
         if (!name) return;
-        try {
-          localStorage.setItem(STORAGE_KEY, name);
-        } catch (e) { /* private mode 등 */ }
         currentUser = name;
       }
 
       function loadUserName() {
         try {
+          var session = loadAuthSession();
+          if (session && session.name) return session.name;
           return localStorage.getItem(STORAGE_KEY) || '';
         } catch (e) {
           return '';
@@ -10709,23 +11149,30 @@
           showError('등록되지 않은 사용자입니다.');
           return;
         }
+        if (!loggedInUser) {
+          if (users.length > 0) el.userSelect.value = name;
+          else el.userName.value = name;
+          if (el.userPassword) el.userPassword.focus();
+          showError('로그인한 뒤 일지를 볼 수 있습니다.');
+          return;
+        }
 
         var targetDate = viewDateForSidebarSection(section);
         activeSidebarSection = section;
         var sameUser = namesMatch(name, currentUser);
 
-        if (!sameUser && mainViewMode === 'feedback') {
+        if (!sameUser && mainViewMode === 'feedback' && canEditCurrentUser()) {
           persistFeedbackToMemory();
         }
-        if (!sameUser && mainViewMode === 'scoring') {
+        if (!sameUser && mainViewMode === 'scoring' && canEditCurrentUser()) {
           persistScoreToMemory();
         }
 
-        saveUserName(name);
         currentUser = name;
         saveViewDate(targetDate);
         clearViewDateSelect();
         updateDateBadge();
+        updateReadonlyUi();
 
         if (!sameUser || el.taskCard.style.display === 'none') {
           showTaskUI();
@@ -10743,7 +11190,7 @@
           }
         }
         updateSidebarActiveState();
-        if (mainViewMode === 'diary') el.taskInput.focus();
+        if (mainViewMode === 'diary' && canEditCurrentUser()) el.taskInput.focus();
       }
 
       function switchToUser(name) {
@@ -10940,6 +11387,7 @@
       }
 
       function onCycleTask(taskId) {
+        if (!assertCanEdit()) return;
         var li = el.taskList.querySelector('[data-task-id="' + taskId + '"]');
         if (!li || li.classList.contains('is-modifying') || li.classList.contains('is-pending')) {
           return;
@@ -10971,6 +11419,7 @@
       }
 
       function onCycleTomorrowTask(taskId) {
+        if (!assertCanEdit()) return;
         var li = el.tomorrowTaskList.querySelector('[data-task-id="' + taskId + '"]');
         if (!li || li.classList.contains('is-modifying') || li.classList.contains('is-pending')) {
           return;
@@ -11011,6 +11460,7 @@
       }
 
       function onDeleteTask(taskId) {
+        if (!assertCanEdit()) return;
         var li = el.taskList.querySelector('[data-task-id="' + taskId + '"]');
         if (!li) return;
 
@@ -11040,6 +11490,7 @@
       }
 
       function onDeleteTomorrowTask(taskId) {
+        if (!assertCanEdit()) return;
         var li = el.tomorrowTaskList.querySelector('[data-task-id="' + taskId + '"]');
         if (!li) return;
 
@@ -11257,7 +11708,7 @@
         updateTomorrowPanelVisibility();
         setNameLocked(true);
         el.displayName.textContent = currentUser;
-        el.nameHint.textContent = '할 일을 입력하고 Enter를 누르세요.';
+        updateNameHint();
         el.chartCard.style.display = 'block';
         if (hasChartCacheData()) {
           showChartOverlay('갱신 중...', false);
@@ -11283,25 +11734,57 @@
           .then(function () { return preloadFeedbackSheetsForUser(); })
           .then(function () { return preloadScoreSheetsForUser(); })
           .then(scheduleChartLoad);
-        el.taskInput.focus();
+        if (canEditCurrentUser()) el.taskInput.focus();
+      }
+
+      function completeLogin(name, passwordHash) {
+        name = String(name || '').trim();
+        loggedInUser = name;
+        currentUser = name;
+        saveAuthSession(name, passwordHash || '');
+        activeSidebarSection = 'today';
+        saveViewDate(todayStr());
+        clearViewDateSelect();
+        if (el.userPassword) el.userPassword.value = '';
+        showTaskUI();
+      }
+
+      function logoutUser() {
+        loggedInUser = '';
+        currentUser = '';
+        clearAuthSession();
+        mainViewMode = 'diary';
+        if (typeof applyMainViewMode === 'function') applyMainViewMode();
+        if (el.taskDiaryRow) el.taskDiaryRow.style.display = 'none';
+        el.taskCard.style.display = 'none';
+        el.chartCard.style.display = 'none';
+        setNameLocked(false);
+        applySavedNameToSelect();
+        if (el.userPassword) {
+          el.userPassword.value = '';
+          el.userPassword.focus();
+        }
+        updateReadonlyUi();
       }
 
       function confirmUser() {
         var name = (users.length > 0 && el.userSelect.value)
           ? el.userSelect.value.trim()
           : el.userName.value.trim();
+        var password = el.userPassword ? el.userPassword.value : '';
         if (!name) {
           showError('이름을 입력하거나 선택해주세요.');
           return;
         }
-        saveUserName(name);
-        activeSidebarSection = 'today';
-        saveViewDate(todayStr());
-        clearViewDateSelect();
-        showTaskUI();
+        run('verifyUserPassword', [name, password], '로그인 중...')
+          .then(function (session) {
+            completeLogin(session.name, session.passwordHash);
+          })
+          .catch(function (e) { showError(e.message || String(e)); });
       }
 
       function addTomorrowTask() {
+        if (!assertCanEdit()) return;
         var text = el.tomorrowTaskInput.value.trim();
         if (!text) return;
         el.tomorrowTaskInput.value = '';
@@ -11324,6 +11807,7 @@
       }
 
       function addTask() {
+        if (!assertCanEdit()) return;
         var text = el.taskInput.value.trim();
         if (!text) return;
         el.taskInput.value = '';
@@ -11353,29 +11837,91 @@
           });
       }
 
+      function userHasPassword(name) {
+        for (var i = 0; i < usersAuth.length; i++) {
+          if (usersAuth[i].name === name) return !!usersAuth[i].hasPassword;
+        }
+        return false;
+      }
+
+      function refreshUsersAuth() {
+        return runSilent('getUsersAuth', [])
+          .then(function (list) {
+            usersAuth = list || [];
+            renderAdminUsers();
+          })
+          .catch(function () {
+            usersAuth = [];
+            renderAdminUsers();
+          });
+      }
+
       function renderAdminUsers() {
         el.userChips.innerHTML = '';
         users.forEach(function (u) {
-          var chip = document.createElement('span');
-          chip.className = 'chip';
-          chip.textContent = u;
-          var btn = document.createElement('button');
-          btn.type = 'button';
-          btn.title = '삭제';
-          btn.textContent = '×';
-          btn.addEventListener('click', function () {
+          var row = document.createElement('div');
+          row.className = 'admin-user-row';
+
+          var nameEl = document.createElement('span');
+          nameEl.className = 'admin-user-name';
+          nameEl.textContent = u;
+
+          var status = document.createElement('span');
+          var hasPw = userHasPassword(u);
+          status.className = 'admin-pw-status' + (hasPw ? ' is-set' : '');
+          status.textContent = hasPw ? '비밀번호 설정됨' : '비밀번호 미설정';
+
+          var pwInput = document.createElement('input');
+          pwInput.type = 'password';
+          pwInput.placeholder = '새 비밀번호';
+          pwInput.autocomplete = 'new-password';
+
+          var saveBtn = document.createElement('button');
+          saveBtn.type = 'button';
+          saveBtn.className = 'btn btn-primary btn-sm';
+          saveBtn.textContent = '비밀번호 저장';
+          saveBtn.addEventListener('click', function () {
+            run('setUserPassword', [u, pwInput.value], '비밀번호 저장 중...')
+              .then(function () {
+                pwInput.value = '';
+                showError('"' + u + '" 비밀번호가 저장되었습니다.');
+                el.errorBox.style.background = 'rgba(34, 197, 94, 0.15)';
+                el.errorBox.style.color = '#86efac';
+                refreshUsersAuth();
+              })
+              .catch(function (e) { showError(e.message || String(e)); });
+          });
+          pwInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              saveBtn.click();
+            }
+          });
+
+          var delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'btn btn-danger btn-sm';
+          delBtn.title = '삭제';
+          delBtn.textContent = '삭제';
+          delBtn.addEventListener('click', function () {
             if (!confirm('"' + u + '" 사용자를 삭제할까요?')) return;
             run('removeUser', [u], '사용자 삭제 중...')
               .then(function (list) {
                 users = list;
-                renderAdminUsers();
+                if (namesMatch(loggedInUser, u)) logoutUser();
                 populateUserSelect();
                 refreshDiarySidebar();
+                return refreshUsersAuth();
               })
               .catch(function (e) { showError(e.message || String(e)); });
           });
-          chip.appendChild(btn);
-          el.userChips.appendChild(chip);
+
+          row.appendChild(nameEl);
+          row.appendChild(status);
+          row.appendChild(pwInput);
+          row.appendChild(saveBtn);
+          row.appendChild(delBtn);
+          el.userChips.appendChild(row);
         });
       }
 
@@ -11384,6 +11930,7 @@
         el.mainView.style.opacity = '0.5';
         el.title.classList.add('admin-hint');
         renderAdminUsers();
+        refreshUsersAuth();
       }
 
       function closeAdmin() {
@@ -11403,14 +11950,38 @@
       });
 
       el.userName.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') { e.preventDefault(); confirmUser(); }
-      });
-      el.userSelect.addEventListener('change', function () {
-        if (el.userSelect.value) {
-          saveUserName(el.userSelect.value);
-          confirmUser();
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (el.userPassword) el.userPassword.focus();
+          else confirmUser();
         }
       });
+      el.userSelect.addEventListener('change', function () {
+        if (el.userSelect.value && el.userPassword) el.userPassword.focus();
+      });
+      if (el.userPassword) {
+        el.userPassword.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') { e.preventDefault(); confirmUser(); }
+        });
+      }
+      if (el.loginBtn) {
+        el.loginBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          confirmUser();
+        });
+      }
+      if (el.logoutBtn) {
+        el.logoutBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          logoutUser();
+        });
+      }
+      if (el.backToMyDiaryBtn) {
+        el.backToMyDiaryBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          if (loggedInUser) switchToDiary(loggedInUser, 'today');
+        });
+      }
       if (el.contextPrintBtn) {
         el.contextPrintBtn.addEventListener('click', function (e) {
           e.preventDefault();
@@ -11441,9 +12012,9 @@
           .then(function (list) {
             users = list;
             el.newUserName.value = '';
-            renderAdminUsers();
             populateUserSelect();
             refreshDiarySidebar();
+            refreshUsersAuth();
             showError('사용자가 추가되었습니다.'); // 재사용 as toast
             el.errorBox.style.background = 'rgba(34, 197, 94, 0.15)';
             el.errorBox.style.color = '#86efac';
@@ -11730,12 +12301,15 @@
       el.sidebarTodayDate.textContent = todayStr();
       el.sidebarYesterdayDate.textContent = yesterdayStr();
 
-      var savedOnBoot = loadUserName();
+      var savedSession = loadAuthSession();
+      var savedOnBoot = savedSession ? savedSession.name : '';
+      var bootAuthOk = !!savedOnBoot;
       if (savedOnBoot) {
+        loggedInUser = savedOnBoot;
         currentUser = savedOnBoot;
         showTaskUIShell();
         applyCachedBootData();
-        el.taskInput.focus();
+        if (canEditCurrentUser()) el.taskInput.focus();
         scheduleChartLoad();
       } else {
         var cachedUsersOnly = loadUsersCache();
@@ -11747,29 +12321,41 @@
         } else {
           el.mainView.style.display = 'none';
         }
+        updateReadonlyUi();
       }
 
       bootstrapFromServer(savedOnBoot || '')
         .then(function () {
-          if (!savedOnBoot) return;
+          if (!savedSession) return;
+          return runSilent('verifyStoredSession', [savedSession.name, savedSession.hash])
+            .then(function (ok) {
+              if (!ok) {
+                bootAuthOk = false;
+                logoutUser();
+                showError('비밀번호가 변경되었습니다. 다시 로그인해주세요.');
+              }
+            });
+        })
+        .then(function () {
+          if (!savedOnBoot || !bootAuthOk) return;
           return refreshDiaryDates().then(function () {
             if (viewDate === todayStr()) return loadTomorrowTasks();
           });
         })
         .then(function () {
-          if (!savedOnBoot) return;
+          if (!savedOnBoot || !bootAuthOk) return;
           return preloadProcessSheetsForUser();
         })
         .then(function () {
-          if (!savedOnBoot) return;
+          if (!savedOnBoot || !bootAuthOk) return;
           return preloadFeedbackSheetsForUser();
         })
         .then(function () {
-          if (!savedOnBoot) return;
+          if (!savedOnBoot || !bootAuthOk) return;
           return preloadScoreSheetsForUser();
         })
         .then(function () {
-          if (!savedOnBoot) prefetchChartJs();
+          if (!savedOnBoot || !bootAuthOk) prefetchChartJs();
         })
         .catch(function (e) {
           el.mainView.style.display = 'block';
