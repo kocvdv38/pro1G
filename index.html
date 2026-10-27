@@ -498,6 +498,10 @@
       gap: 8px;
       list-style: none;
       width: 100%;
+      flex: 1;
+    }
+    .rsidebar-tab-foot {
+      margin-top: auto;
     }
     .rsidebar-tab {
       display: flex;
@@ -797,7 +801,9 @@
     body.main-view-scoring .task-diary-row,
     body.main-view-scoring #chartCard,
     body.main-view-share .task-diary-row,
-    body.main-view-share #chartCard {
+    body.main-view-share #chartCard,
+    body.main-view-safety .task-diary-row,
+    body.main-view-safety #chartCard {
       display: none !important;
     }
     #feedbackCard {
@@ -1154,6 +1160,148 @@
     }
     #shareCard.visible {
       display: flex;
+    }
+    #safetyCard {
+      display: none;
+      flex-direction: column;
+      gap: 0;
+    }
+    #safetyCard.visible {
+      display: flex;
+    }
+    .safety-create {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      margin: 12px 0 18px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--input-bg);
+    }
+    .safety-create.show { display: flex; }
+    .safety-create label,
+    .safety-edit label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin: 0;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .safety-create input,
+    .safety-create textarea,
+    .safety-edit input,
+    .safety-edit textarea {
+      width: 100%;
+      margin: 0;
+      padding: 10px 12px;
+      font-size: 0.92rem;
+      line-height: 1.45;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--card-solid, var(--bg));
+      color: var(--text);
+      font-family: inherit;
+      box-sizing: border-box;
+      resize: vertical;
+    }
+    .safety-create input:focus,
+    .safety-create textarea:focus,
+    .safety-edit input:focus,
+    .safety-edit textarea:focus {
+      outline: none;
+      border-color: var(--border-strong);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    .safety-create-row,
+    .safety-edit-row {
+      display: grid;
+      grid-template-columns: minmax(140px, 180px) 1fr;
+      gap: 10px 12px;
+    }
+    .safety-create-actions,
+    .safety-edit-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    .safety-form-error {
+      margin: 0;
+      color: var(--danger);
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+    .safety-case {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card-solid, var(--card));
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+    .safety-case-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border: none;
+      background: transparent;
+      color: inherit;
+      font-family: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+    .safety-case-toggle:hover,
+    .safety-case.is-open .safety-case-toggle {
+      background: var(--accent-soft);
+    }
+    .safety-case-main { flex: 1; min-width: 0; }
+    .safety-case-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+    .safety-case-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .safety-case-chevron {
+      flex-shrink: 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+    .safety-case-detail {
+      padding: 4px 14px 14px;
+      border-top: 1px solid var(--border);
+    }
+    .safety-case-actions {
+      display: flex;
+      gap: 4px;
+      padding-top: 10px;
+    }
+    .safety-section { margin-top: 12px; }
+    .safety-section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin: 0 0 4px;
+    }
+    .safety-section-body {
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .safety-edit {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-top: 12px;
     }
     .share-card-header {
       display: flex;
@@ -3213,6 +3361,7 @@
         padding: 16px;
       }
       .rsidebar-tabs {
+        flex: none;
         flex-direction: row;
         flex-wrap: wrap;
         gap: 8px;
@@ -3221,6 +3370,14 @@
         width: auto;
         flex: 1;
         min-width: 140px;
+      }
+      .rsidebar-tab-foot {
+        margin-top: 0;
+        flex: 1 1 100%;
+      }
+      .safety-create-row,
+      .safety-edit-row {
+        grid-template-columns: 1fr;
       }
     }
     .busy-overlay {
@@ -3841,12 +3998,48 @@
         <div class="share-setup" id="shareSetupHint"></div>
         <div id="shareList"></div>
       </div>
+
+      <div class="card" id="safetyCard">
+        <div class="share-card-header">
+          <h2>안전사고 사례</h2>
+          <span class="share-admin-pill" id="safetyAdminPill">작성 권한</span>
+        </div>
+        <p class="hint" id="safetyHint" style="margin-top:0;">등록된 사례는 모든 사용자가 볼 수 있습니다. 작성·수정·삭제는 <strong>관리자</strong>만 할 수 있습니다.</p>
+        <div class="safety-create" id="safetyCreate">
+          <label for="safetyTitleInput">제목
+            <input type="text" id="safetyTitleInput" placeholder="사례 제목" maxlength="120">
+          </label>
+          <div class="safety-create-row">
+            <label for="safetyDateInput">발생일
+              <input type="text" id="safetyDateInput" placeholder="2026-10-20" maxlength="10" inputmode="numeric" autocomplete="off" spellcheck="false">
+            </label>
+            <label for="safetyPlaceInput">장소
+              <input type="text" id="safetyPlaceInput" placeholder="작업 장소" maxlength="80">
+            </label>
+          </div>
+          <label for="safetyBodyInput">사고 내용
+            <textarea id="safetyBodyInput" rows="4" maxlength="4000" placeholder="무슨 일이 있었는지 적어 주세요."></textarea>
+          </label>
+          <label for="safetyCauseInput">원인
+            <textarea id="safetyCauseInput" rows="3" maxlength="2000" placeholder="왜 일어났는지"></textarea>
+          </label>
+          <label for="safetyPreventionInput">재발 방지
+            <textarea id="safetyPreventionInput" rows="3" maxlength="2000" placeholder="다시 일어나지 않게 할 일"></textarea>
+          </label>
+          <p class="safety-form-error" id="safetyFormError" hidden></p>
+          <div class="safety-create-actions">
+            <button type="button" class="btn btn-primary" id="safetyCreateBtn">사례 등록</button>
+          </div>
+        </div>
+        <div class="share-setup" id="safetySetupHint"></div>
+        <div id="safetyList"></div>
+      </div>
     </div>
 
     <div class="card admin-panel" id="adminPanel">
       <h2>관리자 모드</h2>
       <div class="admin-login-box">
-        <p class="hint" style="margin-top:0;">관리자로 로그인하면 모든 사용자의 일지·공정표·자가피드백·채점결과·작품 공유회를 보고 수정·삭제할 수 있습니다. 일반 로그인 목록과 왼쪽 일지 목록에는 관리자가 나타나지 않습니다.</p>
+        <p class="hint" style="margin-top:0;">관리자로 로그인하면 모든 사용자의 일지·공정표·자가피드백·채점결과·작품 공유회를 보고 수정·삭제할 수 있습니다. 안전사고 사례는 관리자만 작성하고, 다른 사용자는 볼 수만 있습니다. 일반 로그인 목록과 왼쪽 일지 목록에는 관리자가 나타나지 않습니다.</p>
         <button type="button" class="btn btn-primary" id="adminLoginBtn">관리자로 로그인</button>
       </div>
       <label for="newUserName">새 사용자 추가</label>
@@ -3888,6 +4081,10 @@
         <button type="button" class="rsidebar-tab" id="coverTabBtn" aria-pressed="false" title="표지 인쇄">
           <span class="rsidebar-tab-icon" aria-hidden="true">📑</span>
           <span class="rsidebar-tab-label">표지</span>
+        </button>
+        <button type="button" class="rsidebar-tab rsidebar-tab-foot" id="safetyTabBtn" aria-pressed="false" aria-controls="safetyCard" title="안전사고 사례">
+          <span class="rsidebar-tab-icon" aria-hidden="true">⚠️</span>
+          <span class="rsidebar-tab-label">안전사고 사례</span>
         </button>
       </nav>
     </aside>
@@ -5055,6 +5252,12 @@
     return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
   }
 
+  var SAFETY_SHARE_LINK = 'internal:safety-case';
+
+  function isSafetyShareRow(row) {
+    return String(row && row.drawing_link || '') === SAFETY_SHARE_LINK;
+  }
+
   async function getShareWorks() {
     var db = requireConfig();
     var res = await db.from('share_works')
@@ -5064,7 +5267,9 @@
       if (isMissingRelationError(res.error)) throw shareSetupError();
       throw new Error(res.error.message);
     }
-    return (res.data || []).map(mapShareWork);
+    return (res.data || []).filter(function (row) {
+      return !isSafetyShareRow(row);
+    }).map(mapShareWork);
   }
 
   async function addShareWork(actorName, title, drawingLink) {
@@ -5073,6 +5278,9 @@
     drawingLink = String(drawingLink || '').trim();
     if (!actorName) throw new Error('로그인 후 등록할 수 있습니다.');
     if (!title) throw new Error('작품명을 입력해주세요.');
+    if (isSafetyShareRow({ drawing_link: drawingLink })) {
+      throw new Error('이 링크는 작품 공유회에 사용할 수 없습니다.');
+    }
     var db = requireConfig();
     var ins = await db.from('share_works').insert({
       title: title,
@@ -5096,9 +5304,9 @@
     if (!workId) throw new Error('수정할 작품을 찾을 수 없습니다.');
     if (!title) throw new Error('작품명을 입력해주세요.');
     var db = requireConfig();
-    var found = await db.from('share_works').select('id, created_by').eq('id', workId).maybeSingle();
+    var found = await db.from('share_works').select('id, created_by, drawing_link').eq('id', workId).maybeSingle();
     if (found.error) throw new Error(found.error.message);
-    if (!found.data) throw new Error('작품을 찾을 수 없습니다.');
+    if (!found.data || isSafetyShareRow(found.data)) throw new Error('작품을 찾을 수 없습니다.');
     if (!canManageShareItem(actorName, found.data.created_by, isAdmin)) {
       throw new Error('처음 등록한 사람과 관리자만 수정할 수 있습니다.');
     }
@@ -5118,9 +5326,9 @@
     if (!actorName) throw new Error('로그인 후 삭제할 수 있습니다.');
     if (!workId) throw new Error('삭제할 작품을 찾을 수 없습니다.');
     var db = requireConfig();
-    var found = await db.from('share_works').select('id, created_by').eq('id', workId).maybeSingle();
+    var found = await db.from('share_works').select('id, created_by, drawing_link').eq('id', workId).maybeSingle();
     if (found.error) throw new Error(found.error.message);
-    if (!found.data) throw new Error('작품을 찾을 수 없습니다.');
+    if (!found.data || isSafetyShareRow(found.data)) throw new Error('작품을 찾을 수 없습니다.');
     if (!canManageShareItem(actorName, found.data.created_by, isAdmin)) {
       throw new Error('처음 등록한 사람과 관리자만 삭제할 수 있습니다.');
     }
@@ -5137,9 +5345,9 @@
     if (!workId) throw new Error('작품을 찾을 수 없습니다.');
     if (!body) throw new Error('댓글 내용을 입력해주세요.');
     var db = requireConfig();
-    var found = await db.from('share_works').select('id, comments').eq('id', workId).maybeSingle();
+    var found = await db.from('share_works').select('id, drawing_link, comments').eq('id', workId).maybeSingle();
     if (found.error) throw new Error(found.error.message);
-    if (!found.data) throw new Error('작품을 찾을 수 없습니다.');
+    if (!found.data || isSafetyShareRow(found.data)) throw new Error('작품을 찾을 수 없습니다.');
     var comments = Array.isArray(found.data.comments) ? found.data.comments.map(mapShareComment) : [];
     var now = new Date().toISOString();
     comments.push({
@@ -5165,9 +5373,9 @@
     if (!actorName) throw new Error('로그인 후 수정할 수 있습니다.');
     if (!body) throw new Error('댓글 내용을 입력해주세요.');
     var db = requireConfig();
-    var found = await db.from('share_works').select('id, comments').eq('id', workId).maybeSingle();
+    var found = await db.from('share_works').select('id, drawing_link, comments').eq('id', workId).maybeSingle();
     if (found.error) throw new Error(found.error.message);
-    if (!found.data) throw new Error('작품을 찾을 수 없습니다.');
+    if (!found.data || isSafetyShareRow(found.data)) throw new Error('작품을 찾을 수 없습니다.');
     var comments = Array.isArray(found.data.comments) ? found.data.comments.map(mapShareComment) : [];
     var idx = -1;
     var i;
@@ -5194,9 +5402,9 @@
     commentId = String(commentId || '').trim();
     if (!actorName) throw new Error('로그인 후 삭제할 수 있습니다.');
     var db = requireConfig();
-    var found = await db.from('share_works').select('id, comments').eq('id', workId).maybeSingle();
+    var found = await db.from('share_works').select('id, drawing_link, comments').eq('id', workId).maybeSingle();
     if (found.error) throw new Error(found.error.message);
-    if (!found.data) throw new Error('작품을 찾을 수 없습니다.');
+    if (!found.data || isSafetyShareRow(found.data)) throw new Error('작품을 찾을 수 없습니다.');
     var comments = Array.isArray(found.data.comments) ? found.data.comments.map(mapShareComment) : [];
     var target = null;
     comments = comments.filter(function (c) {
@@ -5213,6 +5421,272 @@
     }).eq('id', workId).select('id, title, drawing_link, created_by, comments, created_at, updated_at').maybeSingle();
     if (upd.error) throw new Error(upd.error.message);
     return mapShareWork(upd.data);
+  }
+
+  var SAFETY_SETUP_SQL =
+    'create table if not exists public.safety_cases (\n' +
+    '  id uuid primary key default gen_random_uuid(),\n' +
+    '  title text not null,\n' +
+    '  occurred_on date,\n' +
+    '  place text not null default \'\',\n' +
+    '  body text not null default \'\',\n' +
+    '  cause text not null default \'\',\n' +
+    '  prevention text not null default \'\',\n' +
+    '  created_by text not null default \'\',\n' +
+    '  created_at timestamptz not null default now(),\n' +
+    '  updated_at timestamptz not null default now()\n' +
+    ');\n' +
+    'alter table public.safety_cases enable row level security;\n' +
+    'drop policy if exists safety_cases_all on public.safety_cases;\n' +
+    'create policy safety_cases_all on public.safety_cases for all using (true) with check (true);';
+
+  var SAFETY_CASE_COLUMNS = 'id, title, occurred_on, place, body, cause, prevention, created_by, created_at, updated_at';
+
+  function safetySetupError() {
+    return new Error('안전사고 사례 저장을 위해 Supabase SQL Editor에서 안내된 테이블 생성 SQL을 실행해주세요.');
+  }
+
+  function mapSafetyCase(row) {
+    row = row || {};
+    var occurred = row.occurred_on || row.occurredOn || '';
+    occurred = occurred ? String(occurred).slice(0, 10) : '';
+    return {
+      id: row.id,
+      title: String(row.title || '').trim(),
+      occurredOn: occurred,
+      place: String(row.place || '').trim(),
+      body: String(row.body || ''),
+      cause: String(row.cause || ''),
+      prevention: String(row.prevention || ''),
+      createdBy: String(row.created_by || row.createdBy || '').trim(),
+      createdAt: String(row.created_at || ''),
+      updatedAt: String(row.updated_at || '')
+    };
+  }
+
+  function safetyWritePayload(input) {
+    input = input || {};
+    var title = String(input.title || '').trim();
+    var body = String(input.body || '').trim();
+    var occurred = String(input.occurredOn || input.occurred_on || '').trim();
+    if (!title) throw new Error('사례 제목을 입력해주세요.');
+    if (!body) throw new Error('사고 내용을 입력해주세요.');
+    if (occurred && !/^\d{4}-\d{2}-\d{2}$/.test(occurred)) {
+      throw new Error('발생일은 날짜로 입력해주세요.');
+    }
+    return {
+      title: title,
+      occurred_on: occurred || null,
+      place: String(input.place || '').trim(),
+      body: body,
+      cause: String(input.cause || '').trim(),
+      prevention: String(input.prevention || '').trim(),
+      updated_at: new Date().toISOString()
+    };
+  }
+
+  function assertSafetyWriter(isAdmin) {
+    if (!isAdmin) throw new Error('안전사고 사례는 관리자만 작성할 수 있습니다.');
+  }
+
+  var safetyStoreMode = '';
+
+  function sortSafetyCases(list) {
+    return (list || []).slice().sort(function (a, b) {
+      var da = a.occurredOn || '';
+      var db = b.occurredOn || '';
+      if (da !== db) return da < db ? 1 : -1;
+      var ca = a.createdAt || '';
+      var cb = b.createdAt || '';
+      if (ca === cb) return 0;
+      return ca < cb ? 1 : -1;
+    });
+  }
+
+  function safetyMetaFromComments(comments) {
+    var meta = {};
+    if (Array.isArray(comments) && comments[0] && comments[0].body) {
+      try {
+        meta = JSON.parse(comments[0].body) || {};
+      } catch (e) {
+        meta = { body: String(comments[0].body || '') };
+      }
+    }
+    return meta && typeof meta === 'object' ? meta : {};
+  }
+
+  function mapSafetyCaseFromShare(row) {
+    var meta = safetyMetaFromComments(row && row.comments);
+    return mapSafetyCase({
+      id: row && row.id,
+      title: row && row.title,
+      occurred_on: meta.occurredOn || '',
+      place: meta.place || '',
+      body: meta.body || '',
+      cause: meta.cause || '',
+      prevention: meta.prevention || '',
+      created_by: row && row.created_by,
+      created_at: row && row.created_at,
+      updated_at: row && row.updated_at
+    });
+  }
+
+  function safetyShareComments(payload) {
+    var now = payload.updated_at || new Date().toISOString();
+    return [{
+      id: 'body',
+      author: '',
+      body: JSON.stringify({
+        occurredOn: payload.occurred_on || '',
+        place: payload.place || '',
+        body: payload.body || '',
+        cause: payload.cause || '',
+        prevention: payload.prevention || ''
+      }),
+      createdAt: now,
+      updatedAt: now
+    }];
+  }
+
+  async function resolveSafetyStore() {
+    if (safetyStoreMode) return safetyStoreMode;
+    var db = requireConfig();
+    var probe = await db.from('safety_cases').select('id').limit(1);
+    if (!probe.error) {
+      safetyStoreMode = 'table';
+      return safetyStoreMode;
+    }
+    if (isMissingRelationError(probe.error)) {
+      safetyStoreMode = 'share';
+      return safetyStoreMode;
+    }
+    throw new Error(probe.error.message);
+  }
+
+  async function fetchTableSafetyCases() {
+    var db = requireConfig();
+    var res = await db.from('safety_cases')
+      .select(SAFETY_CASE_COLUMNS)
+      .order('occurred_on', { ascending: false })
+      .order('created_at', { ascending: false });
+    if (res.error) {
+      if (isMissingRelationError(res.error)) {
+        safetyStoreMode = 'share';
+        return [];
+      }
+      throw new Error(res.error.message);
+    }
+    return (res.data || []).map(mapSafetyCase);
+  }
+
+  async function fetchShareSafetyCases() {
+    var db = requireConfig();
+    var res = await db.from('share_works')
+      .select('id, title, drawing_link, created_by, comments, created_at, updated_at')
+      .eq('drawing_link', SAFETY_SHARE_LINK)
+      .order('created_at', { ascending: false });
+    if (res.error) {
+      if (isMissingRelationError(res.error)) throw shareSetupError();
+      throw new Error(res.error.message);
+    }
+    return (res.data || []).map(mapSafetyCaseFromShare);
+  }
+
+  async function getSafetyCases() {
+    var mode = await resolveSafetyStore();
+    var shareRows = await fetchShareSafetyCases();
+    if (mode !== 'table') return sortSafetyCases(shareRows);
+    var tableRows = await fetchTableSafetyCases();
+    return sortSafetyCases(tableRows.concat(shareRows));
+  }
+
+  async function addSafetyCase(actorName, input, isAdmin) {
+    actorName = String(actorName || '').trim();
+    assertSafetyWriter(isAdmin);
+    if (!actorName) throw new Error('관리자로 로그인한 뒤 작성할 수 있습니다.');
+    var payload = safetyWritePayload(input);
+    payload.created_by = actorName;
+    var db = requireConfig();
+    var mode = await resolveSafetyStore();
+    if (mode === 'table') {
+      var ins = await db.from('safety_cases')
+        .insert(payload)
+        .select(SAFETY_CASE_COLUMNS)
+        .single();
+      if (ins.error) {
+        if (!isMissingRelationError(ins.error)) throw new Error(ins.error.message);
+        safetyStoreMode = 'share';
+      } else {
+        return mapSafetyCase(ins.data);
+      }
+    }
+    var shareIns = await db.from('share_works').insert({
+      title: payload.title,
+      drawing_link: SAFETY_SHARE_LINK,
+      created_by: actorName,
+      comments: safetyShareComments(payload)
+    }).select('id, title, drawing_link, created_by, comments, created_at, updated_at').single();
+    if (shareIns.error) {
+      if (isMissingRelationError(shareIns.error)) throw shareSetupError();
+      throw new Error(shareIns.error.message);
+    }
+    return mapSafetyCaseFromShare(shareIns.data);
+  }
+
+  async function updateSafetyCase(actorName, caseId, input, isAdmin) {
+    actorName = String(actorName || '').trim();
+    caseId = String(caseId || '').trim();
+    assertSafetyWriter(isAdmin);
+    if (!actorName) throw new Error('관리자로 로그인한 뒤 수정할 수 있습니다.');
+    if (!caseId) throw new Error('수정할 사례를 찾을 수 없습니다.');
+    var payload = safetyWritePayload(input);
+    var db = requireConfig();
+    var mode = await resolveSafetyStore();
+    if (mode === 'table') {
+      var upd = await db.from('safety_cases')
+        .update(payload)
+        .eq('id', caseId)
+        .select(SAFETY_CASE_COLUMNS)
+        .maybeSingle();
+      if (upd.error && !isMissingRelationError(upd.error)) throw new Error(upd.error.message);
+      if (upd.data) return mapSafetyCase(upd.data);
+    }
+    var shareUpd = await db.from('share_works').update({
+      title: payload.title,
+      comments: safetyShareComments(payload),
+      updated_at: payload.updated_at
+    }).eq('id', caseId).eq('drawing_link', SAFETY_SHARE_LINK)
+      .select('id, title, drawing_link, created_by, comments, created_at, updated_at')
+      .maybeSingle();
+    if (shareUpd.error) throw new Error(shareUpd.error.message);
+    if (!shareUpd.data) throw new Error('사례를 찾을 수 없습니다.');
+    return mapSafetyCaseFromShare(shareUpd.data);
+  }
+
+  async function deleteSafetyCase(actorName, caseId, isAdmin) {
+    actorName = String(actorName || '').trim();
+    caseId = String(caseId || '').trim();
+    assertSafetyWriter(isAdmin);
+    if (!actorName) throw new Error('관리자로 로그인한 뒤 삭제할 수 있습니다.');
+    if (!caseId) throw new Error('삭제할 사례를 찾을 수 없습니다.');
+    var db = requireConfig();
+    var mode = await resolveSafetyStore();
+    var removed = false;
+    if (mode === 'table') {
+      var del = await db.from('safety_cases').delete().eq('id', caseId).select('id');
+      if (del.error && !isMissingRelationError(del.error)) throw new Error(del.error.message);
+      if (del.data && del.data.length) removed = true;
+    }
+    if (!removed) {
+      var shareDel = await db.from('share_works').delete()
+        .eq('id', caseId)
+        .eq('drawing_link', SAFETY_SHARE_LINK)
+        .select('id');
+      if (shareDel.error) throw new Error(shareDel.error.message);
+      if (shareDel.data && shareDel.data.length) removed = true;
+    }
+    if (!removed) throw new Error('삭제할 사례를 찾을 수 없습니다.');
+    return getSafetyCases();
   }
 
   global.ProDiaryApi = {
@@ -5254,7 +5728,12 @@
     addShareComment: addShareComment,
     updateShareComment: updateShareComment,
     deleteShareComment: deleteShareComment,
-    shareSetupSql: function () { return SHARE_SETUP_SQL; }
+    shareSetupSql: function () { return SHARE_SETUP_SQL; },
+    getSafetyCases: getSafetyCases,
+    addSafetyCase: addSafetyCase,
+    updateSafetyCase: updateSafetyCase,
+    deleteSafetyCase: deleteSafetyCase,
+    safetySetupSql: function () { return SAFETY_SETUP_SQL; }
   };
 })(window);
 
@@ -5358,6 +5837,7 @@
       var feedbackSavedListOpen = false;
       var scoreSavedListOpen = false;
       var shareState = { works: [], editingWorkId: '', editingCommentKey: '', openWorkId: '', setupError: '' };
+      var safetyState = { cases: [], editingId: '', openId: '', setupError: '' };
       var PROCESS_CATEGORIES = [
         '재단', 'CAD', 'CAM', '3D 프린터', 'CNC', '밀링', '선반', '일반가공', '도색', '조립'
       ];
@@ -5484,6 +5964,20 @@
         shareWorkModalMeta: document.getElementById('shareWorkModalMeta'),
         shareWorkModalBody: document.getElementById('shareWorkModalBody'),
         shareWorkModalClose: document.getElementById('shareWorkModalClose'),
+        safetyTabBtn: document.getElementById('safetyTabBtn'),
+        safetyCard: document.getElementById('safetyCard'),
+        safetyAdminPill: document.getElementById('safetyAdminPill'),
+        safetyCreate: document.getElementById('safetyCreate'),
+        safetyTitleInput: document.getElementById('safetyTitleInput'),
+        safetyDateInput: document.getElementById('safetyDateInput'),
+        safetyFormError: document.getElementById('safetyFormError'),
+        safetyPlaceInput: document.getElementById('safetyPlaceInput'),
+        safetyBodyInput: document.getElementById('safetyBodyInput'),
+        safetyCauseInput: document.getElementById('safetyCauseInput'),
+        safetyPreventionInput: document.getElementById('safetyPreventionInput'),
+        safetyCreateBtn: document.getElementById('safetyCreateBtn'),
+        safetySetupHint: document.getElementById('safetySetupHint'),
+        safetyList: document.getElementById('safetyList'),
         processTableBody: document.getElementById('processTableBody'),
         processTableFoot: document.getElementById('processTableFoot'),
         processEmpty: document.getElementById('processEmpty'),
@@ -7267,6 +7761,10 @@
       function triggerContextPrint() {
         if (mainViewMode === 'share') {
           printShareWorks();
+          return;
+        }
+        if (mainViewMode === 'safety') {
+          printSafetyCases();
           return;
         }
         if (!currentUser || !el.nameCard || !el.nameCard.classList.contains('name-locked')) {
@@ -10800,8 +11298,10 @@
           else localStorage.removeItem(STORAGE_ADMIN);
         } catch (e) { /* ignore */ }
         updateShareAdminUi();
+        updateSafetyAdminUi();
         updateAdminLoginButton();
         if (mainViewMode === 'share') renderShareList();
+        if (mainViewMode === 'safety') renderSafetyList();
       }
 
       function isAdminAccountName(name) {
@@ -10861,6 +11361,7 @@
         }
         updateReadonlyUi();
         if (mainViewMode === 'share') renderShareList();
+        if (mainViewMode === 'safety') renderSafetyList();
         showError('관리자 권한이 해제되었습니다.');
       }
 
@@ -11356,6 +11857,462 @@
           .catch(function (e) { showError(e.message || String(e)); });
       }
 
+      function isSafetyAdmin() {
+        return !!adminUnlocked;
+      }
+
+      function safetyActorName() {
+        return String(loggedInUser || (adminUnlocked ? ADMIN_NAME : '')).trim();
+      }
+
+      function updateSafetyAdminUi() {
+        var admin = isSafetyAdmin();
+        if (el.safetyAdminPill) el.safetyAdminPill.classList.toggle('show', admin);
+        if (el.safetyCreate) el.safetyCreate.classList.toggle('show', admin);
+        if (admin && el.safetyDateInput && !el.safetyDateInput.value) {
+          el.safetyDateInput.value = todayStr();
+        }
+      }
+
+      function showSafetySetup(on) {
+        if (!el.safetySetupHint) return;
+        if (!on) {
+          el.safetySetupHint.classList.remove('show');
+          el.safetySetupHint.innerHTML = '';
+          return;
+        }
+        var sql = '';
+        try {
+          sql = window.ProDiaryApi && window.ProDiaryApi.safetySetupSql
+            ? window.ProDiaryApi.safetySetupSql()
+            : '';
+        } catch (e) { sql = ''; }
+        el.safetySetupHint.innerHTML =
+          '안전사고 사례를 저장하려면 Supabase SQL Editor에서 아래를 한 번 실행하세요.' +
+          (sql ? '<pre>' + escapeHtml(sql) + '</pre>' : '');
+        el.safetySetupHint.classList.add('show');
+      }
+
+      function safetyMetaText(item) {
+        var parts = [];
+        if (item.occurredOn) parts.push(item.occurredOn);
+        if (item.place) parts.push(item.place);
+        if (item.createdBy) parts.push(item.createdBy + ' 작성');
+        return parts.join(' · ');
+      }
+
+      function normalizeSafetyDate(value) {
+        value = String(value || '').trim();
+        if (!value) return '';
+        var matched = value.match(/^(\d{4})[./-](\d{1,2})[./-](\d{1,2})$/);
+        if (!matched) return null;
+        var year = matched[1];
+        var month = String(matched[2]).padStart(2, '0');
+        var day = String(matched[3]).padStart(2, '0');
+        var iso = year + '-' + month + '-' + day;
+        var parsed = new Date(iso + 'T12:00:00');
+        if (isNaN(parsed.getTime())) return null;
+        if (parsed.getFullYear() !== parseInt(year, 10) ||
+            parsed.getMonth() + 1 !== parseInt(month, 10) ||
+            parsed.getDate() !== parseInt(day, 10)) return null;
+        return iso;
+      }
+
+      function showSafetyFormError(message) {
+        if (!el.safetyFormError) return;
+        el.safetyFormError.textContent = message || '';
+        el.safetyFormError.hidden = !message;
+      }
+
+      function readSafetyFormValues() {
+        var rawDate = el.safetyDateInput ? el.safetyDateInput.value : '';
+        var occurredOn = normalizeSafetyDate(rawDate);
+        return {
+          title: el.safetyTitleInput ? el.safetyTitleInput.value : '',
+          occurredOn: occurredOn || '',
+          dateError: rawDate.trim() && !occurredOn ? '발생일은 2026-10-20처럼 입력해주세요.' : '',
+          place: el.safetyPlaceInput ? el.safetyPlaceInput.value : '',
+          body: el.safetyBodyInput ? el.safetyBodyInput.value : '',
+          cause: el.safetyCauseInput ? el.safetyCauseInput.value : '',
+          prevention: el.safetyPreventionInput ? el.safetyPreventionInput.value : ''
+        };
+      }
+
+      function clearSafetyForm() {
+        showSafetyFormError('');
+        if (el.safetyTitleInput) el.safetyTitleInput.value = '';
+        if (el.safetyDateInput) el.safetyDateInput.value = todayStr();
+        if (el.safetyPlaceInput) el.safetyPlaceInput.value = '';
+        if (el.safetyBodyInput) el.safetyBodyInput.value = '';
+        if (el.safetyCauseInput) el.safetyCauseInput.value = '';
+        if (el.safetyPreventionInput) el.safetyPreventionInput.value = '';
+      }
+
+      function showSafetyToast(message) {
+        showError(message);
+        if (el.errorBox) {
+          el.errorBox.style.background = 'rgba(34, 197, 94, 0.15)';
+          el.errorBox.style.color = '#86efac';
+        }
+      }
+
+      function upsertSafetyCaseInState(item) {
+        if (!item || !item.id) return;
+        var i;
+        for (i = 0; i < safetyState.cases.length; i++) {
+          if (safetyState.cases[i].id === item.id) {
+            safetyState.cases[i] = item;
+            return;
+          }
+        }
+        safetyState.cases.unshift(item);
+      }
+
+      function loadSafetyCases() {
+        updateSafetyAdminUi();
+        return runSilent('getSafetyCases', [])
+          .then(function (list) {
+            safetyState.cases = list || [];
+            safetyState.setupError = '';
+            showSafetySetup(false);
+            renderSafetyList();
+          })
+          .catch(function (e) {
+            safetyState.cases = [];
+            safetyState.setupError = e && e.message ? e.message : String(e);
+            if (/테이블 생성 SQL|safety_cases|relation/i.test(safetyState.setupError)) {
+              showSafetySetup(isSafetyAdmin());
+              if (!isSafetyAdmin()) {
+                safetyState.setupError = '사례를 아직 불러올 수 없습니다. 관리자에게 문의해 주세요.';
+              }
+            } else {
+              showSafetySetup(false);
+              showError(safetyState.setupError);
+            }
+            renderSafetyList();
+          });
+      }
+
+      function appendSafetySection(parent, label, text) {
+        text = String(text || '').trim();
+        if (!text) return;
+        var sec = document.createElement('div');
+        sec.className = 'safety-section';
+        var lab = document.createElement('p');
+        lab.className = 'safety-section-label';
+        lab.textContent = label;
+        var body = document.createElement('p');
+        body.className = 'safety-section-body';
+        body.textContent = text;
+        sec.appendChild(lab);
+        sec.appendChild(body);
+        parent.appendChild(sec);
+      }
+
+      function appendSafetyLabeledControl(parent, labelText, control) {
+        var label = document.createElement('label');
+        label.appendChild(document.createTextNode(labelText));
+        label.appendChild(control);
+        parent.appendChild(label);
+      }
+
+      function buildSafetyEditEl(item) {
+        var form = document.createElement('div');
+        form.className = 'safety-edit';
+        var titleInput = document.createElement('input');
+        titleInput.type = 'text';
+        titleInput.maxLength = 120;
+        titleInput.value = item.title || '';
+        titleInput.placeholder = '사례 제목';
+        appendSafetyLabeledControl(form, '제목', titleInput);
+
+        var row = document.createElement('div');
+        row.className = 'safety-edit-row';
+        var dateInput = document.createElement('input');
+        dateInput.type = 'text';
+        dateInput.maxLength = 10;
+        dateInput.placeholder = '2026-10-20';
+        dateInput.value = item.occurredOn || '';
+        appendSafetyLabeledControl(row, '발생일', dateInput);
+        var placeInput = document.createElement('input');
+        placeInput.type = 'text';
+        placeInput.maxLength = 80;
+        placeInput.value = item.place || '';
+        placeInput.placeholder = '작업 장소';
+        appendSafetyLabeledControl(row, '장소', placeInput);
+        form.appendChild(row);
+
+        var bodyInput = document.createElement('textarea');
+        bodyInput.rows = 4;
+        bodyInput.maxLength = 4000;
+        bodyInput.value = item.body || '';
+        appendSafetyLabeledControl(form, '사고 내용', bodyInput);
+        var causeInput = document.createElement('textarea');
+        causeInput.rows = 3;
+        causeInput.maxLength = 2000;
+        causeInput.value = item.cause || '';
+        appendSafetyLabeledControl(form, '원인', causeInput);
+        var preventionInput = document.createElement('textarea');
+        preventionInput.rows = 3;
+        preventionInput.maxLength = 2000;
+        preventionInput.value = item.prevention || '';
+        appendSafetyLabeledControl(form, '재발 방지', preventionInput);
+
+        var actions = document.createElement('div');
+        actions.className = 'safety-edit-actions';
+        var cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.className = 'btn btn-outline';
+        cancelBtn.textContent = '취소';
+        cancelBtn.addEventListener('click', function () {
+          safetyState.editingId = '';
+          renderSafetyList();
+        });
+        var saveBtn = document.createElement('button');
+        saveBtn.type = 'button';
+        saveBtn.className = 'btn btn-primary';
+        saveBtn.textContent = '저장';
+        saveBtn.addEventListener('click', function () {
+          var occurredOn = normalizeSafetyDate(dateInput.value);
+          if (String(dateInput.value || '').trim() && !occurredOn) {
+            showError('발생일은 2026-10-20처럼 입력해주세요.');
+            return;
+          }
+          saveSafetyCaseUi(item.id, {
+            title: titleInput.value,
+            occurredOn: occurredOn || '',
+            place: placeInput.value,
+            body: bodyInput.value,
+            cause: causeInput.value,
+            prevention: preventionInput.value
+          });
+        });
+        actions.appendChild(cancelBtn);
+        actions.appendChild(saveBtn);
+        form.appendChild(actions);
+        return form;
+      }
+
+      function buildSafetyCaseEl(item) {
+        var open = String(safetyState.openId) === String(item.id);
+        var wrap = document.createElement('article');
+        wrap.className = 'safety-case' + (open ? ' is-open' : '');
+
+        var toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'safety-case-toggle';
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        var main = document.createElement('div');
+        main.className = 'safety-case-main';
+        var titleEl = document.createElement('h3');
+        titleEl.className = 'safety-case-title';
+        titleEl.textContent = item.title || '제목 없음';
+        var meta = document.createElement('div');
+        meta.className = 'safety-case-meta';
+        meta.textContent = safetyMetaText(item) || '안전사고 사례';
+        main.appendChild(titleEl);
+        main.appendChild(meta);
+        var chevron = document.createElement('span');
+        chevron.className = 'safety-case-chevron';
+        chevron.setAttribute('aria-hidden', 'true');
+        chevron.textContent = open ? '▼' : '▶';
+        toggle.appendChild(main);
+        toggle.appendChild(chevron);
+        toggle.addEventListener('click', function () {
+          if (open) {
+            safetyState.openId = '';
+            safetyState.editingId = '';
+          } else {
+            safetyState.openId = String(item.id);
+            safetyState.editingId = '';
+          }
+          renderSafetyList();
+        });
+        wrap.appendChild(toggle);
+
+        if (!open) return wrap;
+
+        var detail = document.createElement('div');
+        detail.className = 'safety-case-detail';
+        if (isSafetyAdmin()) {
+          var actions = document.createElement('div');
+          actions.className = 'safety-case-actions';
+          var editBtn = document.createElement('button');
+          editBtn.type = 'button';
+          editBtn.className = 'link-btn';
+          editBtn.textContent = String(safetyState.editingId) === String(item.id) ? '수정 취소' : '수정';
+          editBtn.addEventListener('click', function () {
+            safetyState.editingId = String(safetyState.editingId) === String(item.id) ? '' : String(item.id);
+            renderSafetyList();
+          });
+          var delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'link-btn';
+          delBtn.textContent = '삭제';
+          delBtn.addEventListener('click', function () { deleteSafetyCaseUi(item); });
+          actions.appendChild(editBtn);
+          actions.appendChild(delBtn);
+          detail.appendChild(actions);
+        }
+
+        if (isSafetyAdmin() && String(safetyState.editingId) === String(item.id)) {
+          detail.appendChild(buildSafetyEditEl(item));
+        } else {
+          appendSafetySection(detail, '사고 내용', item.body);
+          appendSafetySection(detail, '원인', item.cause);
+          appendSafetySection(detail, '재발 방지', item.prevention);
+          if (!String(item.body || '').trim() && !String(item.cause || '').trim() && !String(item.prevention || '').trim()) {
+            var emptyDetail = document.createElement('p');
+            emptyDetail.className = 'safety-case-meta';
+            emptyDetail.textContent = '작성된 내용이 없습니다.';
+            detail.appendChild(emptyDetail);
+          }
+        }
+        wrap.appendChild(detail);
+        return wrap;
+      }
+
+      function renderSafetyList() {
+        if (!el.safetyList) return;
+        updateSafetyAdminUi();
+        el.safetyList.innerHTML = '';
+        if (!safetyState.cases.length) {
+          var empty = document.createElement('p');
+          empty.className = 'share-empty';
+          if (safetyState.setupError) empty.textContent = safetyState.setupError;
+          else if (isSafetyAdmin()) empty.textContent = '아직 등록된 사례가 없습니다. 위에서 작성해 주세요.';
+          else empty.textContent = '아직 등록된 안전사고 사례가 없습니다.';
+          el.safetyList.appendChild(empty);
+          return;
+        }
+        safetyState.cases.forEach(function (item) {
+          el.safetyList.appendChild(buildSafetyCaseEl(item));
+        });
+      }
+
+      function createSafetyCaseUi() {
+        if (!isSafetyAdmin()) {
+          showError('안전사고 사례는 관리자만 작성할 수 있습니다.');
+          return;
+        }
+        var input = readSafetyFormValues();
+        if (input.dateError) {
+          showSafetyFormError(input.dateError);
+          showError(input.dateError);
+          return;
+        }
+        showSafetyFormError('');
+        run('addSafetyCase', [safetyActorName(), input, true], '사례 등록 중...')
+          .then(function (item) {
+            clearSafetyForm();
+            upsertSafetyCaseInState(item);
+            safetyState.openId = String(item.id || '');
+            safetyState.setupError = '';
+            showSafetySetup(false);
+            renderSafetyList();
+            showSafetyToast('안전사고 사례가 등록되었습니다.');
+          })
+          .catch(function (e) {
+            var msg = e && e.message ? e.message : String(e);
+            if (/테이블 생성 SQL/.test(msg)) showSafetySetup(true);
+            showError(msg);
+          });
+      }
+
+      function saveSafetyCaseUi(caseId, input) {
+        if (!isSafetyAdmin()) {
+          showError('안전사고 사례는 관리자만 수정할 수 있습니다.');
+          return;
+        }
+        run('updateSafetyCase', [safetyActorName(), caseId, input, true], '사례 저장 중...')
+          .then(function (item) {
+            safetyState.editingId = '';
+            upsertSafetyCaseInState(item);
+            renderSafetyList();
+            showSafetyToast('안전사고 사례가 수정되었습니다.');
+          })
+          .catch(function (e) { showError(e.message || String(e)); });
+      }
+
+      function deleteSafetyCaseUi(item) {
+        if (!item || !isSafetyAdmin()) return;
+        if (!confirm('"' + (item.title || '사례') + '"을(를) 삭제할까요?')) return;
+        run('deleteSafetyCase', [safetyActorName(), item.id, true], '사례 삭제 중...')
+          .then(function (list) {
+            safetyState.cases = list || [];
+            if (String(safetyState.openId) === String(item.id)) safetyState.openId = '';
+            if (String(safetyState.editingId) === String(item.id)) safetyState.editingId = '';
+            renderSafetyList();
+            showSafetyToast('안전사고 사례가 삭제되었습니다.');
+          })
+          .catch(function (e) { showError(e.message || String(e)); });
+      }
+
+      function showSafetyView() {
+        if (!loggedInUser && !adminUnlocked) {
+          showError('안전사고 사례를 보려면 먼저 로그인해주세요.');
+          return;
+        }
+        if (mainViewMode === 'process') persistProcessRowsToMemory();
+        else if (mainViewMode === 'feedback') persistFeedbackToMemory();
+        else if (mainViewMode === 'scoring') persistScoreToMemory();
+        mainViewMode = 'safety';
+        applyMainViewMode();
+      }
+
+      function buildSafetyPrintHtml(items) {
+        var blocks = (items || []).map(function (item) {
+          function section(label, text) {
+            text = String(text || '').trim();
+            if (!text) return '';
+            return '<h3>' + escapeHtml(label) + '</h3><p>' + formatPrintMultiline(text) + '</p>';
+          }
+          return '<section class="case">' +
+            '<h2>' + escapeHtml(item.title || '제목 없음') + '</h2>' +
+            '<p class="meta">' + escapeHtml(safetyMetaText(item) || '') + '</p>' +
+            section('사고 내용', item.body) +
+            section('원인', item.cause) +
+            section('재발 방지', item.prevention) +
+            '</section>';
+        }).join('');
+        if (!blocks) blocks = '<p>등록된 안전사고 사례가 없습니다.</p>';
+        return '<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>안전사고 사례</title><style>' +
+          'body { font-family: "Pretendard", "Malgun Gothic", sans-serif; color: #111; margin: 24px; }' +
+          'h1 { margin: 0 0 6px; font-size: 1.35rem; text-align: center; }' +
+          '.print-meta { text-align: center; color: #555; font-size: 0.85rem; margin: 0 0 22px; }' +
+          '.case { border: 1px solid #ccc; border-radius: 8px; padding: 14px 16px; margin: 0 0 16px; page-break-inside: avoid; }' +
+          '.case h2 { margin: 0 0 4px; font-size: 1.12rem; }' +
+          '.case h3 { margin: 12px 0 4px; font-size: 0.88rem; }' +
+          '.meta { margin: 0; color: #444; font-size: 0.85rem; }' +
+          'p { margin: 0; font-size: 0.92rem; line-height: 1.55; white-space: pre-wrap; }' +
+          '@media print { body { margin: 12mm; } @page { margin: 12mm; } .case { page-break-inside: avoid; } }' +
+          '</style></head><body><h1>안전사고 사례</h1><p class="print-meta">인쇄: ' +
+          escapeHtml(new Date().toLocaleString('ko-KR')) + '</p>' + blocks + '</body></html>';
+      }
+
+      function printSafetyCases() {
+        if (!loggedInUser && !adminUnlocked) {
+          showError('로그인 후 인쇄할 수 있습니다.');
+          return;
+        }
+        var iframe = document.createElement('iframe');
+        iframe.setAttribute('aria-hidden', 'true');
+        iframe.style.cssText = 'position:fixed;left:-10000px;top:0;width:794px;height:1123px;border:0;visibility:hidden;';
+        document.body.appendChild(iframe);
+        var printWindow = iframe.contentWindow;
+        var printDoc = printWindow.document;
+        printDoc.open();
+        printDoc.write(buildSafetyPrintHtml(safetyState.cases || []));
+        printDoc.close();
+        setTimeout(function () {
+          printWindow.focus();
+          printWindow.print();
+          setTimeout(function () {
+            if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+          }, 1000);
+        }, 300);
+      }
+
       function persistShareView() { /* 공유회는 입력 즉시 저장 */ }
 
       function showShareView() {
@@ -11375,11 +12332,13 @@
         var isFeedback = mainViewMode === 'feedback';
         var isScoring = mainViewMode === 'scoring';
         var isShare = mainViewMode === 'share';
+        var isSafety = mainViewMode === 'safety';
         var isDiary = mainViewMode === 'diary';
         document.body.classList.toggle('main-view-process', isProcess);
         document.body.classList.toggle('main-view-feedback', isFeedback);
         document.body.classList.toggle('main-view-scoring', isScoring);
         document.body.classList.toggle('main-view-share', isShare);
+        document.body.classList.toggle('main-view-safety', isSafety);
         if (el.processCard) {
           el.processCard.classList.toggle('visible', isProcess);
         }
@@ -11391,6 +12350,9 @@
         }
         if (el.shareCard) {
           el.shareCard.classList.toggle('visible', isShare);
+        }
+        if (el.safetyCard) {
+          el.safetyCard.classList.toggle('visible', isSafety);
         }
         if (el.ganttTabBtn) {
           el.ganttTabBtn.classList.toggle('active', isProcess);
@@ -11408,11 +12370,16 @@
           el.shareTabBtn.classList.toggle('active', isShare);
           el.shareTabBtn.setAttribute('aria-pressed', isShare ? 'true' : 'false');
         }
+        if (el.safetyTabBtn) {
+          el.safetyTabBtn.classList.toggle('active', isSafety);
+          el.safetyTabBtn.setAttribute('aria-pressed', isSafety ? 'true' : 'false');
+        }
         if (el.diaryTabBtn) {
           el.diaryTabBtn.classList.toggle('active', isDiary);
           el.diaryTabBtn.setAttribute('aria-pressed', isDiary ? 'true' : 'false');
         }
         if (!isShare) closeShareWorkModal();
+        if (!isSafety) safetyState.editingId = '';
         if (isDiary) {
           if (el.taskCard && el.taskCard.style.display !== 'none') {
             if (el.taskDiaryRow) el.taskDiaryRow.style.display = 'flex';
@@ -11449,6 +12416,8 @@
             });
         } else if (isShare) {
           loadShareWorks();
+        } else if (isSafety) {
+          loadSafetyCases();
         }
         updateProcessSavedPanelVisibility();
         updateNameHint();
@@ -11832,6 +12801,10 @@
           el.nameHint.textContent = adminUnlocked
             ? '관리자 권한으로 작품 공유회의 모든 작품과 댓글을 수정·삭제할 수 있습니다.'
             : '작품 공유회는 모든 사용자가 함께 봅니다. 본인이 등록한 작품·댓글만 수정·삭제할 수 있습니다.';
+        } else if (mainViewMode === 'safety') {
+          el.nameHint.textContent = adminUnlocked
+            ? '관리자 권한으로 안전사고 사례를 작성·수정·삭제할 수 있습니다.'
+            : '안전사고 사례는 모두 볼 수 있습니다. 작성은 관리자만 할 수 있습니다.';
         } else if (adminUnlocked && (!currentUser || isAdminAccountName(currentUser))) {
           el.nameHint.textContent = '왼쪽에서 사용자를 선택하면 그 데이터를 보고 수정·삭제할 수 있습니다.';
         } else if (adminUnlocked) {
@@ -13670,6 +14643,18 @@
       document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && shareState.openWorkId) closeShareWorkModal();
       });
+      if (el.safetyTabBtn) {
+        el.safetyTabBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          showSafetyView();
+        });
+      }
+      if (el.safetyCreateBtn) {
+        el.safetyCreateBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          createSafetyCaseUi();
+        });
+      }
       if (el.coverTabBtn) {
         el.coverTabBtn.addEventListener('click', function (e) {
           e.preventDefault();
