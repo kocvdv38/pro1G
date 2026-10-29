@@ -1,146 +1,148 @@
+      }
+      function buildSafetyPrintHtml(items) {
+        var blocks = (items || []).map(function (item) {
+          function section(label, text) {
+            text = String(text || '').trim();
+            if (!text) return '';
+            return '<h3>' + escapeHtml(label) + '</h3><p>' + formatPrintMultiline(text) + '</p>';
+          }
+          return '<section class="case">' +
+            '<h2>' + escapeHtml(item.title || '제목 없음') + '</h2>' +
+            '<p class="meta">' + escapeHtml(safetyMetaText(item) || '') + '</p>' +
+            section('사고 내용', item.body) +
+            section('원인', item.cause) +
+            section('재발 방지', item.prevention) +
+            '</section>';
+        }).join('');
+        if (!blocks) blocks = '<p>등록된 안전사고 사례가 없습니다.</p>';
+        return '<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>안전사고 사례</title><style>' +
+          'body { font-family: "Pretendard", "Malgun Gothic", sans-serif; color: #111; margin: 24px; }' +
+          'h1 { margin: 0 0 6px; font-size: 1.35rem; text-align: center; }' +
+          '.print-meta { text-align: center; color: #555; font-size: 0.85rem; margin: 0 0 22px; }' +
+          '.case { border: 1px solid #ccc; border-radius: 8px; padding: 14px 16px; margin: 0 0 16px; page-break-inside: avoid; }' +
+          '.case h2 { margin: 0 0 4px; font-size: 1.12rem; }' +
+          '.case h3 { margin: 12px 0 4px; font-size: 0.88rem; }' +
+          '.meta { margin: 0; color: #444; font-size: 0.85rem; }' +
+          'p { margin: 0; font-size: 0.92rem; line-height: 1.55; white-space: pre-wrap; }' +
+          '@media print { body { margin: 12mm; } @page { margin: 12mm; } .case { page-break-inside: avoid; } }' +
+          '</style></head><body><h1>안전사고 사례</h1><p class="print-meta">인쇄: ' +
+          escapeHtml(new Date().toLocaleString('ko-KR')) + '</p>' + blocks + '</body></html>';
+      }
+      function printSafetyCases() {
+        if (!loggedInUser && !adminUnlocked) {
+          showError('로그인 후 인쇄할 수 있습니다.');
+          return;
+        }
+        var iframe = document.createElement('iframe');
+        iframe.setAttribute('aria-hidden', 'true');
+        iframe.style.cssText = 'position:fixed;left:-10000px;top:0;width:794px;height:1123px;border:0;visibility:hidden;';
+        document.body.appendChild(iframe);
+        var printWindow = iframe.contentWindow;
+        var printDoc = printWindow.document;
+        printDoc.open();
+        printDoc.write(buildSafetyPrintHtml(safetyState.cases || []));
+        printDoc.close();
+        setTimeout(function () {
+          printWindow.focus();
+          printWindow.print();
+          setTimeout(function () {
+            if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+          }, 1000);
+        }, 300);
+      }
+      function persistShareView() { /* 공유회는 입력 즉시 저장 */ }
+      function showShareView() {
 
-[497 lines collapsed]
+[13 lines collapsed]
 
-      gap: 8px;
-      list-style: none;
-      width: 100%;
-      flex: 1;
-    }
-    .rsidebar-tab-foot {
-      margin-top: auto;
-    }
-    .rsidebar-tab {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 10px;
-      width: 100%;
-      padding: 11px 12px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: var(--card-solid, var(--card));
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.88rem;
-      font-weight: 600;
-      line-height: 1.3;
-      letter-spacing: -0.02em;
-      cursor: pointer;
-      transition: background 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease), transform 0.15s var(--ease);
-    }
-    .rsidebar-tab:hover {
-      border-color: var(--border-strong);
-      background: rgba(255, 255, 255, 0.04);
-    }
-    .rsidebar-tab.active {
-      color: var(--accent-hover);
-      border-color: var(--accent);
-      background: var(--accent-soft);
-      box-shadow: var(--shadow-sm);
-    }
-    .rsidebar-tab-icon {
-      font-size: 1.1rem;
-      line-height: 1;
-      flex-shrink: 0;
-    }
-    .rsidebar-tab-label {
-      flex: 1;
-      text-align: left;
-    }
-    #processCard {
-      display: none;
-      flex-direction: column;
-      gap: 0;
-    }
-    #processCard.visible {
-      display: flex;
-    }
-    .process-table-wrap {
-      overflow-x: auto;
-      margin-top: 12px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-    }
-    .process-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.86rem;
-      min-width: 640px;
-      table-layout: fixed;
-    }
-    .process-table th,
-    .process-table td {
-      border-bottom: 1px solid var(--border);
-      padding: 10px 10px;
-      vertical-align: middle;
-      text-align: left;
-    }
-    .process-table th {
-      background: var(--input-bg);
-      color: var(--muted);
-      font-size: 0.75rem;
-      font-weight: 700;
-      white-space: nowrap;
-      text-align: center;
-    }
-    .process-table tbody tr:hover {
-      background: rgba(255, 255, 255, 0.03);
-    }
-    .process-table tfoot td {
-      background: var(--accent-soft);
-      font-weight: 700;
-      border-bottom: none;
-    }
-    .process-table .col-time {
-      width: 96px;
-      white-space: nowrap;
-      text-align: center;
-    }
-    .process-table .col-category {
-      text-align: center;
-    }
-    .process-table .col-category select {
-      text-align: center;
-      text-align-last: center;
-    }
-    .process-table .col-total {
-      width: 88px;
-      text-align: center;
-    }
-    .process-table .process-group-total {
-      color: var(--accent-hover);
-      font-weight: 700;
-    }
-    .process-table .process-group-total.is-dash {
-      color: var(--muted);
-      font-weight: 400;
-    }
-    .process-table .col-move {
-      width: 58px;
-      text-align: center;
-      padding: 6px 2px;
-      white-space: nowrap;
-    }
-    .process-row-drag-handle {
-      display: block;
-      margin: 0 auto 3px;
-      color: var(--muted);
-      font-size: 0.72rem;
-      line-height: 1;
-      letter-spacing: -0.08em;
-      cursor: grab;
-      user-select: none;
-      touch-action: none;
-    }
-    .process-row-drag-handle:hover {
-      color: var(--accent-hover);
-    }
-    .process-row-drag-handle:active {
-      cursor: grabbing;
-    }
-    tr.process-row-dragging {
-      opacity: 0.45;
-    }
-    tr.process-row-drag-over-before td {
-      box-shadow: inset 0 2px 0 var(--accent-hover);
+        var isFeedback = mainViewMode === 'feedback';
+        var isScoring = mainViewMode === 'scoring';
+        var isShare = mainViewMode === 'share';
+        var isSafety = mainViewMode === 'safety';
+        var isDiary = mainViewMode === 'diary';
+        document.body.classList.toggle('main-view-process', isProcess);
+        document.body.classList.toggle('main-view-feedback', isFeedback);
+        document.body.classList.toggle('main-view-scoring', isScoring);
+        document.body.classList.toggle('main-view-share', isShare);
+        document.body.classList.toggle('main-view-safety', isSafety);
+        if (el.processCard) {
+          el.processCard.classList.toggle('visible', isProcess);
+        }
+
+[6 lines collapsed]
+
+        if (el.shareCard) {
+          el.shareCard.classList.toggle('visible', isShare);
+        }
+        if (el.safetyCard) {
+          el.safetyCard.classList.toggle('visible', isSafety);
+        }
+        if (el.ganttTabBtn) {
+          el.ganttTabBtn.classList.toggle('active', isProcess);
+          el.ganttTabBtn.setAttribute('aria-pressed', isProcess ? 'true' : 'false');
+
+[10 lines collapsed]
+
+          el.shareTabBtn.classList.toggle('active', isShare);
+          el.shareTabBtn.setAttribute('aria-pressed', isShare ? 'true' : 'false');
+        }
+        if (el.safetyTabBtn) {
+          el.safetyTabBtn.classList.toggle('active', isSafety);
+          el.safetyTabBtn.setAttribute('aria-pressed', isSafety ? 'true' : 'false');
+        }
+        if (el.diaryTabBtn) {
+          el.diaryTabBtn.classList.toggle('active', isDiary);
+          el.diaryTabBtn.setAttribute('aria-pressed', isDiary ? 'true' : 'false');
+        }
+        if (!isShare) closeShareWorkModal();
+        if (!isSafety) safetyState.editingId = '';
+        if (isDiary) {
+          if (el.taskCard && el.taskCard.style.display !== 'none') {
+            if (el.taskDiaryRow) el.taskDiaryRow.style.display = 'flex';
+
+[30 lines collapsed]
+
+            });
+        } else if (isShare) {
+          loadShareWorks();
+        } else if (isSafety) {
+          loadSafetyCases();
+        }
+        updateProcessSavedPanelVisibility();
+        updateNameHint();
+
+[377 lines collapsed]
+
+          el.nameHint.textContent = adminUnlocked
+            ? '관리자 권한으로 작품 공유회의 모든 작품과 댓글을 수정·삭제할 수 있습니다.'
+            : '작품 공유회는 모든 사용자가 함께 봅니다. 본인이 등록한 작품·댓글만 수정·삭제할 수 있습니다.';
+        } else if (mainViewMode === 'safety') {
+          el.nameHint.textContent = adminUnlocked
+            ? '관리자 권한으로 안전사고 사례를 작성·수정·삭제할 수 있습니다.'
+            : '안전사고 사례는 모두 볼 수 있습니다. 작성은 관리자만 할 수 있습니다.';
+        } else if (adminUnlocked && (!currentUser || isAdminAccountName(currentUser))) {
+          el.nameHint.textContent = '왼쪽에서 사용자를 선택하면 그 데이터를 보고 수정·삭제할 수 있습니다.';
+        } else if (adminUnlocked) {
+
+[1832 lines collapsed]
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && shareState.openWorkId) closeShareWorkModal();
+      });
+      if (el.safetyTabBtn) {
+        el.safetyTabBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          showSafetyView();
+        });
+      }
+      if (el.safetyCreateBtn) {
+        el.safetyCreateBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          createSafetyCaseUi();
+        });
+      }
+      if (el.coverTabBtn) {
+        el.coverTabBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+
+[317 lines collapsed]
