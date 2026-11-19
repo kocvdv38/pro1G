@@ -5232,14 +5232,16 @@
   function mapShareWork(row) {
     var comments = [];
     if (row && Array.isArray(row.comments)) comments = row.comments.map(mapShareComment);
+    var id = row && row.id;
     return {
-      id: row && row.id,
+      id: id,
       title: String(row && row.title || '').trim(),
       drawingLink: String((row && (row.drawing_link || row.drawingLink)) || '').trim(),
       createdBy: String((row && (row.created_by || row.createdBy)) || '').trim(),
       comments: comments,
-      createdAt: String(row && row.created_at || ''),
-      updatedAt: String(row && row.updated_at || '')
+      createdAt: String((row && (row.created_at || row.createdAt)) || ''),
+      updatedAt: String((row && (row.updated_at || row.updatedAt)) || ''),
+      localOnly: !!(row && (row.localOnly || String(id || '').indexOf('local-') === 0))
     };
   }
 
@@ -5255,21 +5257,190 @@
   var SAFETY_SHARE_LINK = 'internal:safety-case';
 
   function isSafetyShareRow(row) {
-    return String(row && row.drawing_link || '') === SAFETY_SHARE_LINK;
+    return String(row && (row.drawing_link || row.drawingLink) || '') === SAFETY_SHARE_LINK;
   }
 
-  async function getShareWorks() {
+  var SHARE_LOCAL_KEY = 'proDiary_shareLocal_v1';
+  var SHARE_CACHE_KEY = 'proDiary_shareCache_v1';
+  var shareRemoteDown = false;
+
+  function isNetworkDbError(err) {
+    var msg = String(err && (err.message || err) || '');
+    return /failed to fetch|networkerror|network request failed|load failed|fetcherror|failed to send|err_name_not_resolved|could not resolve/i.test(msg);
+  }
+
+  function isLocalShareId(id) {
+    return String(id || '').indexOf('local-') === 0;
+  }
+
+  function newLocalShareId() {
+    return 'local-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+
+  function readShareCache() {
+    try {
+      if (!global.localStorage) return [];
+      var raw = global.localStorage.getItem(SHARE_CACHE_KEY);
+      var list = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(list)) return [];
+      return list.map(function (row) {
+        var work = mapShareWork(row);
+        work.localOnly = false;
+        return work;
+      }).filter(function (work) {
+        return work && work.id && !isLocalShareId(work.id) && !isSafetyShareRow(work);
+      });
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function writeShareCache(list) {
+    try {
+      if (!global.localStorage) return;
+      global.localStorage.setItem(SHARE_CACHE_KEY, JSON.stringify((list || []).filter(function (work) {
+        return work && work.id && !work.localOnly;
+      }).map(function (work) {
+        return {
+          id: work.id,
+          title: work.title,
+          drawingLink: work.drawingLink,
+          createdBy: work.createdBy,
+          comments: work.comments || [],
+          createdAt: work.createdAt,
+          updatedAt: work.updatedAt
+        };
+      })));
+    } catch (e) { /* ignore */ }
+  }
+
+  function readLocalShareWorks() {
+    try {
+      if (!global.localStorage) return [];
+      var raw = global.localStorage.getItem(SHARE_LOCAL_KEY);
+      var list = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(list)) return [];
+      return list.map(mapShareWork).filter(function (work) {
+        return work && work.id && !isSafetyShareRow(work);
+      });
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function writeLocalShareWorks(list) {
+    try {
+      if (!global.localStorage) return;
+      global.localStorage.setItem(SHARE_LOCAL_KEY, JSON.stringify((list || []).map(function (work) {
+        return {
+          id: work.id,
+          title: work.title,
+          drawingLink: work.drawingLink,
+          createdBy: work.createdBy,
+          comments: work.comments || [],
+          createdAt: work.createdAt,
+          updatedAt: work.updatedAt,
+          localOnly: true
+        };
+      })));
+    } catch (e) { /* 저장 공간이 가득 찬 경우 */ }
+  }
+
+  function rememberLocalShareWork(work) {
+    var list = readLocalShareWorks().filter(function (item) {
+      return item.id !== work.id;
+    });
+    list.unshift(work);
+    writeLocalShareWorks(list);
+    return work;
+  }
+
+  function replaceLocalShareWork(workId, next) {
+    var list = readLocalShareWorks();
+    var idx = -1;
+    var i;
+    for (i = 0; i < list.length; i++) {
+      if (list[i].id === workId) { idx = i; break; }
+    }
+    if (idx < 0) return null;
+    if (!next) list.splice(idx, 1);
+    else list[idx] = next;
+    writeLocalShareWorks(list);
+    return next;
+  }
+
+  async function fetchShareWorksFromServer() {
     var db = requireConfig();
     var res = await db.from('share_works')
       .select('id, title, drawing_link, created_by, comments, created_at, updated_at')
       .order('created_at', { ascending: false });
     if (res.error) {
       if (isMissingRelationError(res.error)) throw shareSetupError();
-      throw new Error(res.error.message);
+      throw new Error(res.error.message || '작품 목록을 불러오지 못했습니다.');
     }
     return (res.data || []).filter(function (row) {
       return !isSafetyShareRow(row);
     }).map(mapShareWork);
+  }
+
+  async function insertShareWorkRow(actorName, title, drawingLink, comments, createdAt) {
+    var db = requireConfig();
+    var payload = {
+      title: title,
+      drawing_link: drawingLink,
+      created_by: actorName,
+      comments: Array.isArray(comments) ? comments : []
+    };
+    if (createdAt) payload.created_at = createdAt;
+    var ins = await db.from('share_works').insert(payload)
+      .select('id, title, drawing_link, created_by, comments, created_at, updated_at')
+      .single();
+    if (ins.error) {
+      if (isMissingRelationError(ins.error)) throw shareSetupError();
+      throw new Error(ins.error.message || '작품 등록에 실패했습니다.');
+    }
+    return mapShareWork(ins.data);
+  }
+
+  async function flushLocalShareWorks() {
+    var pending = readLocalShareWorks();
+    if (!pending.length) return;
+    var i;
+    for (i = 0; i < pending.length; i++) {
+      var item = pending[i];
+      try {
+        await insertShareWorkRow(item.createdBy, item.title, item.drawingLink, item.comments, item.createdAt);
+        writeLocalShareWorks(pending.slice(i + 1));
+      } catch (e) {
+        writeLocalShareWorks(pending.slice(i));
+        throw e;
+      }
+    }
+  }
+
+  async function getShareWorks() {
+    try {
+      try {
+        await flushLocalShareWorks();
+      } catch (flushErr) {
+        if (!isNetworkDbError(flushErr)) throw flushErr;
+      }
+      var list = await fetchShareWorksFromServer();
+      writeShareCache(list);
+      shareRemoteDown = false;
+      return readLocalShareWorks().concat(list);
+    } catch (e) {
+      if (isNetworkDbError(e)) {
+        shareRemoteDown = true;
+        var local = readLocalShareWorks();
+        var seen = {};
+        local.forEach(function (work) { seen[work.id] = true; });
+        return local.concat(readShareCache().filter(function (work) {
+          return !seen[work.id];
+        }));
+      }
+      throw e;
+    }
   }
 
   async function addShareWork(actorName, title, drawingLink) {
@@ -5281,18 +5452,28 @@
     if (isSafetyShareRow({ drawing_link: drawingLink })) {
       throw new Error('이 링크는 작품 공유회에 사용할 수 없습니다.');
     }
-    var db = requireConfig();
-    var ins = await db.from('share_works').insert({
-      title: title,
-      drawing_link: drawingLink,
-      created_by: actorName,
-      comments: []
-    }).select('id, title, drawing_link, created_by, comments, created_at, updated_at').single();
-    if (ins.error) {
-      if (isMissingRelationError(ins.error)) throw shareSetupError();
-      throw new Error(ins.error.message);
+    try {
+      var saved = await insertShareWorkRow(actorName, title, drawingLink, []);
+      shareRemoteDown = false;
+      return saved;
+    } catch (e) {
+      if (!isNetworkDbError(e)) throw e;
+      shareRemoteDown = true;
+      var now = new Date().toISOString();
+      var work = mapShareWork({
+        id: newLocalShareId(),
+        title: title,
+        drawing_link: drawingLink,
+        created_by: actorName,
+        comments: [],
+        created_at: now,
+        updated_at: now,
+        localOnly: true
+      });
+      work.savedLocally = true;
+      rememberLocalShareWork(work);
+      return work;
     }
-    return mapShareWork(ins.data);
   }
 
   async function updateShareWork(actorName, workId, title, drawingLink, isAdmin) {
@@ -5303,6 +5484,28 @@
     if (!actorName) throw new Error('로그인 후 수정할 수 있습니다.');
     if (!workId) throw new Error('수정할 작품을 찾을 수 없습니다.');
     if (!title) throw new Error('작품명을 입력해주세요.');
+    if (isSafetyShareRow({ drawing_link: drawingLink })) {
+      throw new Error('이 링크는 작품 공유회에 사용할 수 없습니다.');
+    }
+    if (isLocalShareId(workId)) {
+      var localWorks = readLocalShareWorks();
+      var localFound = null;
+      var li;
+      for (li = 0; li < localWorks.length; li++) {
+        if (localWorks[li].id === workId) { localFound = localWorks[li]; break; }
+      }
+      if (!localFound) throw new Error('작품을 찾을 수 없습니다.');
+      if (!canManageShareItem(actorName, localFound.createdBy, isAdmin)) {
+        throw new Error('처음 등록한 사람과 관리자만 수정할 수 있습니다.');
+      }
+      localFound.title = title;
+      localFound.drawingLink = drawingLink;
+      localFound.updatedAt = new Date().toISOString();
+      localFound.localOnly = true;
+      replaceLocalShareWork(workId, localFound);
+      localFound.savedLocally = true;
+      return localFound;
+    }
     var db = requireConfig();
     var found = await db.from('share_works').select('id, created_by, drawing_link').eq('id', workId).maybeSingle();
     if (found.error) throw new Error(found.error.message);
@@ -5325,6 +5528,20 @@
     workId = String(workId || '').trim();
     if (!actorName) throw new Error('로그인 후 삭제할 수 있습니다.');
     if (!workId) throw new Error('삭제할 작품을 찾을 수 없습니다.');
+    if (isLocalShareId(workId)) {
+      var localWorks = readLocalShareWorks();
+      var localFound = null;
+      var li;
+      for (li = 0; li < localWorks.length; li++) {
+        if (localWorks[li].id === workId) { localFound = localWorks[li]; break; }
+      }
+      if (!localFound) throw new Error('작품을 찾을 수 없습니다.');
+      if (!canManageShareItem(actorName, localFound.createdBy, isAdmin)) {
+        throw new Error('처음 등록한 사람과 관리자만 삭제할 수 있습니다.');
+      }
+      replaceLocalShareWork(workId, null);
+      return getShareWorks();
+    }
     var db = requireConfig();
     var found = await db.from('share_works').select('id, created_by, drawing_link').eq('id', workId).maybeSingle();
     if (found.error) throw new Error(found.error.message);
@@ -5344,6 +5561,27 @@
     if (!actorName) throw new Error('로그인 후 댓글을 작성할 수 있습니다.');
     if (!workId) throw new Error('작품을 찾을 수 없습니다.');
     if (!body) throw new Error('댓글 내용을 입력해주세요.');
+    if (isLocalShareId(workId)) {
+      var localWorks = readLocalShareWorks();
+      var localFound = null;
+      var li;
+      for (li = 0; li < localWorks.length; li++) {
+        if (localWorks[li].id === workId) { localFound = localWorks[li]; break; }
+      }
+      if (!localFound) throw new Error('작품을 찾을 수 없습니다.');
+      var now = new Date().toISOString();
+      localFound.comments = (localFound.comments || []).concat([{
+        id: newShareCommentId(),
+        author: actorName,
+        body: body,
+        createdAt: now,
+        updatedAt: now
+      }]);
+      localFound.updatedAt = now;
+      replaceLocalShareWork(workId, localFound);
+      localFound.savedLocally = true;
+      return localFound;
+    }
     var db = requireConfig();
     var found = await db.from('share_works').select('id, drawing_link, comments').eq('id', workId).maybeSingle();
     if (found.error) throw new Error(found.error.message);
@@ -5372,6 +5610,31 @@
     body = String(body || '').trim();
     if (!actorName) throw new Error('로그인 후 수정할 수 있습니다.');
     if (!body) throw new Error('댓글 내용을 입력해주세요.');
+    if (isLocalShareId(workId)) {
+      var localWorks = readLocalShareWorks();
+      var localFound = null;
+      var li;
+      for (li = 0; li < localWorks.length; li++) {
+        if (localWorks[li].id === workId) { localFound = localWorks[li]; break; }
+      }
+      if (!localFound) throw new Error('작품을 찾을 수 없습니다.');
+      var comments = localFound.comments || [];
+      var idx = -1;
+      for (li = 0; li < comments.length; li++) {
+        if (comments[li].id === commentId) { idx = li; break; }
+      }
+      if (idx < 0) throw new Error('댓글을 찾을 수 없습니다.');
+      if (!canManageShareItem(actorName, comments[idx].author, isAdmin)) {
+        throw new Error('작성자와 관리자만 댓글을 수정할 수 있습니다.');
+      }
+      comments[idx].body = body;
+      comments[idx].updatedAt = new Date().toISOString();
+      localFound.comments = comments;
+      localFound.updatedAt = comments[idx].updatedAt;
+      replaceLocalShareWork(workId, localFound);
+      localFound.savedLocally = true;
+      return localFound;
+    }
     var db = requireConfig();
     var found = await db.from('share_works').select('id, drawing_link, comments').eq('id', workId).maybeSingle();
     if (found.error) throw new Error(found.error.message);
@@ -5401,6 +5664,28 @@
     workId = String(workId || '').trim();
     commentId = String(commentId || '').trim();
     if (!actorName) throw new Error('로그인 후 삭제할 수 있습니다.');
+    if (isLocalShareId(workId)) {
+      var localWorks = readLocalShareWorks();
+      var localFound = null;
+      var li;
+      for (li = 0; li < localWorks.length; li++) {
+        if (localWorks[li].id === workId) { localFound = localWorks[li]; break; }
+      }
+      if (!localFound) throw new Error('작품을 찾을 수 없습니다.');
+      var target = null;
+      localFound.comments = (localFound.comments || []).filter(function (c) {
+        if (c.id === commentId) { target = c; return false; }
+        return true;
+      });
+      if (!target) throw new Error('댓글을 찾을 수 없습니다.');
+      if (!canManageShareItem(actorName, target.author, isAdmin)) {
+        throw new Error('작성자와 관리자만 댓글을 삭제할 수 있습니다.');
+      }
+      localFound.updatedAt = new Date().toISOString();
+      replaceLocalShareWork(workId, localFound);
+      localFound.savedLocally = true;
+      return localFound;
+    }
     var db = requireConfig();
     var found = await db.from('share_works').select('id, drawing_link, comments').eq('id', workId).maybeSingle();
     if (found.error) throw new Error(found.error.message);
@@ -5723,6 +6008,7 @@
     deleteScoreSheet: deleteScoreSheet,
     getShareWorks: getShareWorks,
     addShareWork: addShareWork,
+    isShareRemoteDown: function () { return shareRemoteDown; },
     updateShareWork: updateShareWork,
     deleteShareWork: deleteShareWork,
     addShareComment: addShareComment,
@@ -5836,7 +6122,7 @@
       var processSavedListOpen = false;
       var feedbackSavedListOpen = false;
       var scoreSavedListOpen = false;
-      var shareState = { works: [], editingWorkId: '', editingCommentKey: '', openWorkId: '', setupError: '' };
+      var shareState = { works: [], editingWorkId: '', editingCommentKey: '', openWorkId: '', setupError: '', offline: false };
       var safetyState = { cases: [], editingId: '', openId: '', setupError: '' };
       var PROCESS_CATEGORIES = [
         '재단', 'CAD', 'CAM', '3D 프린터', 'CNC', '밀링', '선반', '일반가공', '도색', '조립'
@@ -11401,14 +11687,31 @@
         if (el.shareAdminPill) el.shareAdminPill.classList.toggle('show', isShareAdmin());
       }
 
+      function showShareOffline(on) {
+        shareState.offline = !!on;
+        if (!el.shareSetupHint) return;
+        if (!on) {
+          if (el.shareSetupHint.getAttribute('data-offline') === '1') {
+            el.shareSetupHint.classList.remove('show');
+            el.shareSetupHint.textContent = '';
+            el.shareSetupHint.removeAttribute('data-offline');
+          }
+          return;
+        }
+        el.shareSetupHint.setAttribute('data-offline', '1');
+        el.shareSetupHint.textContent = '서버에 연결하지 못했습니다. 지금 등록한 작품은 이 브라우저에만 저장되고, 다른 사람은 볼 수 없습니다. Supabase 대시보드에서 프로젝트를 재시작한 뒤 이 화면을 다시 열면 서버로 올리기를 시도합니다.';
+        el.shareSetupHint.classList.add('show');
+      }
+
       function showShareSetup(on) {
         if (!el.shareSetupHint) return;
         if (!on) {
+          if (el.shareSetupHint.getAttribute('data-offline') === '1') return;
           el.shareSetupHint.classList.remove('show');
           el.shareSetupHint.innerHTML = '';
-          shareState.setupError = '';
           return;
         }
+        el.shareSetupHint.removeAttribute('data-offline');
         var sql = '';
         try {
           sql = window.ProDiaryApi && window.ProDiaryApi.shareSetupSql
@@ -11439,20 +11742,38 @@
           .then(function (list) {
             shareState.works = list || [];
             shareState.setupError = '';
+            var offline = !!(window.ProDiaryApi.isShareRemoteDown && window.ProDiaryApi.isShareRemoteDown());
             showShareSetup(false);
+            showShareOffline(offline);
             renderShareList();
           })
           .catch(function (e) {
-            shareState.works = [];
+            shareState.works = readLocalShareWorksForUi();
             shareState.setupError = e && e.message ? e.message : String(e);
             if (/테이블 생성 SQL|share_works|relation/i.test(shareState.setupError)) {
+              showShareOffline(false);
               showShareSetup(true);
+            } else if (/failed to fetch|서버에 연결|network/i.test(shareState.setupError)) {
+              showShareSetup(false);
+              showShareOffline(true);
+              shareState.setupError = '';
             } else {
+              showShareOffline(false);
               showShareSetup(false);
               showError(shareState.setupError);
             }
             renderShareList();
           });
+      }
+
+      function readLocalShareWorksForUi() {
+        try {
+          var raw = localStorage.getItem('proDiary_shareLocal_v1');
+          var list = raw ? JSON.parse(raw) : [];
+          return Array.isArray(list) ? list : [];
+        } catch (e) {
+          return [];
+        }
       }
 
       function renderShareList() {
@@ -11462,9 +11783,13 @@
         if (!shareState.works.length) {
           var empty = document.createElement('p');
           empty.className = 'share-empty';
-          empty.textContent = shareState.setupError
-            ? '작품을 불러오지 못했습니다. 위 SQL을 실행한 뒤 다시 열어주세요.'
-            : '아직 등록된 작품이 없습니다. 위에서 작품명과 도면 링크를 등록하세요.';
+          if (shareState.offline) {
+            empty.textContent = '서버에 연결하지 못했습니다. 위에서 등록하면 이 브라우저에만 임시로 저장됩니다.';
+          } else if (shareState.setupError) {
+            empty.textContent = '작품을 불러오지 못했습니다. 위 SQL을 실행한 뒤 다시 열어주세요.';
+          } else {
+            empty.textContent = '아직 등록된 작품이 없습니다. 위에서 작품명과 도면 링크를 등록하세요.';
+          }
           el.shareList.appendChild(empty);
           return;
         }
@@ -11520,7 +11845,8 @@
         if (el.shareWorkModalMeta) {
           el.shareWorkModalMeta.textContent = (work.createdBy || '알 수 없음') +
             (work.createdAt ? ' · ' + formatShareDate(work.createdAt) : '') +
-            ' 등록';
+            ' 등록' +
+            (work.localOnly ? ' · 이 브라우저에만 저장' : '');
         }
         el.shareWorkModalBody.innerHTML = '';
 
@@ -11647,7 +11973,8 @@
         meta.className = 'share-work-meta';
         meta.textContent = (work.createdBy || '알 수 없음') +
           (work.createdAt ? ' · ' + formatShareDate(work.createdAt) : '') +
-          ' 등록';
+          ' 등록' +
+          (work.localOnly ? ' · 이 브라우저에만 저장' : '');
         main.appendChild(titleEl);
         main.appendChild(meta);
 
@@ -11759,14 +12086,25 @@
             if (el.shareTitleInput) el.shareTitleInput.value = '';
             if (el.shareLinkInput) el.shareLinkInput.value = '';
             upsertShareWorkInState(work);
+            if (work && work.savedLocally) showShareOffline(true);
+            else showShareOffline(false);
             renderShareList();
-            showError('작품이 등록되었습니다.');
-            el.errorBox.style.background = 'rgba(34, 197, 94, 0.15)';
-            el.errorBox.style.color = '#86efac';
+            if (work && work.savedLocally) {
+              el.errorBox.style.background = '';
+              el.errorBox.style.color = '';
+              showError('이 브라우저에만 등록했습니다. 서버에 연결되지 않아 다른 사람은 아직 볼 수 없습니다.');
+            } else {
+              showError('작품이 등록되었습니다.');
+              el.errorBox.style.background = 'rgba(34, 197, 94, 0.15)';
+              el.errorBox.style.color = '#86efac';
+            }
           })
           .catch(function (e) {
             var msg = e && e.message ? e.message : String(e);
             if (/테이블 생성 SQL/.test(msg)) showShareSetup(true);
+            if (/failed to fetch|network/i.test(msg)) {
+              msg = '서버에 연결하지 못해 등록하지 못했습니다. Supabase 프로젝트를 재시작한 뒤 다시 등록해주세요.';
+            }
             showError(msg);
           });
       }
@@ -12717,7 +13055,11 @@
           Promise.resolve(window.ProDiaryApi[fn].apply(null, args || []))
             .then(resolve)
             .catch(function (e) {
-              reject(new Error(e && e.message ? e.message : String(e)));
+              var msg = e && e.message ? e.message : String(e);
+              if (/failed to fetch|networkerror|load failed|fetcherror/i.test(msg)) {
+                msg = '서버에 연결하지 못했습니다. Supabase 프로젝트가 꺼져 있거나 주소를 찾지 못합니다.';
+              }
+              reject(new Error(msg));
             });
         });
       }
